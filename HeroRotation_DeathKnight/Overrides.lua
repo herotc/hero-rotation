@@ -64,6 +64,12 @@ HL.AddCoreOverride("Player.BonestormTicking",
   end
 , 250)
 
+HL.AddCoreOverride("Player.DRWBPTicking",
+  function (self)
+    return Player:BuffUp(SpellBlood.DancingRuneWeaponBuff) and SpellBlood.BloodBoil:TimeSinceLastCast() < SpellBlood.DancingRuneWeapon:TimeSinceLastCast()
+  end
+, 250)
+
 -- Frost, ID: 251
 local OldFrostIsCastable
 OldFrostIsCastable = HL.AddCoreOverride("Spell.IsCastable",

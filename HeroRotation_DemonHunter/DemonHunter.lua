@@ -27,8 +27,6 @@ Spell.DemonHunter.Commons = {
   ArcaneTorrent                         = Spell(50613),
   -- Abilities
   Glide                                 = Spell(131347),
-  ImmolationAura                        = Spell(258920),
-  ImmolationAuraBuff                    = Spell(258920),
   -- Talents
   AuraofPain                            = Spell(207347),
   ChaosNova                             = Spell(179057),
@@ -52,6 +50,10 @@ Spell.DemonHunter.Commons = {
   SigilofSilence                        = MultiSpell(202137, 389809),
   -- Utility
   Disrupt                               = Spell(183752),
+  -- Buffs
+  ExplosiveAdrenalineBuff               = Spell(1218713), -- Improvised Seaforium Pacemaker buff
+  InnerResilienceBuff                   = Spell(450706),  -- Tome of Light's Devotion buff
+  JunkmaestrosBuff                      = Spell(1219661), -- Junkmaestro's Mega Magnet buff
   -- Debuffs
   SigilofFlameDebuff                    = Spell(204598),
   SigilofMiseryDebuff                   = Spell(207685),
@@ -69,7 +71,8 @@ Spell.DemonHunter.AldrachiReaver = {
   ArtoftheGlaiveBuff                    = Spell(444661),
   GlaiveFlurryBuff                      = Spell(442435),
   ThrilloftheFightAtkBuff               = Spell(442695),
-  ThrilloftheFightDmgBuff               = Spell(442688),
+  ThrilloftheFightHavocDmgBuff          = Spell(442688),
+  ThrilloftheFightVengDmgBuff           = Spell(1227062),
   WarbladesHungerBuff                   = Spell(442503),
   -- Debuffs
   ReaversMarkDebuff                     = Spell(442624),
@@ -81,6 +84,7 @@ Spell.DemonHunter.FelScarred = {
   AbyssalGaze                           = Spell(452497),
   ConsumingFire                         = Spell(452487),
   FelDesolation                         = Spell(452486),
+  Flamebound                            = Spell(452413),
   SigilofDoom                           = Spell(452490),
   SoulSunder                            = Spell(452436),
   SpiritBurst                           = Spell(452437),
@@ -103,6 +107,7 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   DeathSweep                            = Spell(210152),
   DemonsBite                            = Spell(162243),
   FelRush                               = Spell(195072),
+  ImmolationAura                        = MultiSpell(258920, 427917), -- 2nd ID is only used with A Fire Inside when one buff is already active.
   Metamorphosis                         = Spell(191427),
   ThrowGlaive                           = Spell(185123),
   -- Talents
@@ -126,9 +131,11 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   Initiative                            = Spell(388108),
   InnerDemon                            = Spell(389693),
   IsolatedPrey                          = Spell(388113),
+  LooksCanKill                          = Spell(320415),
   Momentum                              = Spell(206476),
   Ragefire                              = Spell(388107),
   RestlessHunter                        = Spell(390142),
+  ScreamingBrutality                    = Spell(1220506),
   SerratedGlaive                        = Spell(390154),
   ShatteredDestiny                      = Spell(388116),
   Soulrend                              = Spell(388106),
@@ -138,15 +145,25 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   UnboundChaos                          = Spell(347461),
   -- Buffs
   ChaosTheoryBuff                       = Spell(390195),
+  CycleofHatredBuff                     = Spell(1214887),
+  ExergyBuff                            = Spell(208628),
   FelBarrageBuff                        = Spell(258925),
   FuriousGazeBuff                       = Spell(343312),
+  ImmolationAuraBuff                    = Spell(999999), -- Dummy, handled in Overrides
+  ImmolationAuraBuff1                   = Spell(258920),
+  ImmolationAuraBuff2                   = Spell(427912),
+  ImmolationAuraBuff3                   = Spell(427913),
+  ImmolationAuraBuff4                   = Spell(427914),
+  ImmolationAuraBuff5                   = Spell(427915),
   InertiaBuff                           = Spell(427641),
   InitiativeBuff                        = Spell(391215),
   InnerDemonBuff                        = Spell(390145),
   MetamorphosisBuff                     = Spell(162264),
   MomentumBuff                          = Spell(208628),
+  NecessarySacrificeBuff                = Spell(1217055), -- TWW S2 4pc Buff
   TacticalRetreatBuff                   = Spell(389890),
   UnboundChaosBuff                      = Spell(347462),
+  WinningStreakBuff                     = Spell(1220706), -- TWW S2 2pc Buff
   -- Debuffs
   BurningWoundDebuff                    = Spell(391191),
   EssenceBreakDebuff                    = Spell(320338),
@@ -157,6 +174,7 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Havoc, Spell.DemonHu
 
 Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   -- Abilities
+  ImmolationAura                        = Spell(258920),
   InfernalStrike                        = Spell(189110),
   Shear                                 = Spell(203782),
   SoulCleave                            = Spell(228477),
@@ -183,6 +201,7 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Commons, {
   Metamorphosis                         = Spell(187827),
   -- Buffs
   DemonSpikesBuff                       = Spell(203819),
+  ImmolationAuraBuff                    = Spell(258920),
   MetamorphosisBuff                     = Spell(187827),
   SoulFurnaceBuff                       = Spell(391166),
   SoulFurnaceDmgBuff                    = Spell(391172),
@@ -196,9 +215,21 @@ Spell.DemonHunter.Vengeance = MergeTableByKey(Spell.DemonHunter.Vengeance, Spell
 if not Item.DemonHunter then Item.DemonHunter = {} end
 Item.DemonHunter.Commons = {
   -- TWW Trinkets
+  Blastmaster3000                       = Item(234717, {13, 14}),
+  GeargrindersSpareKeys                 = Item(230197, {13, 14}),
+  HouseofCards                          = Item(230027, {13, 14}),
+  ImprovisedSeaforiumPacemaker          = Item(232541, {13, 14}),
+  JunkmaestrosMegaMagnet                = Item(230189, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
-  SkardynsGrace                         = Item(133282, {13, 14}),
+  MisterLockNStalk                      = Item(230193, {13, 14}),
+  RatfangToxin                          = Item(235359, {13, 14}),
+  RavenousHoneyBuzzer                   = Item(219298, {13, 14}),
+  SignetofthePriory                     = Item(219308, {13, 14}),
+  TomeofLightsDevotion                  = Item(219309, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
+  -- TWW S2 Old Trinkets
+  GrimCodex                             = Item(178811, {13, 14}),
+  SkardynsGrace                         = Item(133282, {13, 14}),
 }
 
 Item.DemonHunter.Vengeance = MergeTableByKey(Item.DemonHunter.Commons, {

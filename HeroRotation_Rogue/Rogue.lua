@@ -83,6 +83,7 @@ Spell.Rogue.Commons = {
   DeeperStratagem         = Spell(193531),
   DeathStalkersMark       = Spell(457052),
   DeathStalkersMarkDebuff = Spell(457129),
+  DisorientingStrikes     = Spell(441274),
   DoubleJeopardy          = Spell(454430),
   EchoingReprimand        = Spell(385616),
   EchoingReprimand2       = Spell(323558),
@@ -102,25 +103,28 @@ Spell.Rogue.Commons = {
   FlawlessForm            = Spell(441321),
   FlawlessFormBuff        = Spell(441326),
   FollowTheBlood          = Spell(457068),
+  ForcedInduction         = Spell(470668),
   HandOfFate              = Spell(452536),
   ImprovedAmbush          = Spell(381620),
   FateboundInevitability  = Spell(454434),
+  InevitabileEnd          = Spell(454434),
   Inevitability           = Spell(382512),
   LingeringDarkness       = Spell(457056),
   LingeringDarknessBuff   = Spell(457273),
   MarkedforDeath          = Spell(137619),
+  MeanStreak              = Spell(453428),
   MomentumOfDespair       = Spell(457067),
   Nightstalker            = Spell(14062),
+  NimbleFlurry            = Spell(441367),
   ResoundingClarity       = Spell(381622),
   Reverberation           = Spell(394332),
   SealFate                = Spell(14190),
-  Sepsis                  = Spell(385408),
-  SepsisBuff              = Spell(375939),
   ShadowDance             = Spell(185313), -- Base Spell
   ShadowDanceTalent       = Spell(394930),
   ShadowDanceBuff         = Spell(185422),
   Subterfuge              = Spell(108208),
   SubterfugeBuff          = Spell(115192),
+  SurprisingStrikes       = Spell(441273),
   ThistleTea              = Spell(381623),
   TricksterDistract       = Spell(441587),
   UnseenBlade             = Spell(441146),
@@ -134,6 +138,7 @@ Spell.Rogue.Commons = {
   VanishBuff2             = Spell(115193),
   WithoutATrace           = Spell(382513),
   -- Trinkets
+  JunkmaestrosBuff        = Spell(1219661), -- Junkmaestro's Mega Magnet buff
   -- Misc
   PoolEnergy              = Spell(999910),
 }
@@ -162,6 +167,7 @@ Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   -- Talents
   ArterialPrecision       = Spell(400783),
   AtrophicPoisonDebuff    = Spell(392388),
+  Blindside               = Spell(236274),
   BlindsideBuff           = Spell(121153),
   CausticSpatter          = Spell(421975),
   CausticSpatterDebuff    = Spell(421976),
@@ -195,6 +201,7 @@ Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   ThrownPrecision         = Spell(381629),
   VenomRush               = Spell(152152),
   ViciousVenoms           = Spell(381634),
+  ZoldyckRecipe           = Spell(381798)
   -- PvP
 })
 
@@ -236,6 +243,7 @@ Spell.Rogue.Outlaw = MergeTableByKey(Spell.Rogue.Commons, {
   QuickDraw               = Spell(196938),
   Ruthlessness            = Spell(14161),
   SummarilyDispatched     = Spell(381990),
+  Supercharger            = Spell(470347),
   SwiftSlasher            = Spell(381988),
   TakeEmBySurprise        = Spell(382742),
   TakeEmBySurpriseBuff    = Spell(385907),
@@ -322,26 +330,38 @@ Item.Rogue.Assassination = {
   AlgetharPuzzleBox        = Item(193701, {13, 14}),
   AshesoftheEmbersoul      = Item(207167, {13, 14}),
   BottledFlayedwingToxin   = Item(178742, {13, 14}),
+  CursedStoneIdol          = Item(246344, {13, 14}),
   ImperfectAscendancySerum = Item(225654, {13, 14}),
+  JunkmaestrosMegaMagnet   = Item(230189, {13, 14}),
   MadQueensMandate         = Item(212454, {13, 14}),
+  PerfidiousProjector      = Item(242403, {13, 14}),
+  SignetofthePriory        = Item(219308, {13, 14}),
   TreacherousTransmitter   = Item(221023, {13, 14}),
+  UnyieldingNetherprism    = Item(242396, {13, 14}),
   WitherbarksBranch        = Item(109999, {13, 14}),
 }
 
 Item.Rogue.Outlaw = {
   -- Trinkets
   BottledFlayedwingToxin   = Item(178742, {13, 14}),
+  CursedStoneIdol          = Item(246344, {13, 14}),
   ImperfectAscendancySerum = Item(225654, {13, 14}),
+  JunkmaestrosMegaMagnet   = Item(230189, {13, 14}),
   MadQueensMandate         = Item(212454, {13, 14}),
-  ScrollOfMomentum         = Item(226539, {13, 14})
+  PerfidiousProjector      = Item(242403, {13, 14}),
+  ScrollOfMomentum         = Item(226539, {13, 14}),
+  UnyieldingNetherprism    = Item(242396, {13, 14}),
 }
 
 Item.Rogue.Subtlety = {
   -- Trinkets
   BottledFlayedwingToxin   = Item(178742, {13, 14}),
+  CursedStoneIdol          = Item(246344, {13, 14}),
   ImperfectAscendancySerum = Item(225654, {13, 14}),
   MadQueensMandate         = Item(212454, {13, 14}),
-  TreacherousTransmitter   = Item(221023, {13, 14})
+  PerfidiousProjector      = Item(242403, {13, 14}),
+  TreacherousTransmitter   = Item(221023, {13, 14}),
+  UnyieldingNetherprism    = Item(242396, {13, 14}),
 }
 
 function Commons.StealthSpell()
@@ -367,7 +387,7 @@ do
 
   function Commons.CrimsonVial()
     if CrimsonVial:IsCastable() and Player:HealthPercentage() <= Settings.Commons.CrimsonVialHP then
-      if HR.Cast(CrimsonVial, Settings.CommonsOGCD.GCDasOffGCD.CrimsonVial) then return "Cast Crimson Vial (Defensives)" end
+      if HR.Cast(CrimsonVial, nil, Settings.CommonsDS.DisplayStyle.CrimsonVial) then return "Cast Crimson Vial (Defensives)" end
     end
 
     return false
@@ -445,28 +465,21 @@ end
 -- PMultipliers
 
 do
-  -- Rupture and Nightstalker spell IDs and PMultipliers are shared between Subtlety and Assassination
+  -- Rupture spell ID and PMultiplier is shared between Subtlety and Assassination
   -- Need to register here so we don't end up registering it twice and overwriting the reference
   local AssassinationSpell = Spell.Rogue.Assassination
   local SubtletySpell = Spell.Rogue.Subtlety
 
-  local function ComputeNighstalkerPMultiplier ()
-    if AssassinationSpell.Nightstalker:IsAvailable() and Player:StealthUp(true, false, true) then
-      return 1 + (0.05 * AssassinationSpell.Nightstalker:TalentRank())
-    end
-    return 1
-  end
   local function ComputeImprovedGarrotePMultiplier ()
     if AssassinationSpell.ImprovedGarrote:IsAvailable() and (Player:BuffUp(AssassinationSpell.ImprovedGarroteAura, nil, true)
-      or Player:BuffUp(AssassinationSpell.ImprovedGarroteBuff, nil, true) or Player:BuffUp(AssassinationSpell.SepsisBuff, nil, true)) then
+      or Player:BuffUp(AssassinationSpell.ImprovedGarroteBuff, nil, true)) then
       return 1.5
     end
     return 1
   end
 
-  AssassinationSpell.Rupture:RegisterPMultiplier( ComputeNighstalkerPMultiplier, { SubtletySpell.FinalityRuptureBuff, 1.3 } )
-  AssassinationSpell.Garrote:RegisterPMultiplier( ComputeNighstalkerPMultiplier, ComputeImprovedGarrotePMultiplier )
-  AssassinationSpell.CrimsonTempest:RegisterPMultiplier( ComputeNighstalkerPMultiplier )
+  AssassinationSpell.Rupture:RegisterPMultiplier( { SubtletySpell.FinalityRuptureBuff, 1.3 } )
+  AssassinationSpell.Garrote:RegisterPMultiplier( ComputeImprovedGarrotePMultiplier )
 end
 
 --- ======= SIMC CUSTOM FUNCTION / EXPRESSION =======
@@ -475,9 +488,11 @@ do
   local DeeperStratagem = Spell(193531)
   local DeviousStratagem = Spell(394321)
   local SecretStratagem = Spell(394320)
+  local SanguineStratagem = Spell(457512)
 
   function Commons.CPMaxSpend()
     return 5 + (DeeperStratagem:IsAvailable() and 1 or 0) + (DeviousStratagem:IsAvailable() and 1 or 0) + (SecretStratagem:IsAvailable() and 1 or 0)
+      + (SanguineStratagem:IsAvailable() and 1 or 0)
   end
 end
 

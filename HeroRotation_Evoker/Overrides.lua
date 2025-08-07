@@ -10,6 +10,7 @@ local Spell   = HL.Spell
 local Item    = HL.Item
 -- HeroRotation
 local HR      = HeroRotation
+local num     = HR.Commons.Everyone.num
 -- Spells
 local SpellDeva = Spell.Evoker.Devastation
 local SpellAug  = Spell.Evoker.Augmentation
@@ -47,6 +48,16 @@ DevOldIsMoving = HL.AddCoreOverride ("Player.IsMoving",
   end
 , 1467)
 
+HL.AddCoreOverride ("Player.EmpowerCastTime",
+  function(self, stage)
+    local Haste = Player:SpellHaste()
+    local FoMEmpowerMod = (SpellAug.FontofMagic:IsAvailable()) and 0.8 or 1
+    local MaxEmpower = (SpellAug.FontofMagic:IsAvailable()) and 4 or 3
+    if not stage then stage = MaxEmpower end
+    return ((1 + 0.75 * (stage - 1)) * Haste * FoMEmpowerMod)
+  end
+, 1467)
+
 HL.AddCoreOverride ("Player.EssenceTimeToMax",
   function()
     local Deficit = Player:EssenceDeficit()
@@ -67,6 +78,18 @@ HL.AddCoreOverride ("Player.EssenceTimeToX",
     local TimeToOneEssence = 1 / Regen
     local LastUpdate = Cache.Persistent.Player.LastPowerUpdate
     return ((Amount - Essence) * TimeToOneEssence) - (GetTime() - LastUpdate)
+  end
+, 1467)
+
+HL.AddCoreOverride ("Player.EssenceBurst",
+  function()
+    return Player:BuffStack(SpellDeva.EssenceBurstBuff)
+  end
+, 1467)
+
+HL.AddCoreOverride ("Player.MaxEssenceBurst",
+  function()
+    return (SpellDeva.EssenceAttunement:IsAvailable()) and 2 or 1
   end
 , 1467)
 
@@ -108,7 +131,7 @@ AugOldIsReady = HL.AddCoreOverride ("Spell.IsReady",
     elseif self == SpellAug.EbonMight then
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellAug.Unravel then
-      return BaseCheck and Target:EnemyAbsorb()
+      return BaseCheck and Target:ActiveDamageAbsorb()
     else
       return BaseCheck
     end
@@ -159,6 +182,12 @@ HL.AddCoreOverride ("Player.EssenceP",
   end
 , 1473)
 
+HL.AddCoreOverride ("Player.EssenceDeficitP",
+  function()
+    return Player:EssenceMax() - Player:EssenceP()
+  end
+, 1473)
+
 HL.AddCoreOverride ("Player.EssenceTimeToMax",
   function()
     local Deficit = Player:EssenceDeficit()
@@ -179,5 +208,17 @@ HL.AddCoreOverride ("Player.EssenceTimeToX",
     local TimeToOneEssence = 1 / Regen
     local LastUpdate = Cache.Persistent.Player.LastPowerUpdate
     return ((Amount - Essence) * TimeToOneEssence) - (GetTime() - LastUpdate)
+  end
+, 1473)
+
+HL.AddCoreOverride ("Player.EssenceBurst",
+  function()
+    return Player:BuffStack(SpellAug.EssenceBurstBuff) - num(Player:IsCasting(SpellAug.Eruption))
+  end
+, 1473)
+
+HL.AddCoreOverride ("Player.MaxEssenceBurst",
+  function()
+    return 2
   end
 , 1473)

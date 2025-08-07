@@ -78,6 +78,7 @@ HR.GUISettings.APL.DeathKnight = {
   },
   Frost = {
     AMSAbsorbPercent = 0,
+    SkipSTDnD = false,
     PotionType = {
       Selected = "Tempered",
     },
@@ -106,8 +107,7 @@ HR.GUISettings.APL.DeathKnight = {
       ArmyOfTheDead = "SuggestedRight",
     },
     GCDasOffGCD = {
-      -- Abilities
-      AbominationLimb = false,
+      -- Abilities4
       Apocalypse = false,
       DarkTransformation = true,
       Epidemic = false,
@@ -148,6 +148,7 @@ CreateARPanelOptions(CP_Blood, "APL.DeathKnight.Blood")
 
 --Frost Panels
 CreatePanelOption("Slider", CP_Frost, "APL.DeathKnight.Frost.AMSAbsorbPercent", {0, 100, 1}, "AMS Absorb Percentage", "Set this to the average percentage of AMS's absorb shield that is actively used on any given cast of AMS. Leave at 0 if unsure.")
+CreatePanelOption("CheckButton", CP_Frost, "APL.DeathKnight.Frost.SkipSTDnD", "Skip ST Death and Decay", "Enable this setting to skip use of Death and Decay during single target scenarios.")
 CreateARPanelOptions(CP_Frost, "APL.DeathKnight.Frost")
 
 --Unholy Panels

@@ -18,6 +18,9 @@ local GetTime = GetTime
 HR.Commons.Evoker = {}
 local Evoker = HR.Commons.Evoker
 Evoker.FirestormTracker = {}
+Evoker.LastFBEmpowerLevel = 0
+Evoker.LastFBFullDuration = 0
+Evoker.LastESEmpowerLevel = 0
 
 --- ============================ CONTENT ============================
 --- ======= NON-COMBATLOG =======
@@ -52,6 +55,21 @@ HL:RegisterForCombatEvent(
   end,
   "UNIT_DIED",
   "UNIT_DESTROYED"
+)
+
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    local SpellID, _, _, EmpowerLevel = select(12, ...)
+    if SpellID == 357208 or SpellID == 382266 then
+      -- Fire Breath
+      Evoker.LastFBEmpowerLevel = EmpowerLevel
+      Evoker.LastFBFullDuration = 24 - ((EmpowerLevel - 1) * 6)
+    elseif SpellID == 359073 then
+      -- Eternity Surge
+      Evoker.LastESEmpowerLevel = EmpowerLevel
+    end
+  end,
+  "SPELL_EMPOWER_END"
 )
 
 --- ======= COMBATLOG =======

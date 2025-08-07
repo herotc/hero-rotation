@@ -33,6 +33,11 @@ Hunter.Pet.FeignGUID = 0
 Hunter.Pet.SummonSpells = { 883, 83242, 83243, 83244, 83245, 982 }
 local P = Hunter.Pet
 
+-- Pack Leader Tracking
+Hunter.PackLeader = {}
+Hunter.PackLeader.BoarChargesRemaining = 0
+
+--- ===== Pet Status Event Tracking =====
 HL:RegisterForSelfCombatEvent(
   function(...)
     local DestGUID, _, _, _, SpellID = select(8, ...)
@@ -113,6 +118,29 @@ HL:RegisterForEvent(
   , "CHALLENGE_MODE_START"
 )
 
+--- ===== Howl of the Pack Leader Event Tracking =====
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    local SpellID = select(12, ...)
+    -- "Boar Next" buff removed
+    if SpellID == 472324 then
+      Hunter.PackLeader.BoarChargesRemaining = 3
+    end
+  end
+  , "SPELL_AURA_REMOVED"
+)
+
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    local DestGUID, _, _, _, SpellID = select(8, ...)
+    -- Boar Charge
+    if SpellID == 471936 then
+      Hunter.PackLeader.BoarChargesRemaining = Hunter.PackLeader.BoarChargesRemaining - 1
+    end
+  end
+  , "SPELL_DAMAGE"
+)
+
 --- ===== Steady Focus Tracker =====
 --[[ Note: This tracker isn't used in 11.0.5, but leaving it here in case we need it in the future.
 Hunter.SteadyFocus = {}
@@ -130,7 +158,6 @@ HL:RegisterForSelfCombatEvent(
   end
   , "SPELL_CAST_SUCCESS"
 )
-]]
 
 HL:RegisterForSelfCombatEvent(
   function(...)
@@ -142,4 +169,4 @@ HL:RegisterForSelfCombatEvent(
     end
   end
   , "SPELL_AURA_APPLIED"
-)
+)]]

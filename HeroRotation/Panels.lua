@@ -91,7 +91,7 @@ do
     end
     -- Iterate over all options available
     for Type, _ in pairs(CreateARPanelOption) do
-      SettingsType = SettingsTable[Type]
+      local SettingsType = SettingsTable[Type]
       if SettingsType then
         for SettingName, _ in pairs(SettingsType) do
           -- Split the key on uppercase matches

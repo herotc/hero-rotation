@@ -73,7 +73,7 @@ BalOldSpellIsCastable = HL.AddCoreOverride ("Spell.IsCastable",
       RangeOK = RangeUnit:IsInRange( Range, AoESpell )
     end
     local BaseCheck = BalOldSpellIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-    if self == SpellBalance.MoonkinForm then
+    if self == SpellBalance.MoonkinForm or self == SpellBalance.BearForm then
       return BaseCheck and Player:BuffDown(self)
     elseif self == SpellBalance.StellarFlare then
       return BaseCheck and not Player:IsCasting(self)

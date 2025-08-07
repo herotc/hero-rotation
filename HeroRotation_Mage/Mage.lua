@@ -48,6 +48,7 @@ Spell.Mage.Commons = {
   IceNova                               = Spell(157997), --splash, 8
   MirrorImage                           = Spell(55342),
   ShiftingPower                         = Spell(382440), --Melee 15
+  Supernova                             = Spell(157980), --Splash, 8
   -- Buffs
   ArcaneIntellectBuff                   = Spell(1459),
   -- Debuffs
@@ -106,6 +107,8 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   ArcaneSurge                           = Spell(365350),
   ArcaneTempo                           = Spell(383980),
   ArcingCleave                          = Spell(231564),
+  ChargedOrb                            = Spell(384651),
+  ConsortiumsBauble                     = Spell(461260),
   Enlightened                           = Spell(321387),
   Evocation                             = Spell(12051),
   HighVoltage                           = Spell(461248),
@@ -114,8 +117,9 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   MagisSpark                            = Spell(454016),
   OrbBarrage                            = Spell(384858),
   PresenceofMind                        = Spell(205025),
+  Resonance                             = Spell(205028),
   Reverberate                           = Spell(281482),
-  Supernova                             = Spell(157980), --Splash, 8
+  TimeLoop                              = Spell(452924),
   TouchoftheMagi                        = Spell(321507), --Splash, 8
   -- Buffs
   AetherAttunementBuff                  = Spell(453601),
@@ -125,11 +129,16 @@ Spell.Mage.Arcane = MergeTableByKey(Spell.Mage.Commons, {
   ArcaneSurgeBuff                       = Spell(365362),
   ArcaneTempoBuff                       = Spell(383997),
   ClearcastingBuff                      = Spell(263725),
-  IntuitionBuff                         = Spell(455681), -- TWW S1 Tier 4pc
+  ClarityBuff                           = Spell(1216178), -- TWW S2 Tier 2pc
+  EnlightenedBuff                       = Spell(1217242),
+  IntuitionBuff                         = Spell(1223797),
   LeydrinkerBuff                        = Spell(453758),
   NetherPrecisionBuff                   = Spell(383783),
   PresenceofMindBuff                    = Spell(205025),
   SiphonStormBuff                       = Spell(384267),
+  -- Tier Set Bonuses (TWW)
+  TWW_S2_2pcBuff                        = Spell(1216178), -- Clarity (same as ClarityBuff)
+  TWW_S2_4pcBuff                        = Spell(1216181), -- Arcane Attunement
   -- Debuffs
   MagisSparkABDebuff                    = Spell(453912),
   MagisSparkABarDebuff                  = Spell(451911),
@@ -150,6 +159,7 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   CalloftheSunKing                      = Spell(343222),
   Combustion                            = Spell(190319),
   FeeltheBurn                           = Spell(383391),
+  Firefall                              = Spell(384033),
   FlameAccelerant                       = Spell(203275),
   FireBlast                             = Spell(108853),
   Firestarter                           = Spell(205026),
@@ -157,6 +167,7 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   Hyperthermia                          = Spell(383860),
   ImprovedScorch                        = Spell(383604),
   Kindling                              = Spell(155148),
+  MarkoftheFirelord                     = Spell(450325),
   Meteor                                = Spell(153561),
   PhoenixFlames                         = Spell(257541),
   PhoenixReborn                         = Spell(453123),
@@ -164,9 +175,9 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   Quickflame                            = Spell(450807),
   Scald                                 = Spell(450746),
   Scorch                                = Spell(2948),
-  SearingTouch                          = Spell(269644),
   SpontaneousCombustion                 = Spell(451875),
   SunKingsBlessing                      = Spell(383886),
+  UnleashedInferno                      = Spell(416506),
   -- Buffs
   CombustionBuff                        = Spell(190319),
   FeeltheBurnBuff                       = Spell(383395),
@@ -176,8 +187,12 @@ Spell.Mage.Fire = MergeTableByKey(Spell.Mage.Commons, {
   HeatingUpBuff                         = Spell(48107),
   HotStreakBuff                         = Spell(48108),
   HyperthermiaBuff                      = Spell(383874),
+  RollinHotBuff                         = Spell(1219035), -- TWW S2 Tier 4pc
   SunKingsBlessingBuff                  = Spell(383882),
   FuryoftheSunKingBuff                  = Spell(383883),
+  -- Tier Set Bonuses (TWW)
+  TWW_S2_2pcBuff                        = Spell(1219034), -- Lead the Chase
+  TWW_S2_4pcBuff                        = Spell(1219035), -- Rollin' Hot (same as RollinHotBuff)
   -- Debuffs
   IgniteDebuff                          = Spell(12654),
   ImprovedScorchDebuff                  = Spell(383608),
@@ -206,19 +221,26 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   IceLance                              = Spell(30455), --splash, 8 (with splitting ice)
   IcyVeins                              = Spell(12472),
   RayofFrost                            = Spell(205021),
+  SlickIce                              = Spell(382144),
   SplinteringCold                       = Spell(379049),
+  SplinteringRay                        = Spell(418733),
   -- Pet Abilities
   Freeze                                = Spell(33395), --splash, 8
   -- Buffs
   BrainFreezeBuff                       = Spell(190446),
   DeathsChillBuff                       = Spell(454371),
+  ExtendedBankrollBuff                  = Spell(1216914), -- TWW S2 Tier 4pc
   FingersofFrostBuff                    = Spell(44544),
   FreezingRainBuff                      = Spell(270232),
   FreezingWindsBuff                     = Spell(382106),
   GlacialSpikeBuff                      = Spell(199844),
   IciclesBuff                           = Spell(205473),
   IcyVeinsBuff                          = Spell(12472),
+  -- Tier Set Bonuses (TWW)
+  TWW_S2_2pcBuff                        = Spell(1216913), -- Windfall
+  TWW_S2_4pcBuff                        = Spell(1216914), -- Extended Bankroll (same as ExtendedBankrollBuff)
   -- Debuffs
+  FreezingWindsDebuff                   = Spell(1216988),
   WintersChillDebuff                    = Spell(228358),
 })
 Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Frost, Spell.Mage.Frostfire)
@@ -230,44 +252,50 @@ Item.Mage.Commons = {
   -- Trinkets kept for variables
   NymuesUnravelingSpindle               = Item(208615, {13, 14}),
   -- TWW Trinkets
+  BurstofKnowledge                      = Item(231424, {13, 14}),
+  HighSpeakersAccretion                 = Item(219303, {13, 14}),
+  HouseOfCards                          = Item(230027, {13, 14}),
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
+  QuickwickCandlestick                  = Item(225649, {13, 14}),
+  SignetOfThePriory                     = Item(219308, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
+  FunhouseLens                          = Item(234217, {13, 14}),
+  FlarendosPilotLight                   = Item(230191, {13, 14}),
+  -- TWW S2 Prior Expansion Items
+  Blastmaster3000                       = Item(234717, {13, 14}),
+  GarbagemancersLastResort              = Item(235984, {13, 14}),
+  GeargrindersSpareKeys                 = Item(230197, {13, 14}),
+  GooBlinGrenade                        = Item(200142, {13, 14}),
+  IngeniousManaBattery                  = Item(169344, {13, 14}),
+  NeuralSynapseEnhancer                 = Item(168973, {16}),
+  NoggenfoggerUltimateDeluxe            = Item(232486, {13, 14}),
+  RatfangToxin                          = Item(235359, {13, 14}),
+  RingingRitualMud                      = Item(232543, {13, 14}),
+  SoullettingRuby                       = Item(178809, {13, 14}),
 }
 
 Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
   -- TWW Trinkets
   AberrantSpellforge                    = Item(212451, {13, 14}),
   FearbreakersEcho                      = Item(224449, {13, 14}),
-  HighSpeakersAccretion                 = Item(219303, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
   MereldarsToll                         = Item(219313, {13, 14}),
-  QuickwickCandlestick                  = Item(225649, {13, 14}),
-  SignetofthePriory                     = Item(219308, {13, 14}),
 })
 
 Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {
-  -- DF Gladiator's Badges
-  CrimsonGladiatorsBadge                = Item(201807, {13, 14}),
-  DraconicGladiatorsBadge               = Item(216279, {13, 14}),
-  ObsidianGladiatorsBadge               = Item(205708, {13, 14}),
-  VerdantGladiatorsBadge                = Item(209343, {13, 14}),
   -- TWW Gladiator's Badges
   ForgedGladiatorsBadge                 = Item(218713, {13, 14}),
-  -- Trinkets kept for variables
-  DragonfireBombDispenser               = Item(202610, {13, 14}),
-  HornofValor                           = Item(133642, {13, 14}),
-  IrideusFragment                       = Item(193743, {13, 14}),
-  MoonlitPrism                          = Item(137541, {13, 14}),
-  SpoilsofNeltharus                     = Item(193773, {13, 14}),
-  TimebreachingTalon                    = Item(193791, {13, 14}),
+  PrizedGladiatorsBadge                 = Item(229780, {13, 14}),
+  -- TWW Trinkets
+  ConcoctionKissofDeath                 = Item(215174, {13, 14}), -- Used for item_cd_1141
+  -- TWW S2 Prior Expansion Trinkets
+  HyperthreadWristwraps                 = Item(168989, {9}),
 })
 
 Item.Mage.Frost = MergeTableByKey(Item.Mage.Commons, {
-  -- DF Trinkets
-  BelorrelostheSuncaller                = Item(207172, {13, 14}),
-  -- Other On-Use Items
-  Dreambinder                           = Item(208616, {16}),
+  -- TWW Trinkets
+  BurstofKnowledge                      = Item(231424, {13, 14}),
 })
 
 --[[ Variables

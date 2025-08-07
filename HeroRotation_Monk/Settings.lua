@@ -31,6 +31,7 @@ HR.GUISettings.APL.Monk = {
       Potions = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
+      Vivify = "Suggested",
     },
   },
   CommonsOGCD = {
@@ -46,16 +47,12 @@ HR.GUISettings.APL.Monk = {
     }
   },
   Brewmaster = {
+    DampenHarmHP = 35,
     ExpelHarmHP = 70,
+    FortifyingBrewHP = 25,
+    VivifyHP = 70,
     PotionType = {
       Selected = "Tempered",
-    },
-    -- DisplayStyle for Brewmaster-only stuff
-    DisplayStyle = {
-      CelestialBrew = "Suggested",
-      DampenHarm = "Suggested",
-      FortifyingBrew = "Suggested",
-      Purify = "SuggestedRight"
     },
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
@@ -74,11 +71,22 @@ HR.GUISettings.APL.Monk = {
       PurifyingBrew = true,
     }
   },
+  BrMDS = {
+    -- DisplayStyle for Brewmaster-only stuff
+    DisplayStyle = {
+      CelestialBrew = "Suggested",
+      DampenHarm = "Suggested",
+      FortifyingBrew = "Suggested",
+      Purify = "SuggestedRight"
+    },
+  },
   Windwalker = {
     FortifyingBrewHP = 40,
     IgnoreFSK = true,
     IgnoreToK = false,
     ShowFortifyingBrewCD = false,
+    MotCCountThreshold = 5,
+    MotCMinTimeThreshold = 5,
     PotionType = {
       Selected = "Tempered",
     },
@@ -112,6 +120,7 @@ local CP_MonkDS = CreateChildPanel(CP_Monk, "Class DisplayStyles")
 local CP_MonkOGCD = CreateChildPanel(CP_Monk, "Class OffGCDs")
 local CP_Windwalker = CreateChildPanel(CP_Monk, "Windwalker")
 local CP_Brewmaster = CreateChildPanel(CP_Monk, "Brewmaster")
+local CP_BrMDS = CreateChildPanel(CP_Monk, "Brewmaster DisplayStyles")
 
 -- Monk
 CreateARPanelOptions(CP_Monk, "APL.Monk.Commons")
@@ -124,7 +133,13 @@ CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.ShowFortify
 CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.IgnoreToK", "Ignore Touch of Karma", "Enable this setting to allow you to ignore Touch of Karma without stalling the rotation. (NOTE: Touch of Karma will never be suggested if this is enabled)")
 CreatePanelOption("CheckButton", CP_Windwalker, "APL.Monk.Windwalker.IgnoreFSK", "Ignore Flying Serpent Kick", "Enable this setting to allow you to ignore Flying Serpent Kick without stalling the rotation. (NOTE: Flying Serpent Kick will never be suggested if this is enabled)")
 CreatePanelOption("Slider", CP_Windwalker, "APL.Monk.Windwalker.FortifyingBrewHP", {1, 100, 1}, "Fortifying Brew HP Threshold", "Set the HP threshold for when to suggest Fortifying Brew.")
+CreatePanelOption("Slider", CP_Windwalker, "APL.Monk.Windwalker.MotCCountThreshold", {1, 10, 1}, "Mark of the Crane Count Threshold", "Allow the profile to cycle through targets to apply Mark of the Crane is below this number of targets with the debuff applied. Default: 5.")
+CreatePanelOption("Slider", CP_Windwalker, "APL.Monk.Windwalker.MotCMinTimeThreshold", {1, 20, 1}, "Mark of the Crane Min Time Threshold", "Allow the profile to cycle through targets to apply Mark of the Crane if the remaining time on any Mark of the Crane debuff is below this number of seconds. Default: 5.")
 
 -- Brewmaster
+CreatePanelOption("Slider", CP_Brewmaster, "APL.Monk.Brewmaster.DampenHarmHP", {1, 100, 1}, "Dampen Harm HP Threshold", "Set the HP threshold for when to suggest Dampen Harm.")
 CreatePanelOption("Slider", CP_Brewmaster, "APL.Monk.Brewmaster.ExpelHarmHP", {1, 100, 1}, "Expel Harm HP Threshold", "Set the HP threshold for when to suggest Expel Harm.")
+CreatePanelOption("Slider", CP_Brewmaster, "APL.Monk.Brewmaster.FortifyingBrewHP", {1, 100, 1}, "Fortifying Brew HP Threshold", "Set the HP threshold for when to suggest Fortifying Brew.")
+CreatePanelOption("Slider", CP_Brewmaster, "APL.Monk.Brewmaster.VivifyHP", {1, 100, 1}, "Vivify HP Threshold", "Set the HP threashold for when to suggest Vivify.")
 CreateARPanelOptions(CP_Brewmaster, "APL.Monk.Brewmaster")
+CreateARPanelOptions(CP_BrMDS, "APL.Monk.BrMDS")

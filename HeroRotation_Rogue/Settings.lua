@@ -39,16 +39,14 @@ HR.GUISettings.APL.Rogue = {
       Potions = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
-      EchoingReprimand = "Suggested",
       Flagellation = "Suggested",
       Stealth = "Main Icon",
-      Sepsis = "Suggested",
+      Shadowstep = "Suggested",
+      CrimsonVial = "Suggested",
     },
   },
   CommonsOGCD = {
     GCDasOffGCD = {
-      EchoingReprimand = true,
-      CrimsonVial = true,
       Feint = true,
     },
     OffGCDasOffGCD = {
@@ -62,14 +60,18 @@ HR.GUISettings.APL.Rogue = {
   Assassination = {
     EnvenomDMGOffset = 3,
     MutilateDMGOffset = 3,
+    ICRuptureCap = 0,
+    ICGarroteCap = 0,
     UsePriorityRotation = "Never", -- Only for Assassination / Subtlety
     PotionType = {
       Selected = "Tempered",
     },
     GCDasOffGCD = {
+      CrimsonTempest = false,
       Exsanguinate = false,
       Kingsbane = false,
       Shiv = false,
+      PoisonedKnife = true,
     },
     OffGCDasOffGCD = {
       Deathmark = true,
@@ -93,7 +95,6 @@ HR.GUISettings.APL.Rogue = {
       BladeRush = false,
       KeepItRolling = false,
       RollTheBones = false,
-      Sepsis = false,
     },
     OffGCDasOffGCD = {
       GhostlyStrike = false,
@@ -104,17 +105,18 @@ HR.GUISettings.APL.Rogue = {
       Shadowmeld = true,
       ImprovedAdrenalineRush = true
     },
-    UseBtEOutsideOfStealth = true
   },
   Subtlety = {
     EviscerateDMGOffset = 3, -- Used to compute the rupture threshold
     BurnShadowDance = "On Bosses not in Dungeons", -- Burn Shadow Dance charges when the target is about to die
     UsePriorityRotation = "Never", -- Only for Assassination / Subtlety
+    HoldCoupForCDs = true,
     PotionType = {
       Selected = "Tempered",
     },
     GCDasOffGCD = {
       ShurikenTornado = false,
+      SecretTechnique = false,
     },
     OffGCDasOffGCD = {
       SymbolsofDeath = true,
@@ -157,6 +159,8 @@ CreateARPanelOptions(CP_RogueOGCD, "APL.Rogue.CommonsOGCD")
 CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.EnvenomDMGOffset", { 1, 5, 0.25 }, "Envenom DMG Offset", "Set the Envenom DMG Offset.")
 CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.MutilateDMGOffset", { 1, 5, 0.25 }, "Mutilate DMG Offset", "Set the Mutilate DMG Offset.")
 CreatePanelOption("Dropdown", CP_Assassination, "APL.Rogue.Assassination.UsePriorityRotation", { "Never", "On Bosses", "Always", "Auto" }, "Use Priority Rotation", "Select when to show rotation for maximum priority damage (at the cost of overall AoE damage.)\nAuto will function as Never except on specific encounters where AoE is not recommended.")
+CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.ICRuptureCap", {0, 10, 1}, "Indiscriminate Carnage Rupture Cap", "Cap the amount of active applications during IC, use 0 to disable")
+CreatePanelOption("Slider", CP_Assassination, "APL.Rogue.Assassination.ICGarroteCap", {0, 10, 1}, "Indiscriminate Carnage Garrote Cap", "Cap the amount of active applications during IC, use 0 to disable")
 CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.StealthMacro.Vanish", "Stealth Combo - Vanish", "Allow suggesting Vanish stealth ability combos (recommended)")
 CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)")
 CreatePanelOption("CheckButton", CP_Assassination, "APL.Rogue.Assassination.ShowIndiscriminateCarnageOnMainIcon", "Indiscriminate Carnage - Main Icon", "Show casts for indiscriminate carnage on the main icon (main target)")
@@ -168,13 +172,13 @@ CreatePanelOption("Dropdown", CP_Outlaw, "APL.Rogue.Outlaw.KillingSpreeDisplaySt
 CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.SpellQueueMacro.Vanish", "Stealth Combo - Vanish", "Allow suggesting Vanish stealth ability combos (recommended)")
 CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.SpellQueueMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)")
 CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.SpellQueueMacro.ImprovedAdrenalineRush", "Finisher Combo - Improved Adrenaline Rush", "Allow suggesting Improved Adrenaline Rush Finisher combos (recommended)")
-CreatePanelOption("CheckButton", CP_Outlaw, "APL.Rogue.Outlaw.UseBtEOutsideOfStealth", "Use Between The Eyes Out of Stealth", "Prevents Between the eyes being used outside of stealth (not recommended, this is a work around to avoid current bugs)")
 CreateARPanelOptions(CP_Outlaw, "APL.Rogue.Outlaw")
 
 -- Subtlety
 CreatePanelOption("Slider", CP_Subtlety, "APL.Rogue.Subtlety.EviscerateDMGOffset", { 1, 5, 0.25 }, "Eviscerate Damage Offset", "Set the Eviscerate Damage Offset, used to compute the rupture threshold.")
 CreatePanelOption("Dropdown", CP_Subtlety, "APL.Rogue.Subtlety.UsePriorityRotation", { "Never", "On Bosses", "Always", "Auto" }, "Use Priority Rotation", "Select when to show rotation for maximum priority damage (at the cost of overall AoE damage.)\nAuto will function as Never except on specific encounters where AoE is not recommended.")
 CreatePanelOption("Dropdown", CP_Subtlety, "APL.Rogue.Subtlety.BurnShadowDance", { "Always", "On Bosses", "On Bosses not in Dungeons" }, "Burn Shadow Dance before Death", "Use remaining Shadow Dance charges when the target is about to die.")
+CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.HoldCoupForCDs", "Hold Coup De Grace for CDs", "Choose whether to hold Coup De Grace for CDs. Turn this off to enable actively holding CDs without HR avoiding using Coup whilst CDs are ready (e.g. for Keys)")
 CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.Vanish", "Stealth Combo - Vanish", "Allow suggesting Vanish stealth ability combos (recommended)")
 CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.Shadowmeld", "Stealth Combo - Shadowmeld", "Allow suggesting Shadowmeld stealth ability combos (recommended)")
 CreatePanelOption("CheckButton", CP_Subtlety, "APL.Rogue.Subtlety.StealthMacro.ShadowDance", "Stealth Combo - Shadow Dance", "Allow suggesting Shadow Dance stealth ability combos (recommended)")

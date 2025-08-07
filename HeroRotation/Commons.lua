@@ -186,7 +186,7 @@ end
 function Commons.GetCurrentEmpowerData(stage)
   local CurrentStage = 0
   local StagesData = {}
-  _, _, _, StartTimeMS, EndTimeMS, _, _, _, _, StageTotal = UnitChannelInfo("player")
+  local _, _, _, StartTimeMS, EndTimeMS, _, _, _, _, StageTotal = UnitChannelInfo("player")
 
   if StageTotal and StageTotal > 0 then
     local LastFinish = 0

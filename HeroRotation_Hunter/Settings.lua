@@ -46,8 +46,6 @@ HR.GUISettings.APL.Hunter = {
       HuntersMark = false,
       MendPet = false,
       RevivePet = false,
-      Stampede = false,
-      SteelTrap = false,
       SummonPet = false,
       TarTrap = false,
     },
@@ -61,15 +59,13 @@ HR.GUISettings.APL.Hunter = {
       Selected = "Tempered",
     },
     GCDasOffGCD = {
-      AMurderOfCrows = false,
       BestialWrath = false,
       Bloodshed = false,
       CallOfTheWild = false,
-      DireBeast = false,
-      WailingArrow = false,
     },
   },
   Marksmanship = {
+    MaxPrioDamage = true,
     PotionType = {
       Selected = "Tempered",
     },
@@ -127,6 +123,7 @@ CreateARPanelOptions(CP_HunterOGCD, "APL.Hunter.CommonsOGCD")
 CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery")
 
 -- Marksmanship
+CreatePanelOption("CheckButton", CP_Marksmanship, "APL.Hunter.Marksmanship.MaxPrioDamage", "Prioritize Current Target", "Enable this setting to prioritize the current target when choosing a target for some abilities.")
 CreateARPanelOptions(CP_Marksmanship, "APL.Hunter.Marksmanship")
 
 -- Survival

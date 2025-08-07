@@ -54,9 +54,6 @@ HL.AddCoreOverride ("Spell.IsViable",
     if self == S.Stormkeeper or self == S.ElementalBlast or self == S.Icefury then
       local MovementPredicate = IgnoreMovement or Player:BuffUp(S.SpiritwalkersGraceBuff) or not Player:IsMoving()
       return BaseCheck and MovementPredicate and not Player:IsCasting(self)
-    elseif self == S.LavaBeam then
-      local MovementPredicate = IgnoreMovement or Player:BuffUp(S.SpiritwalkersGraceBuff) or not Player:IsMoving()
-      return BaseCheck and MovementPredicate
     elseif self == S.LightningBolt or self == S.ChainLightning then
       local MovementPredicate = IgnoreMovement or Player:BuffUp(S.SpiritwalkersGraceBuff) or Player:BuffUp(S.StormkeeperBuff) or not Player:IsMoving()
       return BaseCheck and MovementPredicate

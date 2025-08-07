@@ -96,6 +96,14 @@ function HR:CreateBackdrop (Frame, Strata)
   end
 end
 
+function HR:FontSelect (Frame)
+  if not HR.GUISettings.Scaling.UseGlobalFont then
+    return HR.AssocFonts[HR.GUISettings.Scaling.ChosenFont]
+  else
+    return GameFontNormal:GetFont()
+  end
+end
+
 --- ======= MAIN ICON =======
 -- Init
 function HR.MainIconFrame:Init ()
@@ -121,7 +129,10 @@ function HR.MainIconFrame:Init ()
   -- Keybind
   local KeybindFrame = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
   self.Keybind = KeybindFrame
-  KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+  -- Font Selection
+  local SelectedFont = HR:FontSelect(KeybindFrame)
+  KeybindFrame:SetFont(SelectedFont, 14, "OUTLINE")
+  -- KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
   KeybindFrame:SetAllPoints(true)
   KeybindFrame:SetJustifyH("RIGHT")
   KeybindFrame:SetJustifyV("TOP")
@@ -161,6 +172,10 @@ function HR.MainIconFrame:ChangeIcon (Texture, Keybind, Usable, OutofRange, ID)
     self.Texture:SetVertexColor(1.0, 1.0, 1.0)
   end
   self.Texture:SetAllPoints(self)
+  -- Font Selection
+  local SelectedFont = HR:FontSelect(self.Keybind)
+  self.Keybind:SetFont(SelectedFont, 14, "OUTLINE")
+  self.Text:SetFont(SelectedFont, 12)
   -- Keybind
   if Keybind then
     self.Keybind:SetText(Keybind)
@@ -219,7 +234,10 @@ function HR.MainIconFrame:InitParts ()
     PartFrame.Texture = PartFrame:CreateTexture(nil, "BACKGROUND")
     -- Keybind
     PartFrame.Keybind = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    PartFrame.Keybind:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
+    -- Font Selection
+    local SelectedFont = HR:FontSelect(PartFrame.Keybind)
+    PartFrame.Keybind:SetFont(SelectedFont, 13, "OUTLINE")
+    -- PartFrame.Keybind:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
     PartFrame.Keybind:SetAllPoints(true)
     PartFrame.Keybind:SetJustifyH("RIGHT")
     PartFrame.Keybind:SetJustifyV("TOP")
@@ -280,6 +298,10 @@ function HR.MainIconFrame:SetupParts (Textures, Keybinds)
       (i == QueuedCasts and Blackborder) and (LRx * rightxslice) - 0.08 or LRx * rightxslice,
       Blackborder and LRy - 0.08 or LRy
     )
+
+    -- Font Selection
+    local SelectedFont = HR:FontSelect(PartFrame.Keybind)
+    PartFrame.Keybind:SetFont(SelectedFont, 13, "OUTLINE")
 
     -- Keybind
     if Keybinds[i] then
@@ -347,7 +369,10 @@ function HR.SmallIconFrame:CreateIcons (Index, Align)
   -- Keybind
   local Keybind = IconFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
   IconFrame.Keybind = Keybind
-  Keybind:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
+  -- Font Selection
+  local SelectedFont = HR:FontSelect(Keybind)
+  Keybind:SetFont(SelectedFont, 12, "OUTLINE")
+  -- Keybind:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
   Keybind:SetAllPoints(true)
   Keybind:SetJustifyH("RIGHT")
   Keybind:SetJustifyV("TOP")
@@ -364,7 +389,8 @@ function HR.SmallIconFrame:CreateIcons (Index, Align)
 end
 
 -- Change Icon
-function HR.SmallIconFrame:ChangeIcon (FrameID, Texture, Keybind, OutofRange)
+function HR.SmallIconFrame:ChangeIcon (FrameID, Texture, Keybind, OutofRange, ID)
+  self.ID = ID
   local IconFrame = self.Icon[FrameID]
   -- Texture
   IconFrame.Texture:SetTexture(Texture)
@@ -375,6 +401,9 @@ function HR.SmallIconFrame:ChangeIcon (FrameID, Texture, Keybind, OutofRange)
   else
     IconFrame.Texture:SetVertexColor(1.0, 1.0, 1.0)
   end
+  -- Font Selection
+  SelectedFont = HR:FontSelect(IconFrame.Keybind)
+  IconFrame.Keybind:SetFont(SelectedFont, 12, "OUTLINE")
   -- Keybind
   if Keybind then
     IconFrame.Keybind:SetText(Keybind)
@@ -434,19 +463,32 @@ function HR.LeftIconFrame:Init ()
   -- Keybind
   local KeybindFrame = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
   self.Keybind = KeybindFrame
-  KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+  -- Font Selection
+  local SelectedFont = HR:FontSelect(KeybindFrame)
+  KeybindFrame:SetFont(SelectedFont, 14, "OUTLINE")
+  -- KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
   KeybindFrame:SetAllPoints(true)
   KeybindFrame:SetJustifyH("RIGHT")
   KeybindFrame:SetJustifyV("TOP")
   KeybindFrame:SetPoint("TOPRIGHT")
   KeybindFrame:SetTextColor(0.8,0.8,0.8,1)
   KeybindFrame:SetText("")
+  -- Overlay Text
+  local TextFrame = self:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+  self.Text = TextFrame
+  TextFrame:SetAllPoints(true)
+  TextFrame:SetJustifyH("CENTER")
+  TextFrame:SetJustifyV("MIDDLE")
+  TextFrame:SetPoint("CENTER")
+  TextFrame:SetTextColor(1,1,1,1)
+  TextFrame:SetText("")
   -- Display
   self:Show()
 end
 
 -- Change Icon
-function HR.LeftIconFrame:ChangeIcon (Texture, Keybind)
+function HR.LeftIconFrame:ChangeIcon (Texture, Keybind, ID)
+  self.ID = ID
   -- Texture
   self.Texture:SetTexture(Texture)
   self.Texture:SetAllPoints(self)
@@ -454,6 +496,9 @@ function HR.LeftIconFrame:ChangeIcon (Texture, Keybind)
   if HR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then
     self.Backdrop:Show()
   end
+  -- Font Selection
+  local SelectedFont = HR:FontSelect(self.Keybind)
+  self.Keybind:SetFont(SelectedFont, 14, "OUTLINE")
   -- Keybind
   if Keybind then
     self.Keybind:SetText(Keybind)
@@ -467,6 +512,17 @@ function HR.LeftIconFrame:ChangeIcon (Texture, Keybind)
   if not self:IsVisible() then
     self:Show()
   end
+end
+
+-- Set text on frame
+function HR.LeftIconFrame:OverlayText(Text, FontSize)
+  local Font = self.Text:GetFont()
+  if FontSize then
+    self.Text:SetFont(Font, FontSize)
+  else
+    self.Text:SetFont(Font, 10)
+  end
+  self.Text:SetText(Text)
 end
 
 --- ======= NAMEPLATES =======
@@ -649,7 +705,10 @@ function HR.SuggestedIconFrame:Init ()
   -- Keybind
   local KeybindFrame = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
   self.Keybind = KeybindFrame
-  KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+  -- Font Selection
+  local SelectedFont = HR:FontSelect(KeybindFrame)
+  KeybindFrame:SetFont(SelectedFont, 14, "OUTLINE")
+  -- KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
   KeybindFrame:SetAllPoints(true)
   KeybindFrame:SetJustifyH("RIGHT")
   KeybindFrame:SetJustifyV("TOP")
@@ -676,6 +735,9 @@ function HR.SuggestedIconFrame:ChangeIcon (Texture, Keybind, OutofRange, ID)
   if HR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then
     self.Backdrop:Show()
   end
+  -- Font Selection
+  local SelectedFont = HR:FontSelect(self.Keybind)
+  self.Keybind:SetFont(SelectedFont, 14, "OUTLINE")
   -- Keybind
   if Keybind then
     self.Keybind:SetText(Keybind)
@@ -724,7 +786,10 @@ function HR.RightSuggestedIconFrame:Init ()
   -- Keybind
   local KeybindFrame = self:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
   self.Keybind = KeybindFrame
-  KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+  -- Font Selection
+  local SelectedFont = HR:FontSelect(KeybindFrame)
+  KeybindFrame:SetFont(SelectedFont, 14, "OUTLINE")
+  -- KeybindFrame:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
   KeybindFrame:SetAllPoints(true)
   KeybindFrame:SetJustifyH("RIGHT")
   KeybindFrame:SetJustifyV("TOP")
@@ -751,6 +816,9 @@ function HR.RightSuggestedIconFrame:ChangeIcon (Texture, Keybind, OutofRange, ID
   if HR.GUISettings.General.BlackBorderIcon and not self.Backdrop:IsVisible() then
     self.Backdrop:Show()
   end
+  -- Font Selection
+  local SelectedFont = HR:FontSelect(self.Keybind)
+  self.Keybind:SetFont(SelectedFont, 14, "OUTLINE")
   -- Keybind
   if Keybind then
     self.Keybind:SetText(Keybind)

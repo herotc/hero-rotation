@@ -17,6 +17,9 @@ local Item       = HL.Item
 local MergeTableByKey = HL.Utils.MergeTableByKey
 -- HeroRotation
 local HR         = HeroRotation
+-- Temporary until 11.1
+local GetBuildInfo = GetBuildInfo
+local TOCNum       = select(4, GetBuildInfo())
 
 --- ============================ CONTENT ============================
 
@@ -50,6 +53,7 @@ Spell.Shaman.Commons = {
   NaturesSwiftness                      = Spell(378081),
   PrimordialWave                        = Spell(375982),
   SpiritwalkersGrace                    = Spell(79206),
+  SplinteredElements                    = Spell(382042),
   TotemicRecall                         = Spell(108285),
   WindShear                             = Spell(57994),
   -- Buffs
@@ -75,6 +79,7 @@ Spell.Shaman.Commons = {
 Spell.Shaman.Farseer = {
   -- Talents
   AncestralSwiftness                    = Spell(443454),
+  CalloftheAncestors                    = Spell(443450),
   ElementalReverb                       = Spell(443418),
   PrimordialCapacity                    = Spell(443448),
 }
@@ -102,6 +107,12 @@ Spell.Shaman.Totemic = {
   LivelyTotems                          = Spell(445034),
   SurgingTotem                          = Spell(444995),
   TotemicRebound                        = Spell(445025),
+  -- Buffs
+  LivelyTotemsBuff                      = Spell(461242),
+  TotemicReboundBuff                    = Spell(458269),
+  WhirlingAirBuff                       = Spell(453409),
+  WhirlingEarthBuff                     = Spell(453406),
+  WhirlingFireBuff                      = Spell(453405),
 }
 
 Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
@@ -112,17 +123,19 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   -- Talents
   Ascendance                            = Spell(114050),
   EchoChamber                           = Spell(382032),
+  EchooftheElementals                   = Spell(462864),
   EchooftheElements                     = Spell(333919),
   EchoesofGreatSundering                = Spell(384087),
   ElectrifiedShocks                     = Spell(382086),
+  EruptingLava                          = Spell(468574),
   EyeoftheStorm                         = Spell(381708),
   FirstAscendant                        = Spell(462440),
   FlowofPower                           = Spell(385923),
   FluxMelting                           = Spell(381776),
+  FuryoftheStorms                       = Spell(191717),
   FusionofElements                      = Spell(462840),
   Icefury                               = Spell(210714),
   ImprovedFlametongueWeapon             = Spell(382027),
-  LavaBeam                              = Spell(114074),
   LightningRod                          = Spell(210689),
   LiquidMagmaTotem                      = Spell(192222),
   MagmaChamber                          = Spell(381932),
@@ -132,19 +145,20 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   PrimalElementalist                    = Spell(117013),
   SearingFlames                         = Spell(381782),
   SkybreakersFieryDemise                = Spell(378310),
-  SplinteredElements                    = Spell(382042),
   StormElemental                        = Spell(192249),
   Stormkeeper                           = Spell(191634),
   SurgeofPower                          = Spell(262303),
   SwellingMaelstrom                     = Spell(384359),
   ThunderstrikeWard                     = Spell(462757),
   -- Buffs
-  AscendanceBuff                        = Spell(114050),
+  AscendanceBuff                        = Spell(1219480),
   EchoesofGreatSunderingBuff            = Spell(384088),
   FluxMeltingBuff                       = Spell(381777),
+  FuryofStormsBuff                      = Spell(191716),
   FusionofElementsFire                  = Spell(462843),
   FusionofElementsNature                = Spell(462841),
   IcefuryBuff                           = Spell(210714),
+  JackpotBuff                           = Spell(1218612), -- TWW S2 4pc
   LavaSurgeBuff                         = Spell(77762),
   MagmaChamberBuff                      = Spell(381933),
   MasteroftheElementsBuff               = Spell(260734),
@@ -152,6 +166,7 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   StormFrenzyBuff                       = Spell(462725),
   StormkeeperBuff                       = Spell(191634),
   SurgeofPowerBuff                      = Spell(285514),
+  WindGustBuff                          = Spell(263806),
   -- Debuffs
   ElectrifiedShocksDebuff               = Spell(382089),
   -- Tier Bonuses
@@ -162,6 +177,7 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Elemental, Spell.Shaman.St
 
 Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   -- Abilities
+  VoltaicBlazeAbility                   = Spell(470057),
   Windstrike                            = Spell(115356),
   -- Talents
   AlphaWolf                             = Spell(198434),
@@ -175,13 +191,17 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   ElementalSpirits                      = Spell(262624),
   FeralSpirit                           = Spell(51533),
   FireNova                              = Spell(333974),
+  FlowingSpirits                        = Spell(469314),
   Hailstorm                             = Spell(334195),
   HotHand                               = Spell(201900),
-  IceStrike                             = Spell(342240),
+  IceStrike                             = MultiSpell(342240, 470194),
   LashingFlames                         = Spell(334046),
   LavaLash                              = Spell(60103),
+  LegacyoftheFrostWitch                 = Spell(384450),
   MoltenAssault                         = Spell(334033),
   OverflowingMaelstrom                  = Spell(384149),
+  PrimordialStorm                       = Spell(1218047),
+  PrimordialStormAbility                = Spell(1218090),
   RagingMaelstrom                       = Spell(384143),
   StaticAccumulation                    = Spell(384411),
   Stormblast                            = Spell(319930),
@@ -189,8 +209,11 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   Stormstrike                           = Spell(17364),
   Sundering                             = Spell(197214),
   SwirlingMaelstrom                     = Spell(384359),
+  TempestStrikes                        = Spell(428071),
   ThorimsInvocation                     = Spell(384444),
+  UnrelentingStorms                     = Spell(470490),
   UnrulyWinds                           = Spell(390288),
+  VoltaicBlaze                          = Spell(470053),
   WindfuryTotem                         = Spell(8512),
   WindfuryWeapon                        = Spell(33757),
   WitchDoctorsAncestry                  = Spell(384447),
@@ -201,15 +224,22 @@ Spell.Shaman.Enhancement = MergeTableByKey(Spell.Shaman.Commons, {
   CracklingThunderBuff                  = Spell(409834),
   CrashLightningBuff                    = Spell(187878),
   CLCrashLightningBuff                  = Spell(333964),
-  DoomWindsBuff                         = Spell(384352),
+  DoomWindsBuff                         = Spell(466772),
+  EarthenWeaponBuff                     = Spell(392375),
+  ElectrostaticWagerBuff                = Spell(1223410), -- TWW S2 4pc
+  ElectrostaticWagerDmg                 = Spell(1223332), -- TWW S2 4pc
   FeralSpiritBuff                       = Spell(333957),
   GatheringStormsBuff                   = Spell(198300),
   HailstormBuff                         = Spell(334196),
   HotHandBuff                           = Spell(215785),
   IceStrikeBuff                         = Spell(384357),
+  LegacyoftheFrostWitchBuff             = Spell(384451),
   MaelstromWeaponBuff                   = Spell(344179),
+  PrimordialStormBuff                   = Spell(1218125),
+  StormblastBuff                        = Spell(470466),
   StormsurgeBuff                        = Spell(201846),
   WindfuryTotemBuff                     = Spell(327942),
+  WinningStreakBuff                     = Spell(1218616), -- TWW S2 2pc
   -- Debuffs
   LashingFlamesDebuff                   = Spell(334168),
   -- Elemental Spirits Buffs
@@ -238,5 +268,11 @@ Item.Shaman.Enhancement = MergeTableByKey(Item.Shaman.Commons, {
 
 Item.Shaman.Elemental = MergeTableByKey(Item.Shaman.Commons, {
   -- TWW Trinkets
+  FunhouseLens                          = Item(234217, {13, 14}),
+  HouseofCards                          = Item(230027, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
+  -- TWW Items
+  BestinSlotsCaster                     = Item(232805, {16}),
+  -- TWW S2 Previous Expansion Items
+  NeuralSynapseEnhancer                 = Item(168973, {16}),
 })

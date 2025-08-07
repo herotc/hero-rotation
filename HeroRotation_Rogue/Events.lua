@@ -364,3 +364,26 @@ do
     return BaseCritChance
   end
 end
+
+do
+  local DisorientingStrikesCount = 0
+  -- Track Disorienting Strikes
+  HL:RegisterForSelfCombatEvent(
+    function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
+      -- KillingSpree
+      if SpellID == 51690 then
+        DisorientingStrikesCount = 2
+      end
+      if SpellID == 193315 or SpellID == 8676 or SpellID == 430023 then
+        if DisorientingStrikesCount > 0 then
+          DisorientingStrikesCount = DisorientingStrikesCount - 1
+        end
+      end
+    end,
+    "SPELL_CAST_SUCCESS"
+  )
+
+  function Rogue.DisorientingStrikesCount()
+    return DisorientingStrikesCount
+  end
+end

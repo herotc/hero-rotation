@@ -32,6 +32,7 @@ HR.GUISettings.APL.Warlock = {
       Potions = "Suggested",
       Trinkets = "Suggested",
       -- Class Specific
+      Malevolence = "Suggested",
       SoulRot = "Suggested",
     },
   },
@@ -53,6 +54,7 @@ HR.GUISettings.APL.Warlock = {
     GCDasOffGCD = {
       -- Abilities
       GrimoireOfSacrifice = true,
+      Haunt = false,
       InquisitorsGaze = false,
       PhantomSingularity = true,
       SoulTap = true,
@@ -83,6 +85,7 @@ HR.GUISettings.APL.Warlock = {
       PowerSiphon = true,
       SummonDemonicTyrant = false,
       SummonPet = false,
+      SummonVilefiend = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
@@ -100,9 +103,12 @@ HR.GUISettings.APL.Warlock = {
     GCDasOffGCD = {
       -- Abilities
       Cataclysm = false,
+      ChannelDemonfire = false,
       DimensionalRift = false,
       GrimoireOfSacrifice = true,
       InquisitorsGaze = false,
+      RainOfFire = false,
+      SoulFire = false,
       SummonInfernal = true,
       SummonPet = false,
       SummonSoulkeeper = false,

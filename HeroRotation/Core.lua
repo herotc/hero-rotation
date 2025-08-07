@@ -66,7 +66,7 @@ function HR.GetTexture(Object)
     local TextureCache = Cache.Persistent.Texture.Spell
     if not TextureCache[SpellID] then
       -- Check if the SpellID is the one from Custom Textures or a Regular WoW Spell
-      if SpellID >= 999900 then
+      if SpellID >= 999900 and SpellID < 1000000 then
         TextureCache[SpellID] = "Interface\\Addons\\HeroRotation\\Textures\\"..tostring(SpellID)
       elseif Object.TextureSpellID then
         TextureCache[SpellID] = GetSpellTexture(Object.TextureSpellID)
@@ -177,7 +177,7 @@ function HR.Cast(Object, OffGCD, DisplayStyle, OutofRange, CustomTime)
   if OffGCD or DisplayStyle == "Cooldown" then
     -- If this is the second cooldown, check to ensure we don't have a duplicate icon in the first slot
     if HR.CastOffGCDOffset == 1 or (HR.CastOffGCDOffset == 2 and HR.SmallIconFrame:GetIcon(1) ~= ObjectTexture) then
-      HR.SmallIconFrame:ChangeIcon(HR.CastOffGCDOffset, ObjectTexture, Keybind, OutofRange)
+      HR.SmallIconFrame:ChangeIcon(HR.CastOffGCDOffset, ObjectTexture, Keybind, OutofRange, Object:ID())
       HR.CastOffGCDOffset = HR.CastOffGCDOffset + 1
       Object.LastDisplayTime = GetTime()
       return false
@@ -266,25 +266,28 @@ end
 
 -- Left (+ Nameplate) Cast
 HR.CastLeftOffset = 1
-function HR.CastLeftCommon(Object)
+function HR.CastLeftCommon(Object, Text)
   local Texture = HR.GetTexture(Object)
+  local Text = Text or ""
   local Keybind = not HR.GUISettings.General.HideKeyBinds and HL.Action.TextureHotKey(Texture)
+  local FontScale = (FontSize or 12) * HeroRotationDB.GUISettings["Scaling.ScaleUI"]
   FlashIcon(Object)
-  HR.LeftIconFrame:ChangeIcon(Texture, Keybind)
+  HR.LeftIconFrame:ChangeIcon(Texture, Keybind, Object:ID())
+  HR.LeftIconFrame:OverlayText(Text, FontScale)
   HR.CastLeftOffset = HR.CastLeftOffset + 1
   Object.LastDisplayTime = GetTime()
 end
 
-function HR.CastLeft(Object)
+function HR.CastLeft(Object, Text)
   if HR.CastLeftOffset == 1 then
-    HR.CastLeftCommon(Object)
+    HR.CastLeftCommon(Object, Text)
   end
   return false
 end
 
-function HR.CastLeftNameplate(ThisUnit, Object)
+function HR.CastLeftNameplate(ThisUnit, Object, Text)
   if HR.CastLeftOffset == 1 and HR.Nameplate.AddIcon(ThisUnit, Object) then
-    HR.CastLeftCommon(Object)
+    HR.CastLeftCommon(Object, Text)
   end
   return false
 end

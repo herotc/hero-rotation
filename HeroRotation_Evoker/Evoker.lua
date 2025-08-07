@@ -73,7 +73,10 @@ Spell.Evoker.Chronowarden = {
   ChronoFlames                          = Spell(431443),
   -- Talents
   ChronoFlame                           = Spell(431442),
+  TemporalBurst                         = Spell(431695),
   ThreadsofFate                         = Spell(431715),
+  -- Buffs
+  TemporalBurstBuff                     = Spell(431698),
 }
 
 Spell.Evoker.Flameshaper = {
@@ -81,9 +84,12 @@ Spell.Evoker.Flameshaper = {
   Engulf                                = Spell(443328),
   Enkindle                              = Spell(444016),
   FanTheFlames                          = Spell(444318),
-  TravelingFlame                        = Spell(444140),
+  FlameSiphon                           = Spell(444140),
+  FulminousRoar                         = Spell(1218447),
   -- Buffs
-  EnkindleBuff                          = Spell(444017),
+  EnkindleBuff                          = Spell(445740),
+  -- Debuffs
+  EnkindleDebuff                        = Spell(444017),
 }
 
 Spell.Evoker.Scalecommander = {
@@ -101,6 +107,7 @@ Spell.Evoker.Scalecommander = {
   MassEruptionBuff                      = Spell(438588),
   -- Debuffs
   BombardmentsDebuff                    = Spell(434473),
+  MeltArmorDebuff                       = Spell(441172),
 }
 
 Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
@@ -113,13 +120,16 @@ Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
   BreathofEons                          = MultiSpell(403631,442204),
   DreamofSpring                         = Spell(414969),
   EbonMight                             = Spell(395152),
+  EchoingStrike                         = Spell(410784),
   Eruption                              = Spell(395160),
   FontofMagic                           = Spell(408083),
   ImminentDestruction                   = Spell(459537),
   InterwovenThreads                     = Spell(412713),
   MoltenEmbers                          = Spell(459725),
+  Overlord                              = Spell(410260),
   Prescience                            = Spell(409311),
   PupilofAlexstrasza                    = Spell(407814),
+  Rockfall                              = Spell(1219236),
   TimeSkip                              = Spell(404977),
   TomorrowToday                         = Spell(412723),
   Upheaval                              = Spell(396286),
@@ -132,6 +142,7 @@ Spell.Evoker.Augmentation = MergeTableByKey(Spell.Evoker.Commons, {
   EssenceBurstBuff                      = Spell(392268),
   ImminentDestructionBuff               = Spell(459574),
   PrescienceBuff                        = Spell(410089),
+  ShiftingSandsBuff                     = Spell(413984),
   -- Debuffs
   TemporalWoundDebuff                   = Spell(409560),
 })
@@ -143,6 +154,7 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   Animosity                             = Spell(375797),
   ArcaneIntensity                       = Spell(375618),
   ArcaneVigor                           = Spell(386342),
+  AzureCelerity                         = Spell(1219723),
   Burnout                               = Spell(375801),
   Catalyze                              = Spell(386283),
   Causality                             = Spell(375777),
@@ -157,9 +169,10 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   EyeofInfinity                         = Spell(369375),
   FeedtheFlames                         = Spell(369846),
   Firestorm                             = Spell(368847),
-  FontofMagic                           = Spell(375783),
+  FontofMagic                           = Spell(411212),
   ImminentDestruction                   = Spell(370781),
   Iridescence                           = Spell(370867),
+  PowerSwell                            = Spell(370839),
   Pyre                                  = Spell(357211),
   RagingInferno                         = Spell(405659),
   RubyEmbers                            = Spell(365937),
@@ -175,8 +188,10 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Commons, {
   ChargedBlastBuff                      = Spell(370454),
   EmeraldTranceBuff                     = Spell(424155), -- T31 2pc
   EssenceBurstBuff                      = Spell(359618),
+  ImminentDestructionBuff               = Spell(411055),
   IridescenceBlueBuff                   = MultiSpell(386399,399370),
   IridescenceRedBuff                    = Spell(386353),
+  JackpotBuff                           = Spell(1217769), -- TWW2 4pc
   LimitlessPotentialBuff                = Spell(394402),
   PowerSwellBuff                        = Spell(376850),
   SnapfireBuff                          = Spell(370818),
@@ -190,29 +205,27 @@ Spell.Evoker.Devastation = MergeTableByKey(Spell.Evoker.Devastation, Spell.Evoke
 -- Items
 if not Item.Evoker then Item.Evoker = {} end
 Item.Evoker.Commons = {
-  -- Trinkets kept for variables
-  RubyWhelpShell                        = Item(193757, {13, 14}),
-  WhisperingIncarnateIcon               = Item(194301, {13, 14}),
-  -- DF Trinkets
-  NymuesUnravelingSpindle               = Item(208615, {13, 14}),
   -- TWW Trinkets
+  HouseofCards                          = Item(230027, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
+  -- TWW Items
+  BestinSlotsCaster                     = Item(232805, {16}),
+  -- TWW S2 Old Items
+  NeuralSynapseEnhancer                 = Item(168973, {16}),
 }
 
 Item.Evoker.Augmentation = MergeTableByKey(Item.Evoker.Commons, {
-  -- Trinkets kept for variables
-  BeacontotheBeyond                     = Item(203963, {13, 14}),
   -- TWW Trinkets
   AberrantSpellforge                    = Item(212451, {13, 14}),
   ConcoctionKissofDeath                 = Item(215174, {13, 14}),
+  FlarendosPilotLight                   = Item(230191, {13, 14}),
   OvinaxsMercurialEgg                   = Item(220305, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
 })
 
 Item.Evoker.Devastation = MergeTableByKey(Item.Evoker.Commons, {
-  -- Trinkets kept for variables
-  BelorrelostheSuncaller                = Item(207172, {13, 14}),
-  MirrorofFracturedTomorrows            = Item(207581, {13, 14}),
   -- DF Items
   KharnalexTheFirstLight                = Item(195519, {16}),
+  -- TWW Trinkets
+  SignetofthePriory                     = Item(219308, {13, 14}),
 })

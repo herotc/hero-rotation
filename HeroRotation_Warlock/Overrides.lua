@@ -123,8 +123,6 @@ AffOldBuffRemains = HL.AddCoreOverride ("Player.BuffRemains",
     local BaseCheck = AffOldBuffRemains(self, Spell, AnyCaster, BypassRecovery)
     if Spell == SpellAffli.SoulRot then
       if not Warlock.SoulRotBuffUp then return 0 end
-      --local SoulRotBuffLength = (Player:HasTier(31, 2)) and 12 or 8
-      -- Note: Appears the 2pc is currently bugged. Buff is removed after 8 seconds regardless.
       local SoulRotBuffLength = 8
       local Remains = SoulRotBuffLength - (GetTime() - Warlock.SoulRotAppliedTime)
       return (Remains > 0) and Remains or 0
@@ -164,7 +162,7 @@ HL.AddCoreOverride ("Player.SoulShardsP",
         return min(Shard + 2, 5)
       elseif Player:IsCasting(SpellDemo.ShadowBolt) or Player:IsCasting(SpellDemo.SoulStrike) then
         return min(Shard + 1, 5)
-      elseif Player:IsCasting(SpellDemo.HandofGuldan) or Player:IsCasting(SpellDemo.RuinationAbility) then
+      elseif Player:IsCasting(SpellDemo.HandofGuldan) then
         return max(Shard - 3, 0)
       elseif Player:IsCasting(SpellDemo.CallDreadstalkers) then
         return Shard - 2
@@ -209,10 +207,10 @@ DemoOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
       return BaseCheck and Player:SoulShardsP() >= 1 and not Player:IsCasting(self)
     elseif self == SpellDemo.CallDreadstalkers then
       return BaseCheck and (Player:SoulShardsP() >= 2 or Player:BuffUp(SpellDemo.DemonicCallingBuff)) and not Player:IsCasting(self)
-    elseif self == SpellDemo.SummonDemonicTyrant then
+    elseif self == SpellDemo.SummonDemonicTyrant or self == SpellDemo.RuinationAbility then
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellDemo.HandofGuldan then
-      return BaseCheck and Player:SoulShardsP() >= 1
+      return (BaseCheck or Player:IsCasting(SpellDemo.RuinationAbility)) and Player:SoulShardsP() >= 1
     elseif self == SpellDemo.PowerSiphon then
       return BaseCheck and Warlock.GuardiansTable.ImpCount > 0
     else
@@ -279,6 +277,18 @@ DestroOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
       return BaseCheck and Player:BuffDown(SpellDestro.GrimoireofSacrificeBuff)
     elseif self == SpellDestro.ChannelDemonfire then
       return BaseCheck and not Player:IsCasting(self)
+    else
+      return BaseCheck
+    end
+  end
+, 267)
+
+local DestroOldSpellIsAvailable
+DestroOldSpellIsAvailable = HL.AddCoreOverride ("Spell.IsAvailable",
+  function (self, CheckPet)
+    local BaseCheck = DestroOldSpellIsAvailable(self, CheckPet)
+    if self == SpellDestro.Wither then
+      return SpellDestro.Wither:IsLearned()
     else
       return BaseCheck
     end

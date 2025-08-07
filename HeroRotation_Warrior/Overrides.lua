@@ -39,7 +39,7 @@ ArmsOldDebuffUp = HL.AddCoreOverride ("Unit.DebuffUp",
     if Spell == SpellArms.RavagerDebuff then
       if Warrior.Ravager[self:GUID()] then
         -- Add 0.2s buffer to tick timer.
-        return Warrior.Ravager[self:GUID()] - GetTime() < SpellArms.Ravager:TickTime() + 0.2
+        return GetTime() - Warrior.Ravager[self:GUID()] < SpellArms.Ravager:TickTime() + 0.2
       else
         return false
       end

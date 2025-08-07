@@ -101,7 +101,10 @@ Warlock.GuardiansTable = {
 
   -- Used for Wild Imps spawn prediction
   InnerDemonsNextCast = 0,
-  ImpsSpawnedFromHoG = 0
+  ImpsSpawnedFromHoG = 0,
+
+  -- Used for TWW Bonus Spawns
+  GreaterDreadstalkerDuration = 0
 }
 
 local PetsData = {
@@ -146,7 +149,7 @@ local PetsData = {
     duration = 25
   },
   -- Vilefiend Variants
-  [228268] = { -- Gloomhound
+  [226268] = { -- Gloomhound
     name = "Vilefiend",
     duration = 15
   },
@@ -158,6 +161,11 @@ local PetsData = {
   [217429] = {
     name = "Overfiend",
     duration = 8
+  },
+  -- TWW Season 2 2pc Bonus Spawn
+  [237376] = {
+    name = "Greater Dreadstalker",
+    duration = 12
   },
 }
 
@@ -270,6 +278,9 @@ function Warlock.UpdatePetTable()
           Warlock.GuardiansTable.OverfiendDuration = 0
         elseif petTable.name == "Darkglare" then
           Warlock.GuardiansTable.DarkglareDuration = 0
+        -- TWW Set Bonus Spawns
+        elseif petTable.name == "Greater Dreadstalker" then
+          Warlock.GuardiansTable.GreaterDreadstalkerDuration = 0
         end
         Warlock.GuardiansTable.Pets[key] = nil
       end
@@ -300,6 +311,9 @@ function Warlock.UpdatePetTable()
         Warlock.GuardiansTable.OverfiendDuration = petTable.Duration
       elseif petTable.name == "Darkglare" then
         Warlock.GuardiansTable.DarkglareDuration = petTable.Duration
+      -- TWW Set Bonus Spawns
+      elseif petTable.name == "Greater Dreadstalker" then
+        Warlock.GuardiansTable.GreaterDreadstalkerDuration = petTable.Duration
       end
     end
   end
@@ -348,6 +362,10 @@ HL:RegisterForSelfCombatEvent(
       elseif summonedPet.name == "Darkglare" then
         Warlock.GuardiansTable.DarkglareDuration = summonedPet.duration
         petDuration = summonedPet.duration
+      -- TWW Set Bonus Spawns
+      elseif summonedPet.name == "Greater Dreadstalker" then
+        Warlock.GuardiansTable.GreaterDreadstalkerDuration = summonedPet.duration
+        petDuration = summonedPet.duration
       end
       local petTable = {
         ID = UnitPetGUID,
@@ -357,13 +375,13 @@ HL:RegisterForSelfCombatEvent(
         Duration = petDuration,
         despawnTime = GetTime() + tonumber(petDuration)
       }
-      table.insert(Warlock.GuardiansTable.Pets,petTable)
+      table.insert(Warlock.GuardiansTable.Pets, petTable)
     end
 
     -- Add 15 seconds and 7 casts to all pets when Tyrant is cast
     if PetsData[UnitPetID] and PetsData[UnitPetID].name == "Demonic Tyrant" then
       for key, petTable in pairs(Warlock.GuardiansTable.Pets) do
-        if (petTable and petTable.name ~= "Demonic Tyrant" and petTable.name ~= "Pit Lord") then
+        if (petTable and petTable.name ~= "Demonic Tyrant" and petTable.name ~= "Pit Lord" and petTable.name ~= "Greater Dreadstalker") then
           petTable.despawnTime = petTable.despawnTime + 15
           petTable.ImpCasts = petTable.ImpCasts + 7
         end

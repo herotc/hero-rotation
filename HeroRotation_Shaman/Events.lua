@@ -15,6 +15,8 @@ local Item = HL.Item
 local GetTime = GetTime
 local C_Timer = C_Timer
 local select = select
+-- WoW Locals
+local Delay = C_Timer.After
 -- File Locals
 HR.Commons.Shaman = {}
 local Shaman = HR.Commons.Shaman
@@ -26,6 +28,8 @@ Shaman.CracklingSurgeStacks = 0
 Shaman.IcyEdgeStacks = 0
 Shaman.MoltenWeaponStacks = 0
 Shaman.TempestMaelstrom = 0
+Shaman.SearingTotemActive = false
+Shaman.SearingTotemGUID = 0
 
 --- ============================ CONTENT ============================
 HL:RegisterForSelfCombatEvent(
@@ -43,7 +47,7 @@ HL:RegisterForSelfCombatEvent(
     local DestGUID, _, _, _, SpellID = select(8, ...)
     if DestGUID == Player:GUID() and SpellID == 191634 then
       Shaman.LastSKBuff = GetTime()
-      C_Timer.After(0.1, function()
+      Delay(0.1, function()
         if Shaman.LastSKBuff ~= Shaman.LastSKCast then
           Shaman.LastRollingThunderTick = Shaman.LastSKBuff
         end
@@ -57,9 +61,18 @@ HL:RegisterForSelfCombatEvent(
 HL:RegisterForSelfCombatEvent(
   function (...)
     local SpellID = select(12, ...)
-    if SpellID == 262627 then
+    if SpellID == 262627 or SpellID == 426516 then
+      -- Note: 262627 is the spell ID for Feral Spirit
+      -- Note: 426516 is the spell ID for the extra wolf from Rolling Thunder or TWW S1 4pc
       Shaman.FeralSpiritCount = Shaman.FeralSpiritCount + 1
-      C_Timer.After(15, function()
+      Delay(15, function()
+        Shaman.FeralSpiritCount = Shaman.FeralSpiritCount - 1
+      end)
+    end
+    if SpellID == 469332 then
+      -- Note: 469332 is the spell ID for wolf summoned by Flowing Spirits
+      Shaman.FeralSpiritCount = Shaman.FeralSpiritCount + 1
+      Delay(8, function()
         Shaman.FeralSpiritCount = Shaman.FeralSpiritCount - 1
       end)
     end
@@ -115,23 +128,23 @@ HL:RegisterForSelfCombatEvent(
     -- Fire Elemental. SpellIDs are without and with Primal Elementalist
     if SpellID == 188592 or SpellID == 118291 then
       Shaman.FireElemental.GreaterActive = true
-      C_Timer.After(30, function()
+      Delay(24, function()
         Shaman.FireElemental.GreaterActive = false
       end)
     elseif SpellID == 462992 or SpellID == 462991 then
       Shaman.FireElemental.LesserActive = true
-      C_Timer.After(15, function()
+      Delay(12, function()
         Shaman.FireElemental.LesserActive = false
       end)
     -- Storm Elemental. SpellIDs are without and with Primal Elementalist
     elseif SpellID == 157299 or SpellID == 157319 then
       Shaman.StormElemental.GreaterActive = true
-      C_Timer.After(30, function()
+      Delay(24, function()
         Shaman.StormElemental.GreaterActive = false
       end)
     elseif SpellID == 462993 or SpellID == 462990 then
       Shaman.StormElemental.LesserActive = true
-      C_Timer.After(15, function()
+      Delay(12, function()
         Shaman.StormElemental.LesserActive = false
       end)
     end
@@ -151,4 +164,27 @@ HL:RegisterForSelfCombatEvent(
     end
   end
   , "SPELL_AURA_APPLIED", "SPELL_AURA_APPLIED_DOSE"
+)
+
+-- ===== Searing Totem Tracker =====
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    local DestGUID, DestName, _, _, SpellID = select(8, ...)
+    if SpellID == 458101 and DestName == "Searing Totem" then
+      Shaman.SearingTotemActive = true
+      Shaman.SearingTotemGUID = DestGUID
+    end
+  end
+  , "SPELL_SUMMON"
+)
+
+HL:RegisterForCombatEvent(
+  function (...)
+    local DestGUID = select(8, ...)
+    if DestGUID == Shaman.SearingTotemGUID then
+      Shaman.SearingTotemActive = false
+      Shaman.SearingTotemGUID = 0
+    end
+  end
+  , "UNIT_DIED"
 )

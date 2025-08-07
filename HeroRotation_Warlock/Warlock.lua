@@ -105,7 +105,6 @@ Spell.Warlock.Affliction = MergeTableByKey(Spell.Warlock.Commons, {
   Nightfall                             = Spell(108558),
   Oblivion                              = Spell(417537),
   PhantomSingularity                    = Spell(205179),
-  SowTheSeeds                           = Spell(196226),
   SeedofCorruption                      = Spell(27243),
   ShadowEmbrace                         = Spell(32388),
   SiphonLife                            = Spell(63106),
@@ -177,11 +176,10 @@ Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Commons, {
   DemonicCallingBuff                    = Spell(205146),
   DemonicCoreBuff                       = Spell(264173),
   DemonicPowerBuff                      = Spell(265273),
-  DoomDebuff                            = Spell(460553),
   NetherPortalBuff                      = Spell(267218),
   RiteofRuvaraadBuff                    = Spell(409725), -- T30 4pc
   -- Debuffs
-  DoomDebuff                            = Spell(603),
+  DoomDebuff                            = Spell(460553),
   DoomBrandDebuff                       = Spell(423583), -- T31 2pc
   FromtheShadowsDebuff                  = Spell(270569),
 })
@@ -223,7 +221,7 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Commons, {
   Pyrogenics                            = Spell(387095),
   RagingDemonfire                       = Spell(387166),
   RainofChaos                           = Spell(266086),
-  RainofFire                            = Spell(5740),
+  RainofFire                            = MultiSpell(5740,1214467),
   RoaringBlaze                          = Spell(205184),
   Ruin                                  = Spell(387103),
   Shadowburn                            = Spell(17877),
@@ -253,7 +251,11 @@ Spell.Warlock.Destruction = MergeTableByKey(Spell.Warlock.Destruction, Spell.War
 if not Item.Warlock then Item.Warlock = {} end
 Item.Warlock.Commons = {
   -- TWW Trinkets
+  FunhouseLens                          = Item(234217, {13, 14}),
+  SignetofthePriory                     = Item(219308, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
+  -- Older Items
+  NeuralSynapseEnhancer                 = Item(168973, {13, 14}),
 }
 
 Item.Warlock.Affliction = MergeTableByKey(Item.Warlock.Commons, {

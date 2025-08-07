@@ -89,12 +89,14 @@ Spell.Paladin.Lightsmith = {
   SacredWeapon                         = Spell(432472),
   -- Talents
   BlessedAssurance                     = Spell(433015),
+  HammerandAnvil                       = Spell(433718),
   HolyArmaments                        = Spell(432459),
   RiteofAdjuration                     = Spell(433583),
   RiteofSanctification                 = Spell(433568),
   -- Buffs
   BlessedAssuranceBuff                 = Spell(433019),
   DivineGuidanceBuff                   = Spell(433106),
+  MasterworkBuff                       = Spell(1238903),
   RiteofAdjurationBuff                 = Spell(433584),
   RiteofSanctificationBuff             = Spell(433550),
   SacredWeaponBuff                     = Spell(432502),
@@ -106,7 +108,10 @@ Spell.Paladin.Templar = {
   Hammerfall                           = Spell(432463),
   LightsDeliverance                    = Spell(425518),
   LightsGuidance                       = Spell(427445),
+  ShaketheHeavens                      = Spell(431533),
   -- Buffs
+  HammerofLightBuff                    = Spell(427441),
+  HammerofLightFreeBuff                = Spell(433732),
   LightsDeliveranceBuff                = Spell(433674),
   ShaketheHeavensBuff                  = Spell(431536),
 }
@@ -128,6 +133,7 @@ Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
   InmostLight                           = Spell(405757),
   MomentofGlory                         = Spell(327193),
   Redoubt                               = Spell(280373),
+  RefiningFire                          = Spell(469883),
   RighteousProtector                    = Spell(204074),
   Sentinel                              = Spell(389539),
   -- Buffs
@@ -135,6 +141,8 @@ Spell.Paladin.Protection = MergeTableByKey(Spell.Paladin.Commons, {
   BastionofLightBuff                    = Spell(378974),
   BulwarkofRighteousFuryBuff            = Spell(386652),
   GuardianofAncientKingsBuff            = MultiSpell(86659,212641),
+  InnerResilienceBuff                   = Spell(450706), -- Tome of Light's Devotion buff
+  LuckoftheDrawBuff                     = Spell(1218114), -- TWW S2 Tier
   MomentofGloryBuff                     = Spell(327193),
   RedoubtBuff                           = Spell(280375),
   SanctificationBuff                    = Spell(424616), -- T31, 2pc
@@ -198,6 +206,9 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   EchoesofWrathBuff                     = Spell(423590), -- T31, 4pc
   EmpyreanLegacyBuff                    = Spell(387178),
   EmpyreanPowerBuff                     = Spell(326733),
+  -- Tier Set Bonuses (TWW)
+  WinningStreakBuff                     = Spell(1216828), -- TWW S2 2pc Buff
+  AllInBuff                             = Spell(1216837), -- TWW S2 4pc Buff
   -- Debuffs
   ExecutionSentenceDebuff               = Spell(343527),
   ExpurgationDebuff                     = Spell(383346),
@@ -208,9 +219,13 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Retribution, Spell.Pal
 -- Items
 if not Item.Paladin then Item.Paladin = {} end
 Item.Paladin.Commons = {
+  -- TWW Items
+  BestinSlotsMelee                      = Item(232526, {16}),
 }
 
 Item.Paladin.Protection = MergeTableByKey(Item.Paladin.Commons, {
+  TomeofLightsDevotion                  = Item(219309, {13, 14}),
+  UnyieldingNetherprism                 = Item(242396, {13, 14}),
 })
 
 Item.Paladin.Retribution = MergeTableByKey(Item.Paladin.Commons, {

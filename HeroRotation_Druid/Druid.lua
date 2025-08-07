@@ -44,6 +44,7 @@ Spell.Druid.Commons = {
   HeartoftheWild                        = Spell(319454),
   Innervate                             = Spell(29166),
   Ironfur                               = Spell(192081),
+  LycarasMeditation                     = Spell(474728),
   Maim                                  = Spell(22570),
   MightyBash                            = Spell(5211),
   MoonkinForm                           = MultiSpell(24858,197625),
@@ -65,6 +66,7 @@ Spell.Druid.Commons = {
   -- Buffs
   FrenziedRegenerationBuff              = Spell(22842),
   HeartoftheWildBuff                    = Spell(319454),
+  InnerResilienceBuff                   = Spell(450706),
   IronfurBuff                           = Spell(192081),
   MarkoftheWildBuff                     = Spell(1126),
   PoPHealBuff                           = Spell(395336),
@@ -165,9 +167,11 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   -- Buffs
   BOATArcaneBuff                        = Spell(394050),
   BOATNatureBuff                        = Spell(394049),
-  CABuff                                = Spell(383410),
+  CABuff1                               = Spell(194223),
+  CABuff2                               = Spell(383410),
   DreamstateBuff                        = Spell(450346),
-  IncarnationBuff                       = Spell(390414),
+  IncarnationBuff1                      = Spell(102560),
+  IncarnationBuff2                      = Spell(390414),
   PAPBuff                               = Spell(393961),
   RattledStarsBuff                      = Spell(393955),
   SolsticeBuff                          = Spell(343648),
@@ -204,6 +208,7 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   Bloodtalons                           = Spell(319439),
   BrutalSlash                           = Spell(202028),
   CircleofLifeandDeath                  = Spell(400320),
+  CoiledtoSpring                        = Spell(449537),
   DireFixation                          = Spell(417710),
   DoubleClawedRake                      = Spell(391700),
   DreadfulBleeding                      = Spell(391045),
@@ -220,6 +225,7 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   RampantFerocity                       = Spell(391709),
   RipandTear                            = Spell(391347),
   Sabertooth                            = Spell(202031),
+  SavageFury                            = Spell(449645),
   SouloftheForest                       = Spell(158476),
   Swipe                                 = Spell(106785),
   TearOpenWounds                        = Spell(391785),
@@ -232,6 +238,7 @@ Spell.Druid.Feral = MergeTableByKey(Spell.Druid.Commons, {
   ApexPredatorsCravingBuff              = Spell(391882),
   BloodtalonsBuff                       = Spell(145152),
   Clearcasting                          = Spell(135700),
+  CoiledtoSpringBuff                    = Spell(449538),
   OverflowingPowerBuff                  = Spell(405189),
   PredatorRevealedBuff                  = Spell(408468), -- T30 P4
   PredatorySwiftnessBuff                = Spell(69369),
@@ -265,10 +272,12 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Commons, {
   SouloftheForest                       = Spell(158477),
   Swipe                                 = Spell(213771),
   ThornsofIron                          = Spell(400222),
+  UrsocsEndurance                       = Spell(393611),
   -- Buffs
   DreamofCenariusBuff                   = Spell(372152),
   GalacticGuardianBuff                  = Spell(213708),
   GoreBuff                              = Spell(93622),
+  StackedDeckBuff                       = Spell(1218537), -- TWW S2 4pc
   ToothandClawBuff                      = Spell(135286),
   ViciousCycleMaulBuff                  = Spell(372015),
   ViciousCycleMangleBuff                = Spell(372019),
@@ -282,6 +291,10 @@ Item.Druid.Commons = {
   -- TWW Trinkets
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
   OvinaxsMercurialEgg                   = Item(220305, {13, 14}),
+  TreacherousTransmitter                = Item(221023, {13, 14}),
+  -- TWW Items
+  BestinSlotsCaster                     = Item(232805, {16}),
+  BestinSlotsMelee                      = Item(232526, {16}),
 }
 
 Item.Druid.Balance = MergeTableByKey(Item.Druid.Commons, {
@@ -290,15 +303,21 @@ Item.Druid.Balance = MergeTableByKey(Item.Druid.Commons, {
   ArakaraSacbrood                       = Item(219314, {13, 14}),
   SignetofthePriory                     = Item(219308, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
-  TreacherousTransmitter                = Item(221023, {13, 14}),
+  -- TWW S2 Old Trinkets
+  SoullettingRuby                       = Item(178809, {13, 14}),
+  -- TWW Items
+  NeuralSynapseEnhancer                 = Item(168973, {16}),
 })
 
 Item.Druid.Feral = MergeTableByKey(Item.Druid.Commons, {
   -- TWW Trinkets
   ConcoctionKissofDeath                 = Item(215174, {13, 14}),
+  JunkmaestrosMegaMagnet                = Item(230189, {13, 14}),
   SikransEndlessArsenal                 = Item(212449, {13, 14}),
   TwinFangInstruments                   = Item(219319, {13, 14}),
 })
 
 Item.Druid.Guardian = MergeTableByKey(Item.Druid.Commons, {
+  -- TWW Trinkets
+  TomeofLightsDevotion                  = Item(219309, {13, 14}),
 })

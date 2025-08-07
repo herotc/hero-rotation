@@ -58,24 +58,6 @@ HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, _, _, _, _, spellId)
     DeathKnight.GhoulTable.SummonedGhoul = nil
     DeathKnight.GhoulTable.SummonExpiration = 0
   end
-  if Player:HasTier(31, 4) and (DeathKnight.GhoulTable.ApocMagusExpiration > 0 or DeathKnight.GhoulTable.ArmyMagusExpiration > 0) then
-    if spellId == 85948 then
-      if DeathKnight.GhoulTable:ApocMagusActive() then DeathKnight.GhoulTable.ApocMagusExpiration = DeathKnight.GhoulTable.ApocMagusExpiration + 1 end
-      if DeathKnight.GhoulTable:ArmyMagusActive() then DeathKnight.GhoulTable.ArmyMagusExpiration = DeathKnight.GhoulTable.ArmyMagusExpiration + 1 end
-    end
-    for _, spell in pairs(OneRuneSpenders) do
-      if spell == spellId then
-        if DeathKnight.GhoulTable:ApocMagusActive() then DeathKnight.GhoulTable.ApocMagusExpiration = DeathKnight.GhoulTable.ApocMagusExpiration + 0.5 end
-        if DeathKnight.GhoulTable:ArmyMagusActive() then DeathKnight.GhoulTable.ArmyMagusExpiration = DeathKnight.GhoulTable.ArmyMagusExpiration + 0.5 end
-      end
-    end
-  end
-  if Player:HasTier(31, 2) and spellId == 275699 then
-    DeathKnight.GhoulTable.ApocMagusExpiration = GetTime() + 20
-  end
-  if Player:HasTier(31, 2) and spellId == 42650 then
-    DeathKnight.GhoulTable.ArmyMagusExpiration = GetTime() + 30
-  end
 end, "SPELL_CAST_SUCCESS")
 
 HL:RegisterForCombatEvent(function(_, _, _, _, _, _, _, destGUID)
@@ -104,11 +86,12 @@ function DeathKnight.GhoulTable:AbomActive()
 end
 
 function DeathKnight.GhoulTable:ApocMagusRemains()
+  if DeathKnight.GhoulTable.ApocMagusExpiration == 0 then return 0 end
   return DeathKnight.GhoulTable.ApocMagusExpiration - GetTime()
 end
 
 function DeathKnight.GhoulTable:ApocMagusActive()
-  return DeathKnight.GhoulTable.ApocMagusRemains() > 0
+  return DeathKnight.GhoulTable:ApocMagusRemains() > 0
 end
 
 function DeathKnight.GhoulTable:ArmyMagusRemains()

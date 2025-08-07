@@ -45,6 +45,30 @@ ArcaneOldPlayerAffectingCombat = HL.AddCoreOverride("Player.AffectingCombat",
   end
 , 62)
 
+HL.AddCoreOverride("Player.BuffStackP",
+  function (self, Spell, AnyCaster, Offset)
+    local BaseCheck = Player:BuffStack(Spell, AnyCaster, Offset)
+    if Spell == SpellArcane.ArcaneHarmonyBuff then
+      return HR.Commons.Mage.EventInfo.ArcaneHarmonyLastStack
+    elseif Spell == SpellArcane.ClearcastingBuff then
+      return HR.Commons.Mage.EventInfo.ClearcastingProcs
+    else
+      return BaseCheck
+    end
+  end
+, 62)
+
+HL.AddCoreOverride("Player.BuffRemainsP",
+  function (self, Spell, AnyCaster, Offset)
+    local BaseCheck = Player:BuffRemains(Spell, AnyCaster, Offset)
+    if Spell == SpellArcane.ArcaneSurgeBuff and HR.Commons.Mage.EventInfo.ArcaneSurgeActive then
+      return math.max(0, BaseCheck - (GetTime() - HR.Commons.Mage.EventInfo.ArcaneSurgeStartTime))
+    else
+      return BaseCheck
+    end
+  end
+, 62)
+
 HL.AddCoreOverride("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     local RangeOK = true
@@ -81,14 +105,62 @@ ArcaneOldPlayerArcaneCharges = HL.AddCoreOverride("Player.ArcaneCharges",
   end
 , 62)
 
+local ArcanePlayerBuffUp
+ArcanePlayerBuffUp = HL.AddCoreOverride("Player.BuffUp",
+  function (self, Spell, AnyCaster, Offset)
+    local BaseCheck = ArcanePlayerBuffUp(self, Spell, AnyCaster, Offset)
+    if Spell == SpellArcane.ArcaneSurgeBuff then
+      return BaseCheck or Player:IsCasting(SpellArcane.ArcaneSurge)
+    else
+      return BaseCheck
+    end
+  end
+, 62)
+
+local ArcanePlayerBuffDown
+ArcanePlayerBuffDown = HL.AddCoreOverride("Player.BuffDown",
+  function (self, Spell, AnyCaster, Offset)
+    local BaseCheck = ArcanePlayerBuffDown(self, Spell, AnyCaster, Offset)
+    if Spell == SpellArcane.ArcaneSurgeBuff then
+      return BaseCheck and not Player:IsCasting(SpellArcane.ArcaneSurge)
+    elseif Spell == SpellArcane.NetherPrecisionBuff then
+      if Player:BuffInfo(Spell) == 1 and Player:IsCasting(SpellArcane.ArcaneBlast) then
+        return true
+      else
+        return BaseCheck
+      end
+    else
+      return BaseCheck
+    end
+  end
+, 62)
+
 -- Fire, ID: 63
+local function IsSKBCastSafe(spell)
+  if not spell then return false end
+  local auraData = C_UnitAuras.GetPlayerAuraBySpellID(SpellFire.FuryoftheSunKingBuff:ID())
+  if auraData and auraData.expirationTime then
+    local currentTime = GetTimePreciseSec()
+    local remainingTime = auraData.expirationTime - currentTime
+    local castTime = spell:CastTime()
+    return remainingTime > (castTime * (auraData.timeMod or 1) + 0.2)
+  end
+  return false
+end
+
 local FirePlayerBuffUp
 FirePlayerBuffUp = HL.AddCoreOverride("Player.BuffUp",
   function (self, Spell, AnyCaster, Offset)
+    if not Spell then return false end
     local BaseCheck = FirePlayerBuffUp(self, Spell, AnyCaster, Offset)
     if Spell == SpellFire.HeatingUpBuff then
-      -- "Predictive" Heating Up buff for SKB Pyroblast casts...
-      return BaseCheck or Player:IsCasting(SpellFire.Pyroblast) and Player:BuffRemains(SpellFire.FuryoftheSunKingBuff) > 0
+      return BaseCheck or (Player:IsCasting(SpellFire.Pyroblast) and IsSKBCastSafe(SpellFire.Pyroblast))
+    elseif Spell == SpellFire.FuryoftheSunKingBuff then
+      local auraData = C_UnitAuras.GetPlayerAuraBySpellID(Spell:ID())
+      if Player:IsCasting(SpellFire.Pyroblast) or Player:IsCasting(SpellFire.Flamestrike) then
+        return IsSKBCastSafe(Player:IsCasting(SpellFire.Pyroblast) and SpellFire.Pyroblast or SpellFire.Flamestrike)
+      end
+      return (auraData and auraData.expirationTime ~= nil) or BaseCheck
     else
       return BaseCheck
     end
@@ -100,7 +172,11 @@ FirePlayerBuffDown = HL.AddCoreOverride("Player.BuffDown",
   function (self, Spell, AnyCaster, Offset)
     local BaseCheck = FirePlayerBuffDown(self, Spell, AnyCaster, Offset)
     if Spell == SpellFire.FuryoftheSunKingBuff then
-      return BaseCheck or Player:IsCasting(SpellFire.Pyroblast)
+      local auraData = C_UnitAuras.GetPlayerAuraBySpellID(Spell:ID())
+      if Player:IsCasting(SpellFire.Pyroblast) or Player:IsCasting(SpellFire.Flamestrike) then
+        return not IsSKBCastSafe(Player:IsCasting(SpellFire.Pyroblast) and SpellFire.Pyroblast or SpellFire.Flamestrike)
+      end
+      return auraData == nil and BaseCheck
     else
       return BaseCheck
     end
@@ -110,13 +186,20 @@ FirePlayerBuffDown = HL.AddCoreOverride("Player.BuffDown",
 HL.AddCoreOverride("Spell.IsReady",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local BaseCheck = self:IsCastable() and self:IsUsableP()
-    local MovingOK = true
-    if self:CastTime() > 0 and Player:IsMoving() and Settings.Commons.MovingRotation then
-      if self == SpellFire.Scorch or (self == SpellFire.Pyroblast and Player:BuffUp(SpellFire.HotStreakBuff)) or (self == SpellFire.Flamestrike and Player:BuffUp(SpellFire.HotStreakBuff)) then
-        MovingOK = true
-      else
-        return false
+
+    if Settings.Commons.MovingRotation and self:CastTime() > 0 and Player:IsMoving() then
+      if self == SpellFire.Scorch or
+         (self == SpellFire.Pyroblast and Player:BuffUp(SpellFire.HotStreakBuff)) or
+         (self == SpellFire.Flamestrike and Player:BuffUp(SpellFire.HotStreakBuff)) then
+        return true
       end
+      return false
+    end
+
+    if self == SpellFire.FireBlast then
+      return BaseCheck and self:Charges() >= 1
+    elseif self == SpellFire.Pyroblast or self == SpellFire.Flamestrike then
+      return BaseCheck and not Player:IsCasting(self)
     else
       return BaseCheck
     end
@@ -125,17 +208,11 @@ HL.AddCoreOverride("Spell.IsReady",
 
 HL.AddCoreOverride("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-    if self:CastTime() > 0 and Player:IsMoving() and Settings.Commons.MovingRotation then
+    if Settings.Commons.MovingRotation and self:CastTime() > 0 and Player:IsMoving() then
       return false
     end
 
-    local RangeOK = true
-    if Range then
-      local RangeUnit = ThisUnit or Target
-      RangeOK = RangeUnit:IsInRange( Range, AoESpell )
-    end
-
-    local BaseCheck = self:IsLearned() and self:CooldownRemains(BypassRecovery, Offset or "Auto") == 0 and RangeOK
+    local BaseCheck = self:IsLearned() and self:CooldownUp(BypassRecovery)
     if self == SpellFire.ShiftingPower then
       return BaseCheck and not Player:IsCasting(self)
     else
@@ -227,7 +304,6 @@ FrostOldBuffUp = HL.AddCoreOverride("Player.BuffUp",
     local BaseCheck = FrostOldBuffUp(self, Spell, AnyCaster, Offset)
     if Spell == SpellFrost.FingersofFrostBuff then
       if SpellFrost.IceLance:InFlight() then
-        -- Note: BypassRecovery to avoid infinite looping from BuffStack to BuffDown.
         return Player:BuffStackP(Spell, false, true) >= 1
       else
         return BaseCheck
@@ -244,7 +320,6 @@ FrostOldBuffDown = HL.AddCoreOverride("Player.BuffDown",
     local BaseCheck = FrostOldBuffDown(self, Spell, AnyCaster, Offset)
     if Spell == SpellFrost.FingersofFrostBuff then
       if SpellFrost.IceLance:InFlight() then
-        -- Note: BypassRecovery to avoid infinite looping from BuffStack to BuffDown.
         return Player:BuffStackP(Spell, false, true) <= 0
       else
         return BaseCheck

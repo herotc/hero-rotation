@@ -30,11 +30,12 @@ OldBMIsCastable = HL.AddCoreOverride("Spell.IsCastable",
 function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
   local BaseCheck = OldBMIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
   if self == SpellBM.SummonPet then
-    return (Hunter.Pet.Status == 0 or Hunter.Pet.Status == 3) and BaseCheck
+    if Hunter.Pet.Status ~= 1 and Pet:IsActive() then Hunter.Pet.Status = 1 end
+    return (Hunter.Pet.Status == 0 or Hunter.Pet.Status == 3) and not (Player:IsMounted() or Player:IsInVehicle()) and BaseCheck
   elseif self == SpellBM.RevivePet then
-    return (Pet:IsDeadOrGhost() or Hunter.Pet.Status == 2 and Hunter.Pet.FeignGUID == 0) and BaseCheck
+    return (Pet:IsDeadOrGhost() or Hunter.Pet.Status == 2 and Hunter.Pet.FeignGUID == 0) and not (Player:IsMounted() or Player:IsInVehicle()) and BaseCheck
   elseif self == SpellBM.MendPet then
-    return Pet:HealthPercentage() > 0 and Pet:HealthPercentage() <= Settings.Commons.MendPetHP and BaseCheck
+    return Pet:HealthPercentage() > 0 and Pet:HealthPercentage() <= Settings.Commons.MendPetHP and not (Player:IsMounted() or Player:IsInVehicle()) and BaseCheck
   else
     return BaseCheck
   end
@@ -78,13 +79,14 @@ end
 local OldMMIsReady
 OldMMIsReady = HL.AddCoreOverride("Spell.IsReady",
 function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  local BaseCheck = OldMMIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+  --local BaseCheck = OldMMIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset) and Player:FocusP() >= self:Cost()
+  local BaseCheck = self:IsCastable() and self:IsUsable() and Player:FocusP() >= self:Cost()
   if self == SpellMM.AimedShot then
-    local ShouldCastAS = (not Player:IsCasting(SpellMM.AimedShot) and SpellMM.AimedShot:Charges() == 1 or SpellMM.AimedShot:Charges() > 1)
+    if Player:IsCasting(self) then return false end
     if Settings.Marksmanship.HideAimedWhileMoving then
-      return BaseCheck and ShouldCastAS and (not Player:IsMoving() or Player:BuffUp(SpellMM.LockandLoadBuff))
+      return BaseCheck and SpellMM.AimedShot:Charges() >= 1 and (not Player:IsMoving() or Player:BuffUp(SpellMM.LockandLoadBuff))
     else
-      return BaseCheck and ShouldCastAS
+      return BaseCheck and SpellMM.AimedShot:Charges() >= 1
     end
   elseif self == SpellMM.WailingArrow then
     return BaseCheck and not Player:IsCasting(self)
@@ -92,6 +94,20 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     return BaseCheck
   end
 end
+, 254)
+
+local OldMMBuffUp
+OldMMBuffUp = HL.AddCoreOverride("Player.BuffUp",
+  function(self, Spell, AnyCaster, Offset)
+    if Spell == SpellMM.LunarStormReadyBuff then
+      return Player:BuffDown(SpellMM.LunarStormCDBuff)
+    elseif Spell == SpellMM.PreciseShotsBuff then
+      -- Note: The TimeSinceLastCast() check is to prevent icon flicker between Aimed Shot cast ending and buff being applied.
+      return OldMMBuffUp(self, Spell, AnyCaster, Offset) or Player:IsCasting(SpellMM.AimedShot) or SpellMM.AimedShot:TimeSinceLastCast() < 1
+    else
+      return OldMMBuffUp(self, Spell, AnyCaster, Offset)
+    end
+  end
 , 254)
 
 local OldMMBuffRemains
@@ -110,8 +126,21 @@ OldMMBuffDown = HL.AddCoreOverride("Player.BuffDown",
   function(self, Spell, AnyCaster, Offset)
     if Spell == SpellMM.PreciseShotsBuff and Player:IsCasting(SpellMM.AimedShot) then
       return false
+    elseif Spell == SpellMM.MovingTargetBuff and Player:IsCasting(SpellMM.AimedShot) then
+      return true
     else
       return OldMMBuffDown(self, Spell, AnyCaster, Offset)
+    end
+  end
+, 254)
+
+local OldMMDebuffDown
+OldMMDebuffDown = HL.AddCoreOverride("Target.DebuffDown",
+  function(self, Spell, AnyCaster, Offset)
+    if Spell == SpellMM.SpottersMarkDebuff and Player:IsCasting(SpellMM.AimedShot) then
+      return true
+    else
+      return OldMMDebuffDown(self, Spell, AnyCaster, Offset)
     end
   end
 , 254)
@@ -123,13 +152,15 @@ HL.AddCoreOverride("Player.FocusP",
       return Focus
     else
       if Player:IsCasting(SpellMM.SteadyShot) then
-        return Focus + 10
+        return Focus + 20
       elseif Player:IsChanneling(SpellMM.RapidFire) then
-        return Focus + 7
+        return Focus + 20
       elseif Player:IsCasting(SpellMM.WailingArrow) then
-        return Focus - 15
+        return Player:BuffUp(SpellMM.TrueshotBuff) and Focus - 8 or Focus - 15
       elseif Player:IsCasting(SpellMM.AimedShot) then
-        return Focus - 35
+        return Player:BuffUp(SpellMM.TrueshotBuff) and Focus - 18 or Focus - 35
+      else
+        return Focus
       end
     end
   end

@@ -43,6 +43,8 @@ Spell.Monk.Commons = {
   QuakingPalm                           = Spell(107079),
   RocketBarrage                         = Spell(69041),
   Shadowmeld                            = Spell(58984),
+  -- External Buffs
+  PowerInfusion                         = Spell(10060),
   -- Abilities
   CracklingJadeLightning                = Spell(117952),
   ExpelHarm                             = Spell(322101),
@@ -55,6 +57,7 @@ Spell.Monk.Commons = {
   TouchofDeath                          = Spell(322109),
   Transcendence                         = Spell(101643),
   TranscendenceTransfer                 = Spell(119996),
+  VivaciousVivication                   = Spell(388812),
   Vivify                                = Spell(116670),
   -- Talents
   BonedustBrew                          = Spell(386276),
@@ -82,15 +85,17 @@ Spell.Monk.Commons = {
   BonedustBrewBuff                      = Spell(386276),
   BonedustBrewDebuff                    = Spell(386276),
   DampenHarmBuff                        = Spell(122278),
+  JunkmaestrosBuff                      = Spell(1219661), -- Junkmaestro's Mega Magnet buff
   PressurePointBuff                     = Spell(393053),
   RushingJadeWindBuff                   = Spell(116847),
+  VivaciousVivicationBuff               = Spell(392883),
   -- Debuffs
   -- Item Effects
   CalltoDominanceBuff                   = Spell(403380), -- Neltharion trinket buff
   DomineeringArroganceBuff              = Spell(411661), -- Neltharion trinket buff2
-  TheEmperorsCapacitorBuff              = Spell(235054),
+  TheEmperorsCapacitorBuff              = Spell(393039),
   -- Misc
-  PoolEnergy                            = Spell(999910),
+  Pool                                  = Spell(999910),
   StopFoF                               = Spell(363653)
 }
 
@@ -121,6 +126,7 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   FlyingSerpentKickLand                 = Spell(115057),
   SpinningCraneKick                     = Spell(101546),
   -- Talents
+  CourageousImpulse                     = Spell(451495),
   CraneVortex                           = Spell(388848),
   EnergyBurst                           = Spell(451498),
   GaleForce                             = Spell(451580),
@@ -132,12 +138,16 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   InnerPeace                            = Spell(397768),
   InvokeXuenTheWhiteTiger               = Spell(123904),
   KnowledgeoftheBrokenTemple            = Spell(451529),
+  LastEmperorsCapacitor                 = Spell(392989),
   MemoryoftheMonastery                  = Spell(454969),
   OrderedElements                       = Spell(451463),
+  PoweroftheThunderKing                 = Spell(459809),
   RevolvingWhirl                        = Spell(451524),
   SequencedStrikes                      = Spell(451515),
   ShadowboxingTreads                    = Spell(392982),
   SingularlyFocusedJade                 = Spell(451573),
+  SlicingWinds                          = Spell(1217413),
+  SlicingWindsDamage                    = Spell(1217411),
   StormEarthAndFire                     = Spell(137639),
   StormEarthAndFireFixate               = Spell(221771),
   StrikeoftheWindlord                   = Spell(392983),
@@ -160,9 +170,12 @@ Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Commons, {
   TeachingsoftheMonasteryBuff           = Spell(202090),
   -- Debuffs
   AcclamationDebuff                     = Spell(451433),
+  GaleForceDebuff                       = Spell(451582),
   MarkoftheCraneDebuff                  = Spell(228287),
   -- Tier 31 Effects
   BlackoutReinforcementBuff             = Spell(424454),
+  -- TWW2 Effects
+  CashoutBuff                           = Spell(1216498), -- TWW2 4pc
 })
 Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Windwalker, Spell.Monk.ConduitoftheCelestials)
 Spell.Monk.Windwalker = MergeTableByKey(Spell.Monk.Windwalker, Spell.Monk.ShadoPan)
@@ -211,6 +224,8 @@ Spell.Monk.Brewmaster = MergeTableByKey(Spell.Monk.Commons, {
   HeavyStagger                          = Spell(124273),
   ModerateStagger                       = Spell(124274),
   LightStagger                          = Spell(124275),
+  -- TWW2 Effects
+  OpportunisticStrikeBuff               = Spell(1217999), -- TWW2 4pc
 })
 Spell.Monk.Brewmaster = MergeTableByKey(Spell.Monk.Brewmaster, Spell.Monk.MasterofHarmony)
 Spell.Monk.Brewmaster = MergeTableByKey(Spell.Monk.Brewmaster, Spell.Monk.ShadoPan)
@@ -221,18 +236,12 @@ Item.Monk.Commons = {
 }
 
 Item.Monk.Windwalker = MergeTableByKey(Item.Monk.Commons, {
-  -- DF Trinkets
-  AlgetharPuzzleBox                     = Item(193701, {13, 14}),
-  BeacontotheBeyond                     = Item(203963, {13, 14}),
-  DragonfireBombDispenser               = Item(202610, {14, 14}),
-  EruptingSpearFragment                 = Item(193769, {13, 14}),
-  ManicGrieftorch                       = Item(194308, {13, 14}),
   -- TWW Trinkets
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
+  JunkmaestrosMegaMagnet                = Item(230189, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
+  SignetofthePriory                     = Item(219308, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
-  -- Other On-Use Items
-  Djaruun                               = Item(202569, {16}),
 })
 
 Item.Monk.Brewmaster = MergeTableByKey(Item.Monk.Commons, {
