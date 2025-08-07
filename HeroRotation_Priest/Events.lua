@@ -13,8 +13,10 @@ local Spell = HL.Spell
 local Item = HL.Item
 -- Lua
 -- File Locals
-
-
+HR.Commons.Priest = {}
+local Priest = HR.Commons.Priest
+Priest.Archon4pcStacks = 0
+local SpellShadow = Spell.Priest.Shadow
 
 --- ============================ CONTENT ============================
 --- ======= NON-COMBATLOG =======
@@ -74,5 +76,23 @@ local Item = HL.Item
   -- Arguments Variables
 
 --------------------------
------ Shadow --------
+--------- Shadow ---------
 --------------------------
+
+-- Archon 4pc Helper
+HL:RegisterForSelfCombatEvent(
+  function(...)
+    if Player:HeroTreeID() == 19 then
+      local Event, _, SourceGUID, _, _, _, DestGUID, _, _, _, SpellID = select(2, ...)
+      if Event == "SPELL_AURA_REMOVED" and SpellID == SpellShadow.PowerSurgeBuff:ID() then
+        -- Power Surge removed, reset variable
+        Priest.Archon4pcStacks = 0
+      elseif Event == "SPELL_CAST_SUCCESS" and SpellID == SpellShadow.DevouringPlague:ID() then
+        -- Each cast of Devouring Plague increases the stacks by 1
+        Priest.Archon4pcStacks = Priest.Archon4pcStacks + 1
+      end
+    end
+  end
+  , "SPELL_AURA_REMOVED"
+  , "SPELL_CAST_SUCCESS"
+)

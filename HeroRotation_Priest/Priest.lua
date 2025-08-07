@@ -75,6 +75,8 @@ Spell.Priest.Archon = {
   EmpoweredSurges             = Spell(453799),
   PerfectedForm               = Spell(453917),
   PowerSurge                  = Spell(453109),
+  -- Buffs
+  PowerSurgeBuff              = Spell(453112),
   -- 11.2 Tier Set
   AscensionBuff               = Spell(1239336), -- TWW S3 2pc Buff
 }
@@ -105,6 +107,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   -- Talents
   DarkAscension               = Spell(391109),
   Deathspeaker                = Spell(392507),
+  DescendingDarkness          = Spell(1242666),
   DevouringPlague             = Spell(335467),
   Dispersion                  = Spell(47585),
   DistortedReality            = Spell(409044),
@@ -127,6 +130,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   UnfurlingDarkness           = Spell(341273),
   VoidTorrent                 = Spell(263165),
   Voidtouched                 = Spell(407430),
+  VoidVolley                  = Spell(1240401),
   WhisperingShadows           = Spell(406777),
   -- Buffs
   DarkAscensionBuff           = Spell(391109),
@@ -141,6 +145,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   ShadowformBuff              = Spell(232698),
   UnfurlingDarknessBuff       = Spell(341282),
   VoidformBuff                = Spell(194249),
+  VoidVolleyBuff              = Spell(1242171),
   -- Debuffs
   DevouringPlagueDebuff       = Spell(335467),
   VampiricTouchDebuff         = Spell(34914),
@@ -153,9 +158,11 @@ if not Item.Priest then Item.Priest = {} end
 Item.Priest.Shadow = {
   -- TWW Trinkets
   AberrantSpellforge          = Item(212451, {13, 14}),
+  AstralGladiatorsBadge       = Item(230638, {13, 14}),
   FlarendosPilotLight         = Item(230191, {13, 14}),
   GeargrindersSpareKeys       = Item(230197, {13, 14}),
-  PrizedGladiatorsBadgeofFerocity = Item(229780, {13, 14}),
+  PerfidiousProjector         = Item(242403, {13, 14}),
+  PrizedGladiatorsBadge       = Item(229780, {13, 14}),
   SignetofthePriory           = Item(219308, {13, 14}),
   SpymastersWeb               = Item(220202, {13, 14}),
   -- TWW S2 Old Trinkets
