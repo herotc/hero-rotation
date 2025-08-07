@@ -96,6 +96,7 @@ Spell.Paladin.Lightsmith = {
   -- Buffs
   BlessedAssuranceBuff                 = Spell(433019),
   DivineGuidanceBuff                   = Spell(433106),
+  MasterworkBuff                       = Spell(1238903),
   RiteofAdjurationBuff                 = Spell(433584),
   RiteofSanctificationBuff             = Spell(433550),
   SacredWeaponBuff                     = Spell(432502),
@@ -109,6 +110,8 @@ Spell.Paladin.Templar = {
   LightsGuidance                       = Spell(427445),
   ShaketheHeavens                      = Spell(431533),
   -- Buffs
+  HammerofLightBuff                    = Spell(427441),
+  HammerofLightFreeBuff                = Spell(433732),
   LightsDeliveranceBuff                = Spell(433674),
   ShaketheHeavensBuff                  = Spell(431536),
 }
@@ -222,6 +225,7 @@ Item.Paladin.Commons = {
 
 Item.Paladin.Protection = MergeTableByKey(Item.Paladin.Commons, {
   TomeofLightsDevotion                  = Item(219309, {13, 14}),
+  UnyieldingNetherprism                 = Item(242396, {13, 14}),
 })
 
 Item.Paladin.Retribution = MergeTableByKey(Item.Paladin.Commons, {
