@@ -117,6 +117,9 @@ local function Defensives()
   if S.CelestialBrew:IsCastable() and (Player:BuffDown(S.BlackoutComboBuff) and Player:IncomingDamageTaken(1999) > (UnitHealthMax("player") * 0.1 + Player:StaggerLastTickDamage(4)) and Player:BuffStack(S.ElusiveBrawlerBuff) < 2) then
     if Cast(S.CelestialBrew, nil, Settings.BrMDS.DisplayStyle.CelestialBrew) then return "Celestial Brew"; end
   end
+  if S.CelestialInfusion:IsCastable() and (Player:BuffDown(S.CelestialInfusionBuff) and (Player:IncomingDamageTaken(1999) > (UnitHealthMax("player") * 0.15 + Player:StaggerLastTickDamage(4) * 2) or Player:DebuffUp(S.HeavyStagger) or Player:DebuffUp(S.ModerateStagger))) then
+    if Cast(S.CelestialInfusion, nil, Settings.BrMDS.DisplayStyle.CelestialInfusion) then return "Celestial Infusion"; end
+  end
   if S.PurifyingBrew:IsCastable() and ShouldPurify() then
     if Cast(S.PurifyingBrew, nil, Settings.BrMDS.DisplayStyle.Purify) then return "Purifying Brew (Capping Charges)"; end
   end
