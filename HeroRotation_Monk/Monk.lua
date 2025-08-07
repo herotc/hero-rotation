@@ -208,6 +208,7 @@ Spell.Monk.Brewmaster = MergeTableByKey(Spell.Monk.Commons, {
   WeaponsofOrder                        = Spell(387184),
   -- Defensive
   CelestialBrew                         = Spell(322507),
+  CelestialInfusion                     = Spell(1241059),
   FortifyingBrew                        = Spell(115203),
   PurifyingBrew                         = Spell(119582),
   -- Buffs

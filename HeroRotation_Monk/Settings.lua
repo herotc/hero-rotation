@@ -75,6 +75,7 @@ HR.GUISettings.APL.Monk = {
     -- DisplayStyle for Brewmaster-only stuff
     DisplayStyle = {
       CelestialBrew = "Suggested",
+      CelestialInfusion = "Suggested",
       DampenHarm = "Suggested",
       FortifyingBrew = "Suggested",
       Purify = "SuggestedRight"
