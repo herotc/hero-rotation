@@ -124,25 +124,28 @@ local function Precombat()
   -- variable,name=If_build,value=1,value_else=0,if=talent.thorns_of_iron.enabled&talent.ursocs_endurance.enabled
   -- Note: Handled in variable declarations and SPELLS_CHANGED/LEARNED_SPELL_IN_TAB.
   -- heart_of_the_Wild,if=talent.heart_of_the_wild.enabled&!talent.rip.enabled
+  if S.HeartoftheWild:IsCastable() and (not S.Rip:IsAvailable()) then
+    if Cast(S.HeartoftheWild, Settings.Guardian.GCDasOffGCD.HeartOfTheWild) then return "heart_of_the_wild precombat 4"; end
+  end
   -- bear_form
   if S.BearForm:IsCastable() then
-    if Cast(S.BearForm) then return "bear_form precombat 4"; end
+    if Cast(S.BearForm) then return "bear_form precombat 6"; end
   end
   -- Manually added: moonfire
   if S.Moonfire:IsCastable() then
-    if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire precombat 6"; end
+    if Cast(S.Moonfire, nil, nil, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire precombat 8"; end
   end
   -- Manually added: wild_charge
   if S.WildCharge:IsCastable() and (Target:IsInRange(S.WildCharge.MaximumRange) and not Target:IsInRange(S.WildCharge.MinimumRange)) then
-    if Cast(S.WildCharge) then return "wild_charge precombat 8"; end
+    if Cast(S.WildCharge) then return "wild_charge precombat 10"; end
   end
   -- Manually added: thrash_bear
   if S.ThrashBear:IsCastable() and IsInAoERange then
-    if Cast(S.ThrashBear) then return "thrash precombat 10"; end
+    if Cast(S.ThrashBear) then return "thrash precombat 12"; end
   end
   -- Manually added: mangle
   if S.Mangle:IsCastable() and IsInMeleeRange then
-    if Cast(S.Mangle) then return "mangle precombat 12"; end
+    if Cast(S.Mangle) then return "mangle precombat 14"; end
   end
 end
 
@@ -178,10 +181,6 @@ local function Bear()
   -- heart_of_the_Wild,if=(talent.heart_of_the_wild.enabled&!talent.rip.enabled)|talent.heart_of_the_wild.enabled&buff.feline_potential_counter.stack=6&active_enemies<3
   if CDsON() and S.HeartoftheWild:IsCastable() and (not S.Rip:IsAvailable() or Player:BuffStack(S.FelinePotentialBuff) == 6 and Enemies8yCount < 3) then
     if Cast(S.HeartoftheWild, Settings.Guardian.GCDasOffGCD.HeartOfTheWild) then return "heart_of_the_wild bear 4"; end
-  end
-  -- moonfire,cycle_targets=1,if=buff.bear_form.up&(((!ticking&target.time_to_die>12)|(refreshable&target.time_to_die>12))&active_enemies<7&talent.fury_of_nature.enabled)|(((!ticking&target.time_to_die>12)|(refreshable&target.time_to_die>12))&active_enemies<4&!talent.fury_of_nature.enabled)
-  if S.Moonfire:IsCastable() and Player:BuffUp(S.BearForm) then
-    if Everyone.CastCycle(S.Moonfire, Enemies8y, EvaluateCycleMoonfire, not Target:IsSpellInRange(S.Moonfire)) then return "moonfire bear 6"; end
   end
   -- thrash_bear,target_if=refreshable|(dot.thrash_bear.stack<5&talent.flashing_claws.rank=2|dot.thrash_bear.stack<4&talent.flashing_claws.rank=1|dot.thrash_bear.stack<3&!talent.flashing_claws.enabled)
   if S.ThrashBear:IsCastable() then
@@ -411,7 +410,7 @@ local function APL()
 end
 
 local function OnInit()
-  HR.Print("Guardian Druid rotation has been updated for patch 11.1.5.")
+  HR.Print("Guardian Druid rotation has been updated for patch 11.2.0.")
 end
 
 HR.SetAPL(104, APL, OnInit)
