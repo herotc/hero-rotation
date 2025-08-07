@@ -575,7 +575,8 @@ local function CDs ()
   if HR.CDsON() and S.SymbolsofDeath:IsReady() then
     if (Player:BuffRemains(S.SymbolsofDeath) <= 3.5 and Maintenance
       and (MeleeEnemies10yCount >=3 or Player:BuffDown(S.FlagellationBuff) or Target:DebuffRemains(S.Rupture) >= 30)
-      and (not S.Flagellation:IsAvailable() or S.Flagellation:CooldownRemains() >= 30 - 15 * num(not S.DeathPerception:IsAvailable())
+      and (not S.Flagellation:IsAvailable() or (S.Flagellation:CooldownRemains() >= 30 - 15 * num(not S.DeathPerception:IsAvailable())
+      or S.Flagellation:IsReady())
       and S.SecretTechnique:CooldownRemains() < 8 or not S.DeathPerception:IsAvailable()) or HL.BossFilteredFightRemains("<=", 15)) then
       if Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then
         return "Cast Symbols of Death"
@@ -607,7 +608,7 @@ local function CDs ()
     and (S.ShadowDance:IsReady() or Player:BuffUp(S.ShadowDanceBuff))
     and (S.SymbolsofDeath:IsReady() or Player:BuffUp(S.SymbolsofDeath))
     and (S.ShadowBlades:IsReady() or Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:CooldownRemains() <=3) then
-    if ComboPoints >= 5 and S.ShadowBlades:CooldownRemains() <= 3
+    if ComboPoints >= 5
       or HL.BossFilteredFightRemains("<=", 25) then
       if Cast(S.Flagellation, nil, Settings.CommonsDS.DisplayStyle.Flagellation, not Target:IsSpellInRange(S.Flagellation)) then
         return "Cast Flagellation"
