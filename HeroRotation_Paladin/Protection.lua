@@ -35,7 +35,8 @@ local I = Item.Paladin.Protection
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  -- I.ItemName:ID(),
+  I.TomeofLightsDevotion:ID(),
+  I.UnyieldingNetherprism:ID(),
 }
 
 --- ===== GUI Settings ======
