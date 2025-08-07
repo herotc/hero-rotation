@@ -154,7 +154,6 @@ local function ComputeDPPmultiplier()
   local Value = 1
   if Player:BuffUp(S.DarkAscensionBuff) then Value = Value * 1.25 end
   if Player:BuffUp(S.DarkEvangelismBuff) then Value = Value * (1 + (0.01 * Player:BuffStack(S.DarkEvangelismBuff))) end
-  if Player:BuffUp(S.DevouredFearBuff) or Player:BuffUp(S.DevouredPrideBuff) then Value = Value * 1.05 end
   if S.DistortedReality:IsAvailable() then Value = Value * 1.2 end
   if Player:BuffUp(S.MindDevourerBuff) then Value = Value * 1.2 end
   if S.Voidtouched:IsAvailable() then Value = Value * 1.06 end
