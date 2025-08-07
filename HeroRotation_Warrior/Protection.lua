@@ -351,7 +351,7 @@ local function APL()
     end
     -- ignore_pain,if=target.health.pct>=20&
     --(rage.deficit<=15&cooldown.shield_slam.ready
-    --|rage.deficit<=40&cooldown.shield_charge.ready&talent.champions_bulwark.enabled
+    --|rage.deficit<=40&cooldown.shield_charge.ready
     --|rage.deficit<=20&cooldown.shield_charge.ready
     --|rage.deficit<=30&cooldown.demoralizing_shout.ready&talent.booming_voice.enabled
     --|rage.deficit<=20&cooldown.avatar.ready
@@ -367,7 +367,7 @@ local function APL()
     -- Note: Removed tier31 check. Nobody should still be using it.
     if S.IgnorePain:IsReady() and IgnorePainWillNotCap() and (Target:HealthPercentage() >= 20 and 
       (Player:RageDeficit() <= 15 and S.ShieldSlam:CooldownUp() 
-      or Player:RageDeficit() <= 40 and S.ShieldCharge:CooldownUp() and S.ChampionsBulwark:IsAvailable() 
+      or Player:RageDeficit() <= 40 and S.ShieldCharge:CooldownUp() 
       or Player:RageDeficit() <= 20 and S.ShieldCharge:CooldownUp() 
       or Player:RageDeficit() <= 30 and S.DemoralizingShout:CooldownUp() and S.BoomingVoice:IsAvailable() 
       or Player:RageDeficit() <= 20 and S.Avatar:CooldownUp() 
@@ -437,7 +437,7 @@ local function APL()
 end
 
 local function Init()
-  HR.Print("Protection Warrior rotation has been updated for patch 11.1.5.")
+  HR.Print("Protection Warrior rotation has been updated for patch 11.2.0.")
 end
 
 HR.SetAPL(73, APL, Init)
