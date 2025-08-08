@@ -130,14 +130,13 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   UnfurlingDarkness           = Spell(341273),
   VoidTorrent                 = Spell(263165),
   Voidtouched                 = Spell(407430),
-  VoidVolley                  = Spell(1240401),
+  VoidVolley                  = Spell(1242173),
+  VoidVolleyTalent            = Spell(1240401),
   WhisperingShadows           = Spell(406777),
   -- Buffs
   DarkAscensionBuff           = Spell(391109),
   DarkEvangelismBuff          = Spell(391099),
   DeathspeakerBuff            = Spell(392511),
-  DevouredFearBuff            = Spell(373319), -- Idol of Y'Shaarj buff
-  DevouredPrideBuff           = Spell(373316), -- Idol of Y'Shaarj buff
   MindDevourerBuff            = Spell(373204),
   MindFlayInsanityBuff        = Spell(391401),
   MindMeltBuff                = Spell(391092),

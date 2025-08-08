@@ -109,6 +109,7 @@ HR.GUISettings.APL.Druid = {
       Defensives = "Suggested"
     },
     GCDasOffGCD = {
+      CatForm = false,
       HeartOfTheWild = true,
       LunarBeam = false,
       RageOfTheSleeper = false,
