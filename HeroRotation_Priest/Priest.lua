@@ -130,7 +130,8 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   UnfurlingDarkness           = Spell(341273),
   VoidTorrent                 = Spell(263165),
   Voidtouched                 = Spell(407430),
-  VoidVolley                  = Spell(1240401),
+  VoidVolley                  = Spell(1242173),
+  VoidVolleyTalent            = Spell(1240401),
   WhisperingShadows           = Spell(406777),
   -- Buffs
   DarkAscensionBuff           = Spell(391109),
