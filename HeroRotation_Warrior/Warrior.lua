@@ -75,6 +75,7 @@ Spell.Warrior.Commons = {
   BattleShoutBuff                       = Spell(6673),
   ChampionsMightBuff                    = Spell(386286),
   HurricaneBuff                         = Spell(390581),
+  InnerResilienceBuff                   = Spell(450706), -- Tome of Light's Devotion buff
   WarMachineBuff                        = Spell(262232),
   -- Debuffs
   ChampionsMightDebuff                  = Spell(376080),
