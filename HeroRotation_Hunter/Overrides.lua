@@ -88,7 +88,7 @@ function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     else
       return BaseCheck and SpellMM.AimedShot:Charges() >= 1
     end
-  elseif self == SpellMM.WailingArrow then
+  elseif self == SpellMM.BlackArrow then
     return BaseCheck and not Player:IsCasting(self)
   else
     return BaseCheck
@@ -155,10 +155,10 @@ HL.AddCoreOverride("Player.FocusP",
         return Focus + 20
       elseif Player:IsChanneling(SpellMM.RapidFire) then
         return Focus + 20
-      elseif Player:IsCasting(SpellMM.WailingArrow) then
-        return Player:BuffUp(SpellMM.TrueshotBuff) and Focus - 8 or Focus - 15
+      elseif Player:IsCasting(SpellMM.BlackArrow) then
+        return Focus - 10
       elseif Player:IsCasting(SpellMM.AimedShot) then
-        return Player:BuffUp(SpellMM.TrueshotBuff) and Focus - 18 or Focus - 35
+        return Focus - 35
       else
         return Focus
       end
