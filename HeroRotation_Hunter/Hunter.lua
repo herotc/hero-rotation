@@ -109,6 +109,7 @@ Spell.Hunter.PackLeader = {
   HogstriderBuff                        = Spell(472640),
   HowlofthePackBuff                     = Spell(462515),
   HowlofthePackLeaderCDBuff             = Spell(471877),
+  LeadFromTheFrontBuff                  = Spell(472743),
   PackCoordinationBuff                  = Spell(445695),
   ScatteredPreyBuff                     = Spell(461866),
   -- Howl of the Pack Leader Summon Buffs
