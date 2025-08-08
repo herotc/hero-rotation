@@ -249,12 +249,6 @@ local function EvaluateTargetIfDPMain(TargetUnit)
   return S.DevouringPlagueDebuff:AuraActiveCount() <= 1 and Target:DebuffRemains(S.DevouringPlagueDebuff) <= GCDMax and (not S.VoidEruption:IsAvailable() or S.VoidEruption:CooldownRemains() >= GCDMax * 3) or Player:InsanityDeficit() <= 35 or Player:BuffUp(S.MindDevourerBuff) or EntropicRiftUp or Player:BuffUp(S.PowerSurgeBuff) and TWW3Archon4pcHelper() < 4 and Player:BuffUp(S.AscensionBuff)
 end
 
-local function EvaluateTargetIfSWD(TargetUnit)
-  -- if=talent.depth_of_shadows&(target.health.pct<=20|buff.deathspeaker.up&talent.deathspeaker)
-  -- Note: Talent checked before CastTargetIf.
-  return TargetUnit:HealthPercentage() <= 20 or Player:BuffUp(S.DeathspeakerBuff) and S.Deathspeaker:IsAvailable()
-end
-
 local function EvaluateTargetIfVoidBlastMain(TargetUnit)
   -- if=(dot.devouring_plague.remains>=execute_time|buff.entropic_rift.remains<=gcd.max|action.void_torrent.channeling&talent.void_empowerment)&(insanity.deficit>=16|cooldown.mind_blast.full_recharge_time<=gcd.max)&(!talent.mind_devourer|!buff.mind_devourer.up|buff.entropic_rift.remains<=gcd.max)
   -- Note: 2nd and 3rd parts handled before CastTargetIf.
@@ -541,7 +535,7 @@ local function Main()
   end
   -- shadow_word_death,target_if=max:(target.health.pct<=20)*100+dot.devouring_plague.ticking,if=priest.force_devour_matter&talent.devour_matter
   if S.ShadowWordDeath:IsReady() and (Settings.Shadow.ForceDevourMatter and S.DevourMatter:IsAvailable()) then
-    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusHP, EvaluateTargetIfSWD, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 4"; end
+    if Everyone.CastTargetIf(S.ShadowWordDeath, Enemies10ySplash, "max", EvaluateTargetIfFilterDPPlusHP, nil, not Target:IsSpellInRange(S.ShadowWordDeath)) then return "shadow_word_death main 4"; end
   end
   -- void_blast,target_if=max:(dot.devouring_plague.remains*1000+target.time_to_die),if=(dot.devouring_plague.remains>=execute_time|buff.entropic_rift.remains<=gcd.max|action.void_torrent.channeling&talent.void_empowerment)&(insanity.deficit>=16|cooldown.mind_blast.full_recharge_time<=gcd.max|buff.entropic_rift.remains<=gcd.max)
   if S.VoidBlastAbility:IsReady() and ((Player:InsanityDeficit() >= 16 or S.MindBlast:FullRechargeTime() <= GCDMax or EntropicRiftRemains <= GCDMax)) then

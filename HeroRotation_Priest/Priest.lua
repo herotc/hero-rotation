@@ -136,7 +136,6 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   -- Buffs
   DarkAscensionBuff           = Spell(391109),
   DarkEvangelismBuff          = Spell(391099),
-  DeathspeakerBuff            = Spell(392511),
   MindDevourerBuff            = Spell(373204),
   MindFlayInsanityBuff        = Spell(391401),
   MindMeltBuff                = Spell(391092),
