@@ -88,6 +88,7 @@ Spell.Druid.DruidoftheClaw = {
   RavageAbilityBear                     = Spell(441605),
   RavageAbilityCat                      = Spell(441591),
   -- Talents
+  EmpoweredShapeshifting                = Spell(441689),
   FountofStrength                       = Spell(441675),
   Ravage                                = Spell(441583),
   WildpowerSurge                        = Spell(441691),
