@@ -117,7 +117,9 @@ local function Defensives()
   if S.CelestialBrew:IsCastable() and (Player:BuffDown(S.BlackoutComboBuff) and Player:IncomingDamageTaken(1999) > (UnitHealthMax("player") * 0.1 + Player:StaggerLastTickDamage(4)) and Player:BuffStack(S.ElusiveBrawlerBuff) < 2) then
     if Cast(S.CelestialBrew, nil, Settings.BrMDS.DisplayStyle.CelestialBrew) then return "Celestial Brew"; end
   end
-  if S.CelestialInfusion:IsCastable() and (Player:BuffDown(S.CelestialInfusion) and (Player:IncomingDamageTaken(1999) > (UnitHealthMax("player") * 0.15 + Player:StaggerLastTickDamage(4) * 2) or Player:DebuffUp(S.HeavyStagger) or Player:DebuffUp(S.ModerateStagger))) then
+  -- Modified code (include stagger damage, but remove buff checks):
+  -- Incoming damage over 2 seconds exceeds 15% max health + recent stagger tick damage
+  if S.CelestialInfusion:IsCastable() and Player:BuffDown(S.CelestialInfusion) and Player:IncomingDamageTaken(1999) > (UnitHealthMax("player") * 0.15 + Player:StaggerLastTickDamage(4)) then
     if Cast(S.CelestialInfusion, nil, Settings.BrMDS.DisplayStyle.CelestialInfusion) then return "Celestial Infusion"; end
   end
   if S.PurifyingBrew:IsCastable() and ShouldPurify() then
