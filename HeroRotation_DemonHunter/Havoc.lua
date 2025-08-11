@@ -121,8 +121,8 @@ local function SetTrinketVariables()
   VarTrinket1Steroids = VarTrinket1CD > 0 and Trinket1:HasStatAnyDps() and VarTrinket1ID ~= I.ImprovisedSeaforiumPacemaker:ID()
   VarTrinket2Steroids = VarTrinket2CD > 0 and Trinket2:HasStatAnyDps() and VarTrinket2ID ~= I.ImprovisedSeaforiumPacemaker:ID()
 
-  VarTrinket1Crit = VarTrinket1ID == I.MadQueensMandate:ID() or VarTrinket1ID == I.JunkmaestrosMegaMagnet:ID() or VarTrinket1ID == I.GeargrindersSpareKeys:ID() or VarTrinket1ID == I.RavenousHoneyBuzzer:ID() or VarTrinket1ID == I.GrimCodex:ID() or VarTrinekt1ID == I.RatfangToxin:ID() or VarTrinket1ID == I.Blastmaster3000:ID()
-  VarTrinket2Crit = VarTrinket2ID == I.MadQueensMandate:ID() or VarTrinket2ID == I.JunkmaestrosMegaMagnet:ID() or VarTrinket2ID == I.GeargrindersSpareKeys:ID() or VarTrinket2ID == I.RavenousHoneyBuzzer:ID() or VarTrinket2ID == I.GrimCodex:ID() or VarTrinket2ID == I.RatfangToxin:ID() or VarTrinekt2ID == I.Blastmaster3000:ID()
+  VarTrinket1Crit = VarTrinket1ID == I.MadQueensMandate:ID() or VarTrinket1ID == I.JunkmaestrosMegaMagnet:ID() or VarTrinket1ID == I.GeargrindersSpareKeys:ID() or VarTrinket1ID == I.RavenousHoneyBuzzer:ID() or VarTrinket1ID == I.GrimCodex:ID() or VarTrinket1ID == I.RatfangToxin:ID() or VarTrinket1ID == I.Blastmaster3000:ID()
+  VarTrinket2Crit = VarTrinket2ID == I.MadQueensMandate:ID() or VarTrinket2ID == I.JunkmaestrosMegaMagnet:ID() or VarTrinket2ID == I.GeargrindersSpareKeys:ID() or VarTrinket2ID == I.RavenousHoneyBuzzer:ID() or VarTrinket2ID == I.GrimCodex:ID() or VarTrinket2ID == I.RatfangToxin:ID() or VarTrinket2ID == I.Blastmaster3000:ID()
 end
 SetTrinketVariables()
 
@@ -415,7 +415,7 @@ local function FSMeta()
   end
   -- vengeful_retreat,use_off_gcd=1,if=talent.initiative&(gcd.remains<0.3|talent.inertia&cooldown.eye_beam.remains>gcd.remains&(buff.cycle_of_hatred.stack=2|buff.cycle_of_hatred.stack=3))&(cooldown.metamorphosis.remains&(buff.demonsurge_annihilation.down&buff.demonsurge_death_sweep.down)|talent.restless_hunter&(!hero_tree.felscarred|buff.demonsurge_annihilation.down))&(!talent.inertia&buff.unbound_chaos.down|buff.inertia_trigger.down)&(!talent.essence_break|cooldown.essence_break.remains>18|cooldown.essence_break.remains<=gcd.remains+talent.inertia*1.5&(!talent.student_of_suffering|(buff.student_of_suffering.up|cooldown.sigil_of_flame.remains>5)))&(cooldown.eye_beam.remains>5|cooldown.eye_beam.remains<=gcd.remains|cooldown.eye_beam.up)
   if S.VengefulRetreat:IsCastable() and (S.Initiative:IsAvailable() and (Player:GCDRemains() < 0.3 or S.Inertia:IsAvailable() and BeamAbility:CooldownRemains() > Player:GCDRemains() and (Player:BuffStack(S.CycleofHatredBuff) == 2 or Player:BuffStack(S.CycleofHatredBuff) == 3)) and (S.Metamorphosis:CooldownDown() and (not Player:Demonsurge("Annihilation") and not Player:Demonsurge("DeathSweep")) or S.RestlessHunter:IsAvailable() and (VarHeroTree ~= 34 or not Player:Demonsurge("Annihilation"))) and (not S.Inertia:IsAvailable() and Player:BuffDown(S.UnboundChaosBuff) or not InertiaTrigger()) and (not S.EssenceBreak:IsAvailable() or S.EssenceBreak:CooldownRemains() > 18 or S.EssenceBreak:CooldownRemains() <= Player:GCDRemains() + num(S.Inertia:IsAvailable()) * 1.5 and (not S.StudentofSuffering:IsAvailable() or (Player:BuffUp(S.StudentofSufferingBuff) or SigilAbility:CooldownRemains() > 5))) and (BeamAbility:CooldownRemains() > 5 or BeamAbility:CooldownRemains() <= Player:GCDRemains() or BeamAbility:CooldownUp())) then
-    if Cast(S.VengefulRetreat, Settings.Vengeance.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat fs_meta 6"; end
+    if Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat fs_meta 6"; end
   end
   -- death_sweep,if=hero_tree.felscarred&talent.essence_break&buff.demonsurge_death_sweep.up&(buff.inertia.up&(cooldown.essence_break.remains>buff.inertia.remains|!talent.essence_break)|cooldown.metamorphosis.remains<=5&buff.inertia_trigger.down|buff.inertia.up&buff.demonsurge_abyssal_gaze.up)|talent.inertia&buff.inertia_trigger.down&cooldown.vengeful_retreat.remains>=gcd.max&buff.inertia.down
   if S.DeathSweep:IsReady() and (VarHeroTree == 34 and S.EssenceBreak:IsAvailable() and Player:Demonsurge("DeathSweep") and (Player:BuffUp(S.InertiaBuff) and (S.EssenceBreak:CooldownRemains() > Player:BuffRemains(S.InertiaBuff) or not S.EssenceBreak:IsAvailable()) or S.Metamorphosis:CooldownRemains() <= 5 and not InertiaTrigger() or Player:BuffUp(S.InertiaBuff) and Player:Demonsurge("AbyssalGaze")) or S.Inertia:IsAvailable() and not InertiaTrigger() and S.VengefulRetreat:CooldownRemains() >= Player:GCD() and Player:BuffDown(S.InertiaBuff)) then
@@ -601,7 +601,7 @@ end
 local function FS()
   -- pick_up_fragment,use_off_gcd=1
   -- variable,name=fel_barrage,op=set,value=talent.fel_barrage&(cooldown.fel_barrage.remains<gcd.max*7&(active_enemies>=desired_targets+raid_event.adds.count|raid_event.adds.in<gcd.max*7|raid_event.adds.in>90)&(cooldown.metamorphosis.remains|active_enemies>2)|buff.fel_barrage.up)&!(active_enemies=1&!raid_event.adds.exists)
-  VarFelBarrage = S.FelBarrage:IsAvailable() and (S.FelBarrage:CooldownRemains() < Player:GCD() * 7 and (S.Metamorphosis:CooldownDown() or Enemies12yCount > 2 or Player:BuffUp(S.FelBarrageBuff)))
+  VarFelBarrage = S.FelBarrage:IsAvailable() and (S.FelBarrage:CooldownRemains() < Player:GCD() * 7 and (S.Metamorphosis:CooldownDown() or Enemies12yCount > 2) or Player:BuffUp(S.FelBarrageBuff))
   -- call_action_list,name=fs_cooldown
   local ShouldReturn = FSCooldown(); if ShouldReturn then return ShouldReturn; end
   -- run_action_list,name=fs_opener,if=(cooldown.eye_beam.up|cooldown.metamorphosis.up|cooldown.essence_break.up|buff.demonsurge.stack<3+talent.student_of_suffering+talent.a_fire_inside)&time<15&raid_event.adds.in>40
@@ -638,7 +638,7 @@ local function FS()
     if Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat fs 8"; end
   end
   -- run_action_list,name=fs_fel_barrage,if=variable.fel_barrage|!talent.demon_blades&talent.fel_barrage&(buff.fel_barrage.up|cooldown.fel_barrage.up)&buff.metamorphosis.down
-  if VarFelBarrage or not S.DemonBlades:IsAvailable() and S.FelBarrage:IsAvailable() and (Player:BuffUp(S.FelBarrage) or S.FelBarrage:CooldownUp()) and Player:BuffDown(S.MetamorphosisBuff) then
+  if VarFelBarrage or not S.DemonBlades:IsAvailable() and S.FelBarrage:IsAvailable() and (Player:BuffUp(S.FelBarrageBuff) or S.FelBarrage:CooldownUp()) and Player:BuffDown(S.MetamorphosisBuff) then
     local ShouldReturn = FSFelBarrage(); if ShouldReturn then return ShouldReturn; end
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait for FSFelBarrage()"; end
   end
@@ -782,11 +782,11 @@ local function ARCooldown()
     end
     -- do_treacherous_transmitter_task,if=cooldown.eye_beam.remains>15|cooldown.eye_beam.remains<5|fight_remains<20|buff.metamorphosis.up
     -- use_item,slot=trinket1,if=((cooldown.eye_beam.remains<gcd.max&active_enemies>1|buff.metamorphosis.up)&(raid_event.adds.in>trinket.1.cooldown.duration-15|raid_event.adds.remains>8)|!trinket.1.has_buff.any|fight_remains<25)&!trinket.1.is.mister_locknstalk&!variable.trinket1_crit&!trinket.1.is.skardyns_grace&!trinket.1.is.treacherous_transmitter&(!variable.special_trinket|trinket.2.cooldown.remains>20)
-    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and not VarTrinket1Exclude and (((BeamAbility:CooldownRemains() < Player:GCD() and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket1:HasUseBuff() or BossFightRemains < 25) and not VarTrinket1ID == I.MisterLockNStalk:ID() and not VarTrinket1Crit and not VarTrinket1ID == I.SkardynsGrace:ID() and not VarTrinket1ID == I.TreacherousTransmitter:ID() and (not VarSpecialTrinket or Trinket2:CooldownRemains() > 20)) then
+    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (((BeamAbility:CooldownRemains() < Player:GCD() and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket1:HasUseBuff() or BossFightRemains < 25) and VarTrinket1ID ~= I.MisterLockNStalk:ID() and not VarTrinket1Crit and VarTrinket1ID ~= I.SkardynsGrace:ID() and VarTrinket1ID ~= I.TreacherousTransmitter:ID() and (not VarSpecialTrinket or Trinket2:CooldownRemains() > 20)) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "treacherous_transmitter ar_cooldown 30"; end
     end
     -- use_item,slot=trinket2,if=((cooldown.eye_beam.remains<gcd.max&active_enemies>1|buff.metamorphosis.up)&(raid_event.adds.in>trinket.2.cooldown.duration-15|raid_event.adds.remains>8)|!trinket.2.has_buff.any|fight_remains<25)&!trinket.2.is.mister_locknstalk&!variable.trinket2_crit&!trinket.2.is.skardyns_grace&!trinket.2.is.treacherous_transmitter&(!variable.special_trinket|trinket.1.cooldown.remains>20)
-    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and not VarTrinket2Exclude and (((BeamAbility:CooldownRemains() < Player:GCD() and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket2:HasUseBuff() or BossFightRemains < 25) and not VarTrinket2ID == I.MisterLockNStalk:ID() and not VarTrinket2Crit and not VarTrinket2ID == I.SkardynsGrace:ID() and not VarTrinket2ID == I.TreacherousTransmitter:ID() and (not VarSpecialTrinket or Trinket1:CooldownRemains() > 20)) then
+    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (((BeamAbility:CooldownRemains() < Player:GCD() and Enemies8yCount > 1 or Player:BuffUp(S.MetamorphosisBuff)) or not Trinket2:HasUseBuff() or BossFightRemains < 25) and VarTrinket2ID ~= I.MisterLockNStalk:ID() and not VarTrinket2Crit and VarTrinket2ID ~= I.SkardynsGrace:ID() and VarTrinket2ID ~= I.TreacherousTransmitter:ID() and (not VarSpecialTrinket or Trinket1:CooldownRemains() > 20)) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "treacherous_transmitter ar_cooldown 32"; end
     end
   end
@@ -1154,7 +1154,7 @@ local function AR()
     if Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat ar 16"; end
   end
   -- run_action_list,name=ar_fel_barrage,if=variable.fel_barrage|!talent.demon_blades&talent.fel_barrage&(buff.fel_barrage.up|cooldown.fel_barrage.up)&buff.metamorphosis.down
-  if VarFelBarrage or not S.DemonBlades:IsAvailable() and S.FelBarrage:IsAvailable() and (Player:BuffUp(S.FelBarrage) or S.FelBarrage:CooldownUp()) and Player:BuffDown(S.MetamorphosisBuff) then
+  if VarFelBarrage or not S.DemonBlades:IsAvailable() and S.FelBarrage:IsAvailable() and (Player:BuffUp(S.FelBarrageBuff) or S.FelBarrage:CooldownUp()) and Player:BuffDown(S.MetamorphosisBuff) then
     local ShouldReturn = ARFelBarrage(); if ShouldReturn then return ShouldReturn; end
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Wait for ARFelBarrage()"; end
   end
