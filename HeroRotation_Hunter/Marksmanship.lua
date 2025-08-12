@@ -296,8 +296,8 @@ local function DRST()
   if CDsON() and S.Trueshot:IsReady() and (VarTrueshotReady and Player:BuffDown(S.DoubleTapBuff) and Player:BuffDown(S.DeathblowBuff)) then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot dr_st 14"; end
   end
-  -- arcane_shot,if=buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)&buff.deathblow.down
-  if S.ArcaneShot:IsReady() and (Player:BuffUp(S.PreciseShotsBuff) and VarSpotterOrMovingDown and Player:BuffDown(S.DeathblowBuff)) then
+  -- arcane_shot,if=buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)
+  if S.ArcaneShot:IsReady() and (Player:BuffUp(S.PreciseShotsBuff) and VarSpotterOrMovingDown) then
     if Cast(S.ArcaneShot, Settings.Marksmanship.GCDasOffGCD.ArcaneShot, nil, not TargetInRange40y) then return "arcane_shot dr_st 16"; end
   end
   -- aimed_shot,if=buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up
