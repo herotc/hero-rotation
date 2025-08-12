@@ -85,6 +85,7 @@ Spell.Monk.Commons = {
   BonedustBrewBuff                      = Spell(386276),
   BonedustBrewDebuff                    = Spell(386276),
   DampenHarmBuff                        = Spell(122278),
+  InnerResilienceBuff                   = Spell(450706), -- Tome of Light's Devotion buff
   JunkmaestrosBuff                      = Spell(1219661), -- Junkmaestro's Mega Magnet buff
   PressurePointBuff                     = Spell(393053),
   RushingJadeWindBuff                   = Spell(116847),
@@ -113,9 +114,12 @@ Spell.Monk.MasterofHarmony = {
 
 Spell.Monk.ShadoPan = {
   -- Talents
+  AspectofHarmony                       = Spell(450508),
   FlurryStrikes                         = Spell(450615),
   WisdomoftheWall                       = Spell(450994),
   -- Buffs
+  BalancedStratagemMagic                = Spell(451508),
+  BalancedStratagemPhysical             = Spell(451514),
   WisdomoftheWallFlurryBuff             = Spell(452688),
 }
 
@@ -190,6 +194,7 @@ Spell.Monk.Brewmaster = MergeTableByKey(Spell.Monk.Commons, {
   BlackOxBrew                           = Spell(115399),
   BreathofFire                          = Spell(115181),
   BobandWeave                           = Spell(280515),
+  CalltoArms                            = Spell(397251),
   CelestialFlames                       = Spell(325177),
   CharredPassions                       = Spell(386965),
   ExplodingKeg                          = Spell(325153),
@@ -213,9 +218,11 @@ Spell.Monk.Brewmaster = MergeTableByKey(Spell.Monk.Commons, {
   PurifyingBrew                         = Spell(119582),
   -- Buffs
   BlackoutComboBuff                     = Spell(228563),
+  CalltoArmsInvokeNiuzaoBuff            = Spell(395267),
   CharredPassionsBuff                   = Spell(386963),
   ElusiveBrawlerBuff                    = Spell(195630),
   FortifyingBrewBuff                    = Spell(120954),
+  InvokeNiuzaoBuff                      = Spell(132578),
   PresstheAdvantageBuff                 = Spell(418361),
   WeaponsofOrderBuff                    = Spell(387184),
   -- Debuffs
@@ -234,6 +241,8 @@ Spell.Monk.Brewmaster = MergeTableByKey(Spell.Monk.Brewmaster, Spell.Monk.ShadoP
 -- Items
 if not Item.Monk then Item.Monk = {}; end
 Item.Monk.Commons = {
+  -- TWW Trinkets
+  SignetofthePriory                     = Item(219308, {13, 14}),
 }
 
 Item.Monk.Windwalker = MergeTableByKey(Item.Monk.Commons, {
@@ -241,9 +250,12 @@ Item.Monk.Windwalker = MergeTableByKey(Item.Monk.Commons, {
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
   JunkmaestrosMegaMagnet                = Item(230189, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
-  SignetofthePriory                     = Item(219308, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
 })
 
 Item.Monk.Brewmaster = MergeTableByKey(Item.Monk.Commons, {
+  -- TWW Trinkets
+  LilyoftheEternalWeave                 = Item(242494, {13, 14}),
+  TomeofLightsDevotion                  = Item(219309, {13, 14}),
+  UnyieldingNetherprism                 = Item(242396, {13, 14}),
 })
