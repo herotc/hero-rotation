@@ -473,9 +473,8 @@ local function APL()
         local ShouldReturn = DRCleave(); if ShouldReturn then return ShouldReturn; end
       end
     else
-      -- call_action_list,name=st,if=!talent.black_arrow&(active_enemies<2|!talent.beast_cleave&active_enemies>2)
-      -- Note: Changed last enemy count to >1 to prevent a scenario where we have 2 targets and suggest nothing.
-      if PetEnemiesMixedCount < 2 or not S.BeastCleave:IsAvailable() and PetEnemiesMixedCount > 1 then
+      -- call_action_list,name=st,if=!talent.black_arrow&(active_enemies<2|!talent.beast_cleave&active_enemies<3)
+      if PetEnemiesMixedCount < 2 or not S.BeastCleave:IsAvailable() and PetEnemiesMixedCount < 3 then
         local ShouldReturn = ST(); if ShouldReturn then return ShouldReturn; end
       end
       -- call_action_list,name=cleave,if=!talent.black_arrow&(active_enemies>2|talent.beast_cleave&active_enemies>1)
