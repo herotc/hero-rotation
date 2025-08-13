@@ -632,7 +632,7 @@ local function Items()
   -- &(buff.vanish.up|!talent.subterfuge)|fight_remains<=20
   if I.UnyieldingNetherprism:IsEquippedAndReady() then
     if (Cache.APLVar.RtB_Buffs.Total >= 4 or not S.KeepItRolling:IsAvailable()) and
-      (Player:BuffUp(S.Vanish() or not S.Subterfuge:IsAvailable())) or HL.BossFilteredFightRemains("<=", 20) then
+      (Player:BuffUp(S.Vanish) or not S.Subterfuge:IsAvailable()) or HL.BossFilteredFightRemains("<=", 20) then
       if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.UnyieldingNetherprism)) then
         return "Unyielding Netherprism";
       end
