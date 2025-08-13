@@ -171,7 +171,7 @@ local function Precombat()
   -- Note: Moved to variable declarations and PLAYER_EQUIPMENT_CHANGED registration.
   -- Manually added opener abilities
   -- hunters_mark,if=debuff.hunters_mark.down
-  if S.HuntersMark:IsCastable() and (Target:DebuffDown(S.HuntersMark)) then
+  if S.HuntersMark:IsCastable() and (Target:DebuffDown(S.HuntersMarkDebuff, true)) then
     if Cast(S.HuntersMark, Settings.CommonsOGCD.GCDasOffGCD.HuntersMark) then return "hunters_mark precombat 2"; end
   end
   -- barbed_shot

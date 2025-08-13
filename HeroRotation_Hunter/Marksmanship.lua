@@ -186,14 +186,18 @@ local function Precombat()
   -- Note: Moved to variable declarations and PLAYER_EQUIPMENT_CHANGED registration.
   -- summon_pet,if=talent.unbreakable_bond
   -- Note: Moved to APL()
+  -- Manually added: hunters_mark,if=debuff.hunters_mark.down
+  if S.HuntersMark:IsCastable() and (Target:DebuffDown(S.HuntersMarkDebuff, true)) then
+    if Cast(S.HuntersMark, Settings.CommonsOGCD.GCDasOffGCD.HuntersMark) then return "hunters_mark precombat 2"; end
+  end
   -- aimed_shot,if=active_enemies<3|talent.black_arrow&talent.headshot
   -- Note: We can't actually get target counts before combat begins.
   if S.AimedShot:IsReady() and not Player:IsCasting(S.AimedShot) then
-    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot precombat 2"; end
+    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot precombat 4"; end
   end
   -- steady_shot
   if S.SteadyShot:IsCastable() and not Player:IsCasting(S.AimedShot) then
-    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot precombat 4"; end
+    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot precombat 6"; end
   end
 end
 
