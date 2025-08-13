@@ -109,6 +109,7 @@ Spell.Rogue.Commons = {
   FateboundInevitability  = Spell(454434),
   InevitabileEnd          = Spell(454434),
   Inevitability           = Spell(382512),
+  LatentEnergyBuff        = Spell(1239675),
   LingeringDarkness       = Spell(457056),
   LingeringDarknessBuff   = Spell(457273),
   MarkedforDeath          = Spell(137619),
@@ -329,6 +330,7 @@ Item.Rogue.Assassination = {
   -- Trinkets
   AlgetharPuzzleBox        = Item(193701, {13, 14}),
   AshesoftheEmbersoul      = Item(207167, {13, 14}),
+  AstralGladiatorsBadge    = Item(230638, {13, 14}),
   BottledFlayedwingToxin   = Item(178742, {13, 14}),
   CursedStoneIdol          = Item(246344, {13, 14}),
   ImperfectAscendancySerum = Item(225654, {13, 14}),

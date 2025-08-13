@@ -688,13 +688,11 @@ local function CDs ()
     end
   end
 
-  -- # High priority Ghostly Strike as it is off-gcd. 1 FTH builds prefer to not use it at max CPs.
-  -- actions.cds+=/ghostly_strike,if=combo_points<cp_max_spend|talent.fan_the_hammer.rank>1
+  -- # High priority Ghostly Strike as it is off-gcd.
+  -- actions.cds+=/ghostly_strike
   if S.GhostlyStrike:IsCastable() then
-    if ComboPoints < Rogue.CPMaxSpend() or S.FanTheHammer:TalentRank() > 1 then
-      if Cast(S.GhostlyStrike, Settings.Outlaw.OffGCDasOffGCD.GhostlyStrike, nil, not Target:IsSpellInRange(S.GhostlyStrike)) then
-        return "Cast Ghostly Strike"
-      end
+    if Cast(S.GhostlyStrike, Settings.Outlaw.OffGCDasOffGCD.GhostlyStrike, nil, not Target:IsSpellInRange(S.GhostlyStrike)) then
+      return "Cast Ghostly Strike"
     end
   end
 
@@ -1020,26 +1018,25 @@ local function APL ()
           return "Imperfect Ascendancy Serum";
         end
       end
-      -- # Builds with Keep it Rolling+Loaded Dice prepull Adrenaline Rush before Roll the Bones to consume Loaded Dice immediately instead of on the next pandemic roll.
-      -- actions.precombat+=/adrenaline_rush,precombat_seconds=1,if=talent.improved_adrenaline_rush&talent.keep_it_rolling&talent.loaded_dice
-      if S.AdrenalineRush:IsCastable() and S.ImprovedAdrenalineRush:IsAvailable() and S.KeepItRolling:IsAvailable()
-        and S.LoadedDice:IsAvailable() and (not S.Supercharger:IsAvailable() or ChargedComboPoints == 0) then
+
+      -- # Prepull Adrenaline Rush if using Trickster+KIR+Loaded Dice. Fatebound would rather AR on pull for Coin damage.
+      -- actions.precombat+=/adrenaline_rush,precombat_seconds=1,if=!talent.edge_case&talent.keep_it_rolling&talent.loaded_dice
+      if S.AdrenalineRush:IsCastable() and not S.EdgeCase:IsAvailable() and S.KeepItRolling:IsAvailable()
+        and S.LoadedDice:IsAvailable()
+        and (not S.ImprovedAdrenalineRush:IsAvailable() or not Finish_Condition()) then
         if Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then
-          return "Cast Adrenaline Rush (Opener KiR)"
+          return "Cast Adrenaline Rush (Trickster, KiR & LD)"
         end
       end
-      -- actions.precombat+=/roll_the_bones,precombat_seconds=1
-      -- Use same extended logic as a normal rotation for between pulls
-      if S.RolltheBones:IsCastable() and not Player:DebuffUp(S.Dreadblades) and (Cache.APLVar.RtB_Buffs.Total == 0 or RtB_Reroll())
-        and (not S.Supercharger:IsAvailable() or ChargedComboPoints == 0) then
-        if Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then
-          return "Cast Roll the Bones (Opener)"
-        end
-      end
-      -- actions.precombat+=/adrenaline_rush,precombat_seconds=0,if=talent.improved_adrenaline_rush
-      if S.AdrenalineRush:IsCastable() and S.ImprovedAdrenalineRush:IsAvailable() then
-        if Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then
-          return "Cast Adrenaline Rush (Opener)"
+
+      --# Prepull Roll the Bones if using Trickster or not using Loaded Dice.
+      -- actions.precombat+=/roll_the_bones,precombat_seconds=1,if=!talent.edge_case|!talent.loaded_dice
+      if S.RolltheBones:IsCastable() then
+        if (not S.EdgeCase:IsAvailable() or not S.LoadedDice:IsAvailable())
+          and (not S.Supercharger:IsAvailable() or ChargedComboPoints < 2) then
+          if Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then
+            return "Cast Roll the Bones (Opener)"
+          end
         end
       end
 
