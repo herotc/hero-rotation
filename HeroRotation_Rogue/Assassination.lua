@@ -669,11 +669,13 @@ local function UsableItems ()
 
   -- actions.items+=/use_item,name=unyielding_netherprism,use_off_gcd=1,if=dot.deathmark.ticking
   -- &(buff.latent_energy.stack>=16|fight_remains<=90|time<=15)|fight_remains<=20
-  if I.UnyieldingNetherprism:IsEquippedAndReady() and Target:DebuffUp(S.Deathmark) and
-    (Player:BuffStack(S.LatentEnergyBuff) >= 16 or HL.BossFilteredFightRemains('<=', 90) or HL.CombatTime() <= 15)
-    or HL.BossFilteredFightRemains('<=', 20) then
-    if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
-      return "Unyeilding Netherprism";
+  if I.UnyieldingNetherprism:IsEquippedAndReady() then
+    if Target:DebuffUp(S.Deathmark) and
+      (Player:BuffStack(S.LatentEnergyBuff) >= 16 or HL.BossFilteredFightRemains('<=', 90) or HL.CombatTime() <= 15)
+      or HL.BossFilteredFightRemains('<=', 20) then
+      if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
+        return "Unyeilding Netherprism";
+      end
     end
   end
 
