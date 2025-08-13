@@ -68,6 +68,7 @@ Spell.Hunter.Commons = {
   BloodFuryBuff                         = Spell(20572),
   DeathblowBuff                         = Spell(378770),
   JunkmaestrosBuff                      = Spell(1219661), -- Buff from Junkmaestro's Mega Magnet
+  LatentEnergyBuff                      = Spell(1239675), -- Buff from Unyielding Netherprism
   SeethingRageBuff                      = Spell(408835), -- Buff from Djaruun
   -- Debuffs
   HuntersMarkDebuff                     = Spell(257284),
