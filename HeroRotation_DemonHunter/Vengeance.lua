@@ -275,9 +275,10 @@ local function AR()
     end
   end
   -- call_action_list,name=externals,if=(buff.rending_strike.up&buff.glaive_flurry.up)|prev_gcd.1.reavers_glaive
-  if (Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) then
+  -- Note: Not handling externals.
+  --[[if (Player:BuffUp(S.RendingStrikeBuff) and Player:BuffUp(S.GlaiveFlurryBuff)) or Player:PrevGCD(1, S.ReaversGlaive) then
     local ShouldReturn = Externals(); if ShouldReturn then return ShouldReturn; end
-  end
+  end]]
   -- metamorphosis,use_off_gcd=1,if=!buff.metamorphosis.up
   if S.Metamorphosis:IsCastable() and (Player:BuffDown(S.MetamorphosisBuff)) then
     if Cast(S.Metamorphosis, nil, Settings.CommonsDS.DisplayStyle.Metamorphosis) then return "metamorphosis ar 10"; end
