@@ -36,7 +36,7 @@ local SummonPetSpells = { S.SummonPet, S.SummonPet2, S.SummonPet3, S.SummonPet4,
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  -- I.ItemName:ID(),
+  I.UnyieldingNetherprism:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -236,30 +236,17 @@ local function CDs()
 end
 
 local function Trinkets()
-  -- variable,name=buff_sync_ready,value=variable.trueshot_ready
-  local VarBuffSyncReady = VarTrueshotReady
-  -- variable,name=buff_sync_remains,value=cooldown.trueshot.remains
-  local VarBuffSyncRemains = S.Trueshot:CooldownRemains()
-  -- variable,name=buff_sync_active,value=buff.trueshot.up
-  local VarBuffSyncActive = Player:BuffUp(S.TrueshotBuff)
-  -- variable,name=damage_sync_active,value=buff.trueshot.up
-  local VarDamageSyncActive = Player:BuffUp(S.TrueshotBuff)
-  -- variable,name=damage_sync_remains,value=cooldown.trueshot.remains
-  local VarDamageSyncRemains = S.Trueshot:CooldownRemains()
   if Settings.Commons.Enabled.Trinkets then
-    -- use_items,check_existing=0,slots=trinket1:trinket2,if=this_trinket.has_use_buff&(variable.buff_sync_ready&(variable.stronger_trinket_slot=this_trinket_slot|other_trinket.cooldown.remains)|!variable.buff_sync_ready&(!this_trinket.is.unyielding_netherprism|buff.unyielding_netherprism.stack>16)&(variable.stronger_trinket_slot=this_trinket_slot&(variable.buff_sync_remains>this_trinket.cooldown.duration%3&fight_remains>this_trinket.cooldown.duration+20|other_trinket.has_use_buff&other_trinket.cooldown.remains>variable.buff_sync_remains-15&other_trinket.cooldown.remains-5<variable.buff_sync_remains&variable.buff_sync_remains+45>fight_remains)|variable.stronger_trinket_slot!=this_trinket_slot&(other_trinket.cooldown.remains&(other_trinket.cooldown.remains-5<variable.buff_sync_remains&variable.buff_sync_remains>=20|other_trinket.cooldown.remains-5>=variable.buff_sync_remains&(variable.buff_sync_remains>this_trinket.cooldown.duration%3|this_trinket.cooldown.duration<fight_remains&(variable.buff_sync_remains+this_trinket.cooldown.duration>fight_remains)))|other_trinket.cooldown.ready&variable.buff_sync_remains>20&variable.buff_sync_remains<other_trinket.cooldown.duration%3)))
-    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (Trinket1:HasUseBuff() and (VarBuffSyncReady and (VarStrongerTrinketSlot == 1 or Trinket2:CooldownDown()) or not VarBuffSyncReady and (VarTrinket1ID ~= I.UnyieldingNetherprism:ID() or Player:BuffStack(S.LatentEnergyBuff) > 16) and (VarStrongerTrinketSlot == 1 and (VarBuffSyncRemains > VarTrinket1CD / 3 and BossFightRemains > VarTrinket1CD + 20 or Trinket2:HasUseBuff() and Trinket2:CooldownRemains() > VarBuffSyncRemains - 15 and Trinket2:CooldownRemains() - 5 < VarBuffSyncRemains and VarBuffSyncRemains + 45 > BossFightRemains) or VarStrongerTrinketSlot ~= 1 and (Trinket2:CooldownDown() and (Trinket2:CooldownRemains() - 5 < VarBuffSyncRemains and VarBuffSyncRemains >= 20 or Trinket2:CooldownRemains() - 5 >= VarBuffSyncRemains and (VarBuffSyncRemains > VarTrinket1CD / 3 or VarTrinket1CD < BossFightRemains and (VarBuffSyncRemains + VarTrinket1CD > BossFightRemains))) or Trinket2:CooldownUp() and VarBuffSyncRemains > 20 and VarBuffSyncRemains < VarTrinket2CD / 3)))) then
+    -- use_item,name=unyielding_netherprism,if=buff.trueshot.up
+    if I.UnyieldingNetherprism:IsEquippedAndReady() and (Player:BuffUp(S.TrueshotBuff)) then
+      if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "unyielding_netherprism main 16"; end
+    end
+    -- use_items,slots=trinket1:trinket2,if=!this_trinket.has_use_buff|buff.trueshot.up|cooldown.trueshot.remains>30
+    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not Trinket1:HasUseBuff() or Player:BuffUp(S.TrueshotBuff) or S.Trueshot:CooldownRemains() > 30) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") trinkets 2"; end
     end
-    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (Trinket2:HasUseBuff() and (VarBuffSyncReady and (VarStrongerTrinketSlot == 2 or Trinket1:CooldownDown()) or not VarBuffSyncReady and (VarTrinket2ID ~= I.UnyieldingNetherprism:ID() or Player:BuffStack(S.LatentEnergyBuff) > 16) and (VarStrongerTrinketSlot == 2 and (VarBuffSyncRemains > VarTrinket2CD / 3 and BossFightRemains > VarTrinket2CD + 20 or Trinket1:HasUseBuff() and Trinket1:CooldownRemains() > VarBuffSyncRemains - 15 and Trinket1:CooldownRemains() - 5 < VarBuffSyncRemains and VarBuffSyncRemains + 45 > BossFightRemains) or VarStrongerTrinketSlot ~= 2 and (Trinket1:CooldownDown() and (Trinket1:CooldownRemains() - 5 < VarBuffSyncRemains and VarBuffSyncRemains >= 20 or Trinket1:CooldownRemains() - 5 >= VarBuffSyncRemains and (VarBuffSyncRemains > VarTrinket2CD / 3 or VarTrinket2CD < BossFightRemains and (VarBuffSyncRemains + VarTrinket2CD > BossFightRemains))) or Trinket1:CooldownUp() and VarBuffSyncRemains > 20 and VarBuffSyncRemains < VarTrinket1CD / 3)))) then
+    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not Trinket2:HasUseBuff() or Player:BuffUp(S.TrueshotBuff) or S.Trueshot:CooldownRemains() > 30) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") trinkets 4"; end
-    end
-    -- use_items,check_existing=0,slots=trinket1:trinket2,if=!this_trinket.has_use_buff&(this_trinket.cast_time=0|!variable.buff_sync_active)&(!this_trinket.is.junkmaestros_mega_magnet|buff.junkmaestros_mega_magnet.stack>10)&(!other_trinket.has_cooldown&(variable.damage_sync_active|this_trinket.is.junkmaestros_mega_magnet&buff.junkmaestros_mega_magnet.stack>25|!this_trinket.is.junkmaestros_mega_magnet&variable.damage_sync_remains>this_trinket.cooldown.duration%3)|other_trinket.has_cooldown&(!other_trinket.has_use_buff&(variable.stronger_trinket_slot=this_trinket_slot|other_trinket.cooldown.remains)&(variable.damage_sync_active|this_trinket.is.junkmaestros_mega_magnet&buff.junkmaestros_mega_magnet.stack>25|variable.damage_sync_remains>this_trinket.cooldown.duration%3&!this_trinket.is.junkmaestros_mega_magnet|other_trinket.cooldown.remains-5<variable.damage_sync_remains&variable.damage_sync_remains>=20)|other_trinket.has_use_buff&(variable.damage_sync_active|this_trinket.is.junkmaestros_mega_magnet&buff.junkmaestros_mega_magnet.stack>25|!this_trinket.is.junkmaestros_mega_magnet&variable.damage_sync_remains>this_trinket.cooldown.duration%3)&(other_trinket.cooldown.remains>=20|other_trinket.cooldown.remains-5>variable.buff_sync_remains|other_trinket.is.unyielding_netherprism)))
-    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (Trinket1:HasUseBuff() and (VarTrinket1CD == 0 or not VarBuffSyncActive) and (VarTrinket1ID ~= I.JunkmaestrosMegaMagnet:ID() or Player:BuffStack(S.JunkmaestrosMegaMagnetBuff) > 10) and (not Trinket2:HasCooldown() and (VarDamageSyncActive or VarTrinket1ID == I.JunkmaestrosMegaMagnet:ID() and Player:BuffStack(S.JunkmaestrosMegaMagnetBuff) > 25 or VarTrinket1ID ~= I.JunkmaestrosMegaMagnet:ID() and VarDamageSyncRemains > VarTrinket1CD / 3) or Trinket2:HasCooldown() and (not Trinket2:HasUseBuff() and (VarStrongerTrinketSlot == 1 or Trinket2:CooldownDown()) and (VarDamageSyncActive or VarTrinket1ID == I.JunkmaestrosMegaMagnet:ID() and Player:BuffStack(S.JunkmaestrosMegaMagnetBuff) > 25 or VarDamageSyncRemains > VarTrinket1CD / 3 and VarTrinket1ID ~= I.JunkmaestrosMegaMagnet:ID() or Trinket2:CooldownRemains() - 5 < VarDamageSyncRemains and VarDamageSyncRemains >= 20) or Trinket2:HasUseBuff() and (VarDamageSyncActive or VarTrinket1ID == I.JunkmaestrosMegaMagnet:ID() and Player:BuffStack(S.JunkmaestrosMegaMagnetBuff) > 25 or VarTrinket1ID ~= I.JunkmaestrosMegaMagnet:ID() and VarDamageSyncRemains > VarTrinket1CD / 3) and (Trinket2:CooldownRemains() >= 20 or Trinket2:CooldownRemains() - 5 > VarBuffSyncRemains or VarTrinket2ID == I.UnyieldingNetherprism:ID())))) then
-      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") trinkets 4"; end
-    end
-    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (Trinket2:HasUseBuff() and (VarTrinket2CD == 0 or not VarBuffSyncActive) and (VarTrinket2ID ~= I.JunkmaestrosMegaMagnet:ID() or Player:BuffStack(S.JunkmaestrosMegaMagnetBuff) > 10) and (not Trinket1:HasCooldown() and (VarDamageSyncActive or VarTrinket2ID == I.JunkmaestrosMegaMagnet:ID() and Player:BuffStack(S.JunkmaestrosMegaMagnetBuff) > 25 or VarTrinket2ID ~= I.JunkmaestrosMegaMagnet:ID() and VarDamageSyncRemains > VarTrinket2CD / 3) or Trinket1:HasCooldown() and (not Trinket1:HasUseBuff() and (VarStrongerTrinketSlot == 2 or Trinket1:CooldownDown()) and (VarDamageSyncActive or VarTrinket2ID == I.JunkmaestrosMegaMagnet:ID() and Player:BuffStack(S.JunkmaestrosMegaMagnetBuff) > 25 or VarDamageSyncRemains > VarTrinket2CD / 3 and VarTrinket2ID ~= I.JunkmaestrosMegaMagnet:ID() or Trinket1:CooldownRemains() - 5 < VarDamageSyncRemains and VarDamageSyncRemains >= 20) or Trinket1:HasUseBuff() and (VarDamageSyncActive or VarTrinket2ID == I.JunkmaestrosMegaMagnet:ID() and Player:BuffStack(S.JunkmaestrosMegaMagnetBuff) > 25 or VarTrinket2ID ~= I.JunkmaestrosMegaMagnet:ID() and VarDamageSyncRemains > VarTrinket2CD / 3) and (Trinket1:CooldownRemains() >= 20 or Trinket1:CooldownRemains() - 5 > VarBuffSyncRemains or VarTrinket1ID == I.UnyieldingNetherprism:ID())))) then
-      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") trinkets 4"; end
     end
   end
   if Settings.Commons.Enabled.Items then
@@ -556,10 +543,9 @@ local function APL()
     end
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(S.CounterShot, Settings.CommonsDS.DisplayStyle.Interrupts, StunInterrupts); if ShouldReturn then return ShouldReturn; end
-    -- variable,name=trueshot_ready,value=cooldown.trueshot.ready&((!raid_event.adds.exists|raid_event.adds.count=1)&(!talent.bullseye|fight_remains>cooldown.trueshot.duration_guess+buff.trueshot.duration%2|buff.bullseye.stack=buff.bullseye.max_stack)&(!trinket.1.has_use_buff|trinket.1.cooldown.remains>5|trinket.1.cooldown.ready|trinket.2.has_use_buff&trinket.2.cooldown.ready)&(!trinket.2.has_use_buff|trinket.2.cooldown.remains>5|trinket.2.cooldown.ready|trinket.1.has_use_buff&trinket.1.cooldown.ready)|raid_event.adds.exists&(!raid_event.adds.up&(raid_event.adds.duration+raid_event.adds.in<25|raid_event.adds.in>60)|raid_event.adds.up&raid_event.adds.remains>10)|fight_remains<25)
-    -- Note: Can't handle the raid_event conditions.
-    -- TODO: Simplify the above condition for HR.
-    VarTrueshotReady = S.Trueshot:CooldownUp()
+    -- variable,name=trueshot_ready,value=!talent.bullseye|fight_remains>cooldown.trueshot.duration+buff.trueshot.duration|buff.bullseye.stack=buff.bullseye.max_stack|fight_remains<25
+    local TrueshotCD = 120 - num(S.CallingtheShots:IsAvailable()) * 30 - num(Player:HasTier("TWW3", 2)) * 30
+    VarTrueshotReady = not S.Bullseye:IsAvailable() or FightRemains > TrueshotCD + 15 or Player:BuffStack(S.BullseyeBuff) == 30 or BossFightRemains < 25
     -- auto_shot
     -- call_action_list,name=cds
     local ShouldReturn = CDs(); if ShouldReturn then return ShouldReturn; end

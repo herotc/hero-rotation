@@ -25,8 +25,12 @@ HL.AddCoreOverride ("Player.AstralPowerP",
     if not Player:IsCasting() then
       return AP
     else
-      if Player:IsCasting(SpellBalance.Wrath) or Player:IsCasting(SpellBalance.Starfire) or Player:IsCasting(SpellBalance.StellarFlare) then
+      if Player:IsCasting(SpellBalance.Wrath) then
         return AP + 8
+      elseif Player:IsCasting(SpellBalance.Starfire) then
+        return AP + 10
+      elseif Player:IsCasting(SpellBalance.StellarFlare) then
+        return AP + 12
       elseif Player:IsCasting(SpellBalance.NewMoon) then
         return AP + 10
       elseif Player:IsCasting(SpellBalance.HalfMoon) then

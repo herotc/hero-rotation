@@ -436,7 +436,7 @@ local function FSMeta()
     if Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat fs_meta 6"; end
   end
   -- vengeful_retreat,use_off_gcd=1,if=variable.fs_tier34_2piece&buff.inertia_trigger.down&talent.initiative
-  if S.VengefulRetreat:IsCastable() and (Player:HasTier("TWW3", 2) and InertiaTrigger() and S.Initiative:IsAvailable()) then
+  if S.VengefulRetreat:IsCastable() and (Player:HasTier("TWW3", 2) and not InertiaTrigger() and S.Initiative:IsAvailable()) then
     if Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat fs_meta 8"; end
   end
   -- felblade,if=talent.inertia&variable.fs_tier34_2piece&buff.inertia_trigger.up
@@ -761,7 +761,7 @@ local function FS()
     if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura fs 38"; end
   end
   -- felblade,if=buff.out_of_range.down&buff.inertia_trigger.down&cooldown.eye_beam.remains>=gcd.max*(1+talent.student_of_suffering&(cooldown.sigil_of_flame.remains<=gcd.max|cooldown.sigil_of_flame.up))
-  if S.Felblade:IsCastable() and (Target:IsInRange(8) and InertiaTrigger() and BeamAbility:CooldownRemains() >= Player:GCD() * (1 + num(S.StudentofSuffering:IsAvailable() and (SigilAbility:CooldownRemains() <= Player:GCD() or SigilAbility:CooldownUp())))) then
+  if S.Felblade:IsCastable() and (Target:IsInRange(8) and not InertiaTrigger() and BeamAbility:CooldownRemains() >= Player:GCD() * (1 + num(S.StudentofSuffering:IsAvailable() and (SigilAbility:CooldownRemains() <= Player:GCD() or SigilAbility:CooldownUp())))) then
     if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade fs 40"; end
   end
   -- sigil_of_flame,if=buff.out_of_range.down&debuff.essence_break.down&!talent.student_of_suffering&(!talent.fel_barrage|cooldown.fel_barrage.remains>25|(active_enemies=1&!raid_event.adds.exists))
@@ -1078,6 +1078,10 @@ local function ARMeta()
 end
 
 local function AROpener()
+  -- Manually added: immolation_aura (in case it wasn't used Precombat or came off CD after start of combat)
+  if ImmoAbility:IsReady() then
+    if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura ar_opener 1"; end
+  end
   -- potion
   if Settings.Commons.Enabled.Potions then
     local PotionSelected = Everyone.PotionSelected()
@@ -1090,7 +1094,7 @@ local function AROpener()
     if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar_opener 4"; end
   end
   -- vengeful_retreat,use_off_gcd=1,if=talent.initiative&time>4&buff.metamorphosis.up&(!talent.inertia|buff.inertia_trigger.down)&buff.inner_demon.down&cooldown.blade_dance.remains&gcd.remains<0.1
-  if S.VengefulRetreat:IsCastable() and (S.Initiative:IsAvailable() and CombatTime > 4 and Player:BuffUp(S.MetamorphosisBuff) and (not S.Inertia:IsAvailable() or Player:BuffDown(S.InertiaBuff)) and Player:BuffDown(S.InnerDemonBuff) and S.BladeDance:CooldownDown()) then
+  if S.VengefulRetreat:IsCastable() and (S.Initiative:IsAvailable() and CombatTime > 4 and Player:BuffUp(S.MetamorphosisBuff) and (not S.Inertia:IsAvailable() or not InertiaTrigger()) and Player:BuffDown(S.InnerDemonBuff) and S.BladeDance:CooldownDown()) then
     if Cast(S.VengefulRetreat, Settings.Havoc.OffGCDasOffGCD.VengefulRetreat) then return "vengeful_retreat ar_opener 6"; end
   end
   -- death_sweep,if=!talent.chaotic_transformation&cooldown.metamorphosis.up&buff.glaive_flurry.up
@@ -1140,7 +1144,7 @@ local function AROpener()
     if Cast(S.TheHunt, nil, Settings.CommonsDS.DisplayStyle.TheHunt, not Target:IsInRange(50)) then return "the_hunt ar_opener 28"; end
   end
   -- felblade,if=fury<40&buff.inertia_trigger.down&debuff.essence_break.down
-  if S.Felblade:IsCastable() and (Player:Fury() < 40 and InertiaTrigger() and Target:DebuffDown(S.EssenceBreakDebuff)) then
+  if S.Felblade:IsCastable() and (Player:Fury() < 40 and not InertiaTrigger() and Target:DebuffDown(S.EssenceBreakDebuff)) then
     if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade ar_opener 30"; end
   end
   -- reavers_glaive,if=debuff.reavers_mark.down&debuff.essence_break.down
@@ -1278,7 +1282,7 @@ local function AR()
     if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura ar 22"; end
   end
   -- eye_beam,if=(cooldown.blade_dance.remains<7|raid_event.adds.up)&(active_enemies>desired_targets*2&(buff.thrill_of_the_fight_damage.up|buff.rending_strike.down&buff.glaive_flurry.down)|raid_event.adds.in>30-buff.cycle_of_hatred.stack*5|fight_style.dungeonroute&!raid_event.adds.in<=40-buff.cycle_of_hatred.stack*5)&(!variable.trinket1_steroids&!variable.trinket2_steroids|variable.trinket1_steroids&(trinket.1.stat.any.cooldown_remains<gcd.max*3|trinket.1.stat.any.cooldown_remains>30-buff.cycle_of_hatred.stack*5)|variable.trinket2_steroids&(trinket.2.stat.any.cooldown_remains<gcd.max*3|trinket.2.stat.any.cooldown_remains>30-buff.cycle_of_hatred.stack*5))|fight_remains<10
-  if BeamAbility:IsReady() and ((Enemies8yCount > 2 and (Player:BuffUp(S.ThrilloftheFightHavocDmgBuff) or Player:BuffDown(S.RendingStrikeBuff) and Player:BuffDown(S.GlaiveFlurryBuff)) or Player:IsInDungeonArea()) and (not VarTrinket1Steroids and not VarTrinket2Steroids or VarTrinket1Steroids and (Trinket1:CooldownRemains() < Player:GCD() * 3 or Trinket1:CooldownRemains() > 30 - Player:BuffStack(S.CycleofHatredBuff) * 5) or VarTrinket2Steroids and (Trinket2:CooldownRemains() < Player:GCD() * 3 or Trinket2:CooldownRemains() > 30 - Player:BuffStack(S.CycleofHatredBuff) * 5)) or BossFightRemains < 10) then
+  if BeamAbility:IsReady() and ((S.BladeDance:CooldownRemains() < 7 or Enemies8yCount > 1) and ((Player:BuffUp(S.ThrilloftheFightHavocDmgBuff) or Player:BuffDown(S.RendingStrikeBuff) and Player:BuffDown(S.GlaiveFlurryBuff)) or Enemies8yCount == 1 or Player:IsInDungeonArea()) and (not VarTrinket1Steroids and not VarTrinket2Steroids or VarTrinket1Steroids and (Trinket1:CooldownRemains() < Player:GCD() * 3 or Trinket1:CooldownRemains() > 30 - Player:BuffStack(S.CycleofHatredBuff) * 5) or VarTrinket2Steroids and (Trinket2:CooldownRemains() < Player:GCD() * 3 or Trinket2:CooldownRemains() > 30 - Player:BuffStack(S.CycleofHatredBuff) * 5)) or BossFightRemains < 10) then
     if Cast(BeamAbility, Settings.Havoc.GCDasOffGCD.EyeBeam, nil, not IsInMeleeRange(20)) then return "beam_gaze ar 24"; end
   end
   -- blade_dance,if=(cooldown.eye_beam.remains>=gcd.max*2|active_enemies>=2&buff.glaive_flurry.up&(raid_event.adds.in>30-buff.cycle_of_hatred.stack*5|raid_event.adds.remains>=cooldown.eye_beam.remains&cooldown.eye_beam.remains<gcd.max*2))&buff.rending_strike.down
@@ -1318,7 +1322,7 @@ local function AR()
     if Cast(S.Felblade, nil, nil, not Target:IsSpellInRange(S.Felblade)) then return "felblade ar 42"; end
   end
   -- immolation_aura,if=raid_event.adds.in>full_recharge_time|active_enemies>desired_targets&active_enemies>2
-  if ImmoAbility:IsReady() and (Enemies8yCount > 2) then
+  if ImmoAbility:IsReady() then
     if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura ar 44"; end
   end
   -- sigil_of_flame,if=buff.out_of_range.down&debuff.essence_break.down&(!talent.fel_barrage|cooldown.fel_barrage.remains>25|active_enemies=1&!raid_event.adds.exists)

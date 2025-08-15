@@ -108,11 +108,13 @@ Spell.Druid.ElunesChosen = {
 
 Spell.Druid.KeeperoftheGrove = {
   -- Talents
+  BounteousBloom                        = Spell(429215),
   ControloftheDream                     = Spell(434249),
   EarlySpring                           = Spell(428937),
   PoweroftheDream                       = Spell(434220),
   TreantsoftheMoon                      = Spell(428544),
   -- Buffs
+  DryadsFavorBuff                       = Spell(1236807), -- TWW S3 4pc Buff
   HarmonyoftheGroveBuff                 = Spell(428735),
 }
 
@@ -145,6 +147,7 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   OrbitalStrike                         = Spell(390378),
   PowerofGoldrinn                       = Spell(394046),
   PrimordialArcanicPulsar               = Spell(393960),
+  RadiantMoonlight                      = Spell(394121),
   RattletheStars                        = Spell(393954),
   Solstice                              = Spell(343647),
   SouloftheForest                       = Spell(114107),
@@ -174,6 +177,7 @@ Spell.Druid.Balance = MergeTableByKey(Spell.Druid.Commons, {
   IncarnationBuff1                      = Spell(102560),
   IncarnationBuff2                      = Spell(390414),
   PAPBuff                               = Spell(393961),
+  PartingsSkiesBuff                     = Spell(395110),
   RattledStarsBuff                      = Spell(393955),
   SolsticeBuff                          = Spell(343648),
   StarfallBuff                          = Spell(191034),
@@ -290,6 +294,7 @@ Spell.Druid.Guardian = MergeTableByKey(Spell.Druid.Guardian, Spell.Druid.ElunesC
 if not Item.Druid then Item.Druid = {} end
 Item.Druid.Commons = {
   -- TWW Trinkets
+  ArazsRitualForge                      = Item(242402, {13, 14}),
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
   OvinaxsMercurialEgg                   = Item(220305, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
