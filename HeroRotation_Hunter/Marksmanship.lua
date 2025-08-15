@@ -237,16 +237,17 @@ end
 
 local function Trinkets()
   if Settings.Commons.Enabled.Trinkets then
-    -- use_item,name=unyielding_netherprism,if=buff.trueshot.up
-    if I.UnyieldingNetherprism:IsEquippedAndReady() and (Player:BuffUp(S.TrueshotBuff)) then
-      if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "unyielding_netherprism main 16"; end
+    -- use_item,name=unyielding_netherprism,if=buff.latent_energy.stack>7&(buff.trueshot.remains>13|buff.latent_energy.stack=18|fight_remains<25)
+    if I.UnyieldingNetherprism:IsEquippedAndReady() and (Player:BuffStack(S.LatentEnergyBuff) > 7 and (Player:BuffRemains(S.TrueshotBuff) > 13 or Player:BuffStack(S.LatentEnergyBuff) == 18 or BossFightRemains < 25)) then
+      if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "unyielding_netherprism trinket 2"; end
     end
-    -- use_items,slots=trinket1:trinket2,if=!this_trinket.has_use_buff|buff.trueshot.up|cooldown.trueshot.remains>30
+    -- use_items,slots=trinket1:trinket2,if=!this_trinket.is.unyielding_prism&(!this_trinket.has_use_buff|buff.trueshot.up|cooldown.trueshot.remains>30)
+    -- Note: Unyielding Netherprism is excluded via VarTrinket1Ex.
     if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not Trinket1:HasUseBuff() or Player:BuffUp(S.TrueshotBuff) or S.Trueshot:CooldownRemains() > 30) then
-      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") trinkets 2"; end
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") trinkets 4"; end
     end
     if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not Trinket2:HasUseBuff() or Player:BuffUp(S.TrueshotBuff) or S.Trueshot:CooldownRemains() > 30) then
-      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") trinkets 4"; end
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") trinkets 6"; end
     end
   end
   if Settings.Commons.Enabled.Items then
