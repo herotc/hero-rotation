@@ -389,7 +389,7 @@ local function Finish(ReturnSpellOnly)
     if ReturnSpellOnly then
       return S.KillingSpree
     else
-      if Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle, not Target:IsSpellInRange(S.KillingSpree), nil) then
+      if Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle, not Target:IsInRange(8), nil) then
         return "Cast Killing Spree"
       end
     end
