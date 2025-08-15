@@ -204,6 +204,7 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   Bulletstorm                           = Spell(389019),
   Bullseye                              = Spell(204089),
   BurstingShot                          = Spell(186387),
+  CallingtheShots                       = Spell(260404),
   CarefulAim                            = Spell(260228),
   ChimaeraShot                          = Spell(342049),
   DoubleTap                             = Spell(260402),
@@ -240,6 +241,7 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   -- Buffs
   BombardmentBuff                       = Spell(386875),
   BulletstormBuff                       = Spell(389020),
+  BullseyeBuff                          = Spell(204090),
   DoubleTapBuff                         = Spell(260402),
   InTheRhythmBuff                       = Spell(407405),
   LockandLoadBuff                       = Spell(194594),
