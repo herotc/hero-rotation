@@ -613,8 +613,8 @@ local function APL()
       if Cast(S.GrimoireFelguard, Settings.Demonology.GCDasOffGCD.GrimoireFelguard) then return "grimoire_felguard main 6"; end
     end
     -- summon_vilefiend,if=cooldown.summon_demonic_tyrant.remains>=25+cast_time|cooldown.summon_demonic_tyrant.remains<=13&cooldown.call_dreadstalkers.remains<10
-    if S.SummonVilefiend:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() >= 25 + S.SummonVilefiend:CastTime() or S.SummonDemonicTyrant:CooldownRemains() <= 13 and S.CallDreadstalkers:CooldownRemains() < 10) then
-      if Cast(S.SummonVilefiend, Settings.Demonology.GCDasOffGCD.SummonVilefiend) then return "summon_vilefiend main 8"; end
+    if VilefiendAbility:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() >= 25 + S.SummonVilefiend:CastTime() or S.SummonDemonicTyrant:CooldownRemains() <= 13 and S.CallDreadstalkers:CooldownRemains() < 10) then
+      if Cast(VilefiendAbility, Settings.Demonology.GCDasOffGCD.SummonVilefiend) then return "summon_vilefiend main 8"; end
     end
     -- call_dreadstalkers,if=cooldown.summon_demonic_tyrant.remains>=10|cooldown.summon_demonic_tyrant.remains<=10
     if S.CallDreadstalkers:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() >= 10 or S.SummonDemonicTyrant:CooldownRemains() <= 10) then
