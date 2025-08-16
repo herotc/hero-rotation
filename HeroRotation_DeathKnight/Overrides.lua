@@ -83,6 +83,18 @@ OldFrostIsCastable = HL.AddCoreOverride("Spell.IsCastable",
   end
 , 251)
 
+local OldFrostBuffUp
+OldFrostBuffUp = HL.AddCoreOverride("Player.BuffUp",
+  function (self, Spell, AnyCaster, BypassRecovery)
+    local BaseCheck = OldFrostBuffUp(self, Spell, AnyCaster, BypassRecovery)
+    if Spell == SpellFrost.KillingMachineBuff then
+      return BaseCheck or DeathKnight.Exterminate
+    else
+      return BaseCheck
+    end
+  end
+, 251)
+
 -- Unholy, ID: 252
 local OldUHIsCastable
 OldUHIsCastable = HL.AddCoreOverride("Spell.IsCastable",

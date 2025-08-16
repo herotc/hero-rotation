@@ -34,6 +34,8 @@ DeathKnight.GhoulTable = {
 DeathKnight.DnDTable = {}
 -- BonestormTable
 DeathKnight.BonestormTable = {}
+-- Exterminate Handler
+DeathKnight.Exterminate = false
 
 --- ============================ CONTENT ============================
 --- ===== Ghoul Tracking =====
@@ -140,7 +142,22 @@ HL:RegisterForCombatEvent(function(_, _, _, _, _, _, _, destGUID)
   if DeathKnight.DnDTable[destGUID] then
     DeathKnight.DnDTable[destGUID] = nil
   end
-end, "UNIT_DIED", "UNIT_DESTROYED")  
+end, "UNIT_DIED", "UNIT_DESTROYED")
+
+--- ===== Exterminate Handler =====
+HL:RegisterForCombatEvent(function(_, _, _, srcGUID, _, _, _, destGUID, _, _, _, spellId)
+  -- If Exterminate buff is being removed, we're getting a free Killing Machine proc.
+  if destGUID == Player:GUID() and spellId == 441416 then
+    DeathKnight.Exterminate = true
+  end
+end, "SPELL_AURA_REMOVED")
+
+HL:RegisterForCombatEvent(function(_, _, _, srcGUID, _, _, _, destGUID, _, _, _, spellId)
+  -- If Killing Machine buff is up, we don't need to worry about Exterminate.
+  if destGUID == Player:GUID() and spellId == 51124 then
+    DeathKnight.Exterminate = false
+  end
+end, "SPELL_AURA_APPLIED", "SPELL_AURA_APPLIED_DOSE")
 
 --- ======= NON-COMBATLOG =======
 
