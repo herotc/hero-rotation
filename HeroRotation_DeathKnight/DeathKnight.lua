@@ -115,6 +115,7 @@ Spell.DeathKnight.Sanlayn = {
   GiftoftheSanlaynBuff                  = Spell(434153),
   InflictionofSorrowBuff                = Spell(460049),
   VampiricStrikeBuff                    = Spell(433899),
+  VisceralStrengthUnholy                = Spell(1234532),
   -- Debuffs
   InciteTerrorDebuff                    = Spell(458478),
 }
@@ -226,12 +227,14 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   CommanderoftheDead                    = Spell(390259),
   DarkTransformation                    = Spell(63560),
   Defile                                = Spell(152280),
+  Desecrate                             = Spell(1234559),
   DoomedBidding                         = Spell(455386),
   Epidemic                              = Spell(207317),
   FesteringStrike                       = Spell(85948),
   Festermight                           = Spell(377590),
   HarbingerofDoom                       = Spell(276023),
   ImprovedDeathCoil                     = Spell(377580),
+  LegionofSouls                         = Spell(383269),
   MenacingMagus                         = Spell(455135),
   Morbidity                             = Spell(377592),
   Outbreak                              = Spell(77575),
@@ -249,7 +252,9 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Commons, {
   -- Buffs
   CommanderoftheDeadBuff                = Spell(390260),
   FesteringScytheBuff                   = Spell(458123),
+  FesteringScytheStacksBuff             = Spell(459238),
   FestermightBuff                       = Spell(377591),
+  LegionofSoulsBuff                     = Spell(383269),
   RunicCorruptionBuff                   = Spell(51460),
   SuddenDoomBuff                        = Spell(81340),
   -- Debuffs
@@ -267,6 +272,7 @@ Spell.DeathKnight.Unholy = MergeTableByKey(Spell.DeathKnight.Unholy, Spell.Death
 if not Item.DeathKnight then Item.DeathKnight = {} end
 Item.DeathKnight.Commons = {
   -- TWW Trinkets
+  CursedStoneIdol                       = Item(246344, {13, 14}),
   FunhouseLens                          = Item(234217, {13, 14}),
   ImprovisedSeaforiumPacemaker          = Item(232541, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
