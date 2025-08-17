@@ -252,10 +252,15 @@ Item.Mage.Commons = {
   -- Trinkets kept for variables
   NymuesUnravelingSpindle               = Item(208615, {13, 14}),
   -- TWW Trinkets
+  ArazsRitualForge                      = Item(242402, {13, 14}),
   BurstofKnowledge                      = Item(231424, {13, 14}),
+  ChaoticNethergate                     = Item(246825, {13, 14}),
   HighSpeakersAccretion                 = Item(219303, {13, 14}),
   HouseOfCards                          = Item(230027, {13, 14}),
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
+  IncorporealEssencegorger              = Item(246945, {13, 14}),
+  LilyoftheEternalWeave                 = Item(242494, {13, 14}),
+  PerfidiousProjector                   = Item(242403, {13, 14}),
   QuickwickCandlestick                  = Item(225649, {13, 14}),
   SignetOfThePriory                     = Item(219308, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
@@ -273,6 +278,7 @@ Item.Mage.Commons = {
   RatfangToxin                          = Item(235359, {13, 14}),
   RingingRitualMud                      = Item(232543, {13, 14}),
   SoullettingRuby                       = Item(178809, {13, 14}),
+  SunbloodAmethyst                      = Item(178826, {13, 14}),
 }
 
 Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
