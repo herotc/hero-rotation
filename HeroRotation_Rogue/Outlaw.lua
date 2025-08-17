@@ -299,6 +299,19 @@ local function Vanish_DPS_Condition ()
 end
 
 local function Stealth(ReturnSpellOnly)
+  if S.BladeFlurry:IsCastable() then
+    if S.DeftManeuvers:IsAvailable() and not Finish_Condition() and (EnemiesBFCount >= 3
+      and ComboPointsDeficit == EnemiesBFCount + num(Player:BuffUp(S.Broadside)) or EnemiesBFCount >= 5) then
+      if ReturnSpellOnly then
+        return S.BladeFlurry
+      else
+        if Cast(S.BladeFlurry, Settings.Outlaw.GCDasOffGCD.BladeFlurry) then
+          return "Cast Blade Flurry"
+        end
+      end
+    end
+  end
+
   -- actions.stealth+=/cold_blood,if=variable.finish_condition
   if S.ColdBlood:IsCastable() and Player:BuffDown(S.ColdBlood) and Finish_Condition() then
     if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then
@@ -674,7 +687,7 @@ local function CDs ()
   -- |buff.adrenaline_rush.up&talent.improved_adrenaline_rush&combo_points<=2
   if CDsON() and S.AdrenalineRush:IsCastable() then
     if Player:BuffDown(S.AdrenalineRush) and (not Finish_Condition() or not S.ImprovedAdrenalineRush:IsAvailable())
-    or Player:BuffDown(S.AdrenalineRush) and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2 then
+    or Player:BuffUp(S.AdrenalineRush) and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2 then
       if S.ImprovedAdrenalineRush:IsAvailable() then
         ShouldReturn = SpellQueueMacro(S.AdrenalineRush)
         if ShouldReturn then
