@@ -68,6 +68,7 @@ Spell.Druid.Commons = {
   HeartoftheWildBuff                    = Spell(319454),
   InnerResilienceBuff                   = Spell(450706),
   IronfurBuff                           = Spell(192081),
+  LatentEnergyBuff                      = Spell(1239675), -- Buff from Unyielding Netherprism
   MarkoftheWildBuff                     = Spell(1126),
   PoPHealBuff                           = Spell(395336),
   SpymastersReportBuff                  = Spell(451199), -- Stacking buff from before using Spymaster's Web trinket
