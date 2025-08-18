@@ -124,7 +124,7 @@ local function CheckFocusCap(SpellCastTime, GenFocus)
 end
 
 local function HowlSummonReady()
-  return Player:BuffUp(S.HowlBearBuff) or Player:BuffUp(S.HowlBoarBuff) or Player:BuffUp(S.HowlWyvernBuff)
+  return Player:BuffUp(S.HowlWyvernBuff) or Player:BuffUp(S.HowlBoarBuff) or Player:BuffUp(S.HowlBearBuff)
 end
 
 local function RelentlessPrimalFerocityUp()
@@ -257,7 +257,7 @@ local function PLCleave()
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb plcleave 14"; end
   end
   -- kill_command,if=(buff.howl_of_the_pack_leader_wyvern.remains|buff.howl_of_the_pack_leader_boar.remains|buff.howl_of_the_pack_leader_bear.remains)
-  if S.KillCommand:IsReady() and (Player:BuffUp(S.HowlWyvernBuff) or Player:BuffUp(S.HowlBoarBuff) or Player:BuffUp(S.HowlBearBuff)) then
+  if S.KillCommand:IsReady() and (HowlSummonReady()) then
     if Cast(S.KillCommand, nil, nil, not Target:IsInRange(50)) then return "kill_command plcleave 16"; end
   end
   -- flanking_strike,if=buff.tip_of_the_spear.stack>0
@@ -294,7 +294,7 @@ end
 
 local function PLST()
   -- kill_command,if=(buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<1)|(buff.howl_of_the_pack_leader_wyvern.remains|buff.howl_of_the_pack_leader_boar.remains|buff.howl_of_the_pack_leader_bear.remains)
-  if S.KillCommand:IsReady() and ((RelentlessPrimalFerocityUp() and Player:BuffDown(S.TipoftheSpearBuff)) or (Player:BuffUp(S.HowlWyvernBuff) or Player:BuffUp(S.HowlBoarBuff) or Player:BuffUp(S.HowlBearBuff))) then
+  if S.KillCommand:IsReady() and ((RelentlessPrimalFerocityUp() and Player:BuffDown(S.TipoftheSpearBuff)) or HowlSummonReady()) then
     if Cast(S.KillCommand, nil, nil, not Target:IsInRange(50)) then return "kill_command plst 2"; end
   end
   -- spearhead,if=cooldown.coordinated_assault.remains
