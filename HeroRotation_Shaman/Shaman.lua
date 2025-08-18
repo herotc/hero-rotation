@@ -82,6 +82,8 @@ Spell.Shaman.Farseer = {
   CalloftheAncestors                    = Spell(443450),
   ElementalReverb                       = Spell(443418),
   PrimordialCapacity                    = Spell(443448),
+  -- Buffs
+  AncestralWisdomBuff                   = Spell(1238279), -- TWW S3 4pc Buff
 }
 
 Spell.Shaman.Stormbringer = {
@@ -134,6 +136,7 @@ Spell.Shaman.Elemental = MergeTableByKey(Spell.Shaman.Commons, {
   FluxMelting                           = Spell(381776),
   FuryoftheStorms                       = Spell(191717),
   FusionofElements                      = Spell(462840),
+  HeraldoftheStorms                     = Spell(468571),
   Icefury                               = Spell(210714),
   ImprovedFlametongueWeapon             = Spell(382027),
   LightningRod                          = Spell(210689),
