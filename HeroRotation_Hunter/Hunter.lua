@@ -353,4 +353,6 @@ Item.Hunter.Survival = MergeTableByKey(Item.Hunter.Commons, {
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
   SkardynsGrace                         = Item(133282, {13, 14}),
+  -- TWW Items
+  SpellstrikeWarplance                  = Item(242481, {16}),
 })

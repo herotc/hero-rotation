@@ -127,6 +127,10 @@ local function HowlSummonReady()
   return Player:BuffUp(S.HowlBearBuff) or Player:BuffUp(S.HowlBoarBuff) or Player:BuffUp(S.HowlWyvernBuff)
 end
 
+local function RelentlessPrimalFerocityUp()
+  return S.RelentlessPrimalFerocity:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff)
+end
+
 --- ===== CastTargetIf Filter Functions =====
 local function EvaluateTargetIfFilterBloodseekerRemains(TargetUnit)
   -- target_if=min:bloodseeker.remains
@@ -205,9 +209,21 @@ local function CDs()
       if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion cds 12"; end
     end
   end
+  -- use_item,use_off_gcd=1,slot=trinket1,if=buff.coordinated_assault.up&trinket.1.has_use_buff|cooldown.coordinated_assault.remains>31|!trinket.1.has_use_buff&cooldown.coordinated_assault.remains>20|time_to_die<cooldown.coordinated_assault.remains
+  if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (Player:BuffUp(S.CoordinatedAssaultBuff) and Trinket1:HasUseBuff() or S.CoordinatedAssault:CooldownRemains() > 31 or not Trinket1:HasUseBuff() and S.CoordinatedAssault:CooldownRemains() > 20 or BossFightRemains < S.CoordinatedAssault:CooldownRemains()) then
+    if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") cds 14"; end
+  end
+  -- use_item,use_off_gcd=1,slot=trinket2,if=buff.coordinated_assault.up&trinket.2.has_use_buff|cooldown.coordinated_assault.remains>31|!trinket.2.has_use_buff&cooldown.coordinated_assault.remains>20|time_to_die<cooldown.coordinated_assault.remains
+  if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (Player:BuffUp(S.CoordinatedAssaultBuff) and Trinket2:HasUseBuff() or S.CoordinatedAssault:CooldownRemains() > 31 or not Trinket2:HasUseBuff() and S.CoordinatedAssault:CooldownRemains() > 20 or BossFightRemains < S.CoordinatedAssault:CooldownRemains()) then
+    if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") cds 16"; end
+  end
   -- aspect_of_the_eagle,if=target.distance>=6
   if S.AspectoftheEagle:IsCastable() and Settings.Survival.AspectOfTheEagle and not Target:IsInRange(5) then
-    if Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectOfTheEagle) then return "aspect_of_the_eagle cds 14"; end
+    if Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectOfTheEagle) then return "aspect_of_the_eagle cds 18"; end
+  end
+  -- use_item,name=spellstrike_warplance
+  if Settings.Commons.Enabled.Items and I.SpellstrikeWarplance:IsEquippedAndReady() then
+    if Cast(I.SpellstrikeWarplance, nil, Settings.CommonsDS.DisplayStyle.Items) then return "spellstrike_warplance cds 20"; end
   end
 end
 
@@ -216,76 +232,78 @@ local function PLCleave()
   if CDsON() and S.Spearhead:IsCastable() and (S.CoordinatedAssault:CooldownDown()) then
     if Cast(S.Spearhead, Settings.Survival.GCDasOffGCD.Spearhead, nil, not Target:IsSpellInRange(S.Spearhead)) then return "spearhead plcleave 2"; end
   end
-  -- raptor_bite,target_if=max:dot.serpent_sting.remains,if=buff.strike_it_rich.up&buff.strike_it_rich.remains<gcd|buff.hogstrider.remains&boar_charge.remains>0|buff.hogstrider.remains<gcd&buff.hogstrider.up|buff.hogstrider.remains&buff.strike_it_rich.remains|raid_event.adds.exists&raid_event.adds.remains<4
-  if MBRS:IsReady() and (Player:BuffUp(S.StrikeItRichBuff) and Player:BuffRemains(S.StrikeItRichBuff) < Player:GCD() or Player:BuffUp(S.HogstriderBuff) and Hunter.PackLeader.BoarChargesRemaining > 0 or Player:BuffRemains(S.HogstriderBuff) < Player:GCD() and Player:BuffUp(S.HogstriderBuff) or Player:BuffUp(S.HogstriderBuff) and Player:BuffUp(S.StrikeItRichBuff)) then
-    if Everyone.CastTargetIf(MBRS, EnemyList, "max", EvaluateTargetIfFilterSerpentStingRemains, nil, not Target:IsInRange(MBRSRange)) then return MBRS:Name() .. " plcleave 4"; end
-  end
-  -- kill_command,target_if=min:bloodseeker.remains,if=buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<1
-  if S.KillCommand:IsCastable() and (S.RelentlessPrimalFerocity:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff) and Player:BuffDown(S.TipoftheSpearBuff)) then
-    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command plcleave 6"; end
+  -- kill_command,if=buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<1
+  if S.KillCommand:IsReady() and (RelentlessPrimalFerocityUp() and Player:BuffDown(S.TipoftheSpearBuff)) then
+    if Cast(S.KillCommand, nil, nil, not Target:IsInRange(50)) then return "kill_command plcleave 4"; end
   end
   -- fury_of_the_eagle,if=buff.tip_of_the_spear.stack>0
   if S.FuryoftheEagle:IsCastable() and (Player:BuffUp(S.TipoftheSpearBuff)) then
-    if Cast(S.FuryoftheEagle, nil, Settings.CommonsDS.DisplayStyle.FuryOfTheEagle, not Target:IsInMeleeRange(5)) then return "fury_of_the_eagle plcleave 8"; end
+    if Cast(S.FuryoftheEagle, nil, Settings.CommonsDS.DisplayStyle.FuryOfTheEagle, not Target:IsInMeleeRange(5)) then return "fury_of_the_eagle plcleave 6"; end
+  end
+  -- wildfire_bomb,if=cooldown.wildfire_bomb.charges_fractional>1.7
+  if S.WildfireBomb:IsReady() and (S.WildfireBomb:ChargesFractional() > 1.7) then
+    if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb plcleave 8"; end
   end
   -- explosive_shot,if=buff.tip_of_the_spear.stack>0
   if S.ExplosiveShot:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff)) then
     if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot plcleave 10"; end
   end
-  -- wildfire_bomb
-  if S.WildfireBomb:IsReady() then
-    if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb plcleave 12"; end
+  -- raptor_bite,target_if=max:dot.serpent_sting.remains,if=buff.strike_it_rich.up&buff.strike_it_rich.remains<gcd|buff.hogstrider.remains&boar_charge.remains>0|buff.hogstrider.remains<gcd&buff.hogstrider.up|buff.hogstrider.remains&buff.strike_it_rich.remains|raid_event.adds.exists&raid_event.adds.remains<4
+  if MBRS:IsReady() and (Player:BuffUp(S.StrikeItRichBuff) and Player:BuffRemains(S.StrikeItRichBuff) < Player:GCD() or Player:BuffUp(S.HogstriderBuff) and Hunter.PackLeader.BoarChargesRemaining > 0 or Player:BuffRemains(S.HogstriderBuff) < Player:GCD() and Player:BuffUp(S.HogstriderBuff) or Player:BuffUp(S.HogstriderBuff) and Player:BuffUp(S.StrikeItRichBuff)) then
+    if Everyone.CastTargetIf(MBRS, EnemyList, "max", EvaluateTargetIfFilterSerpentStingRemains, nil, not Target:IsInRange(MBRSRange)) then return MBRS:Name() .. " plcleave 12"; end
   end
-  -- kill_command,target_if=min:bloodseeker.remains,if=(buff.howl_of_the_pack_leader_wyvern.remains|buff.howl_of_the_pack_leader_boar.remains|buff.howl_of_the_pack_leader_bear.remains)
-  if S.KillCommand:IsCastable() and (Player:BuffUp(S.HowlWyvernBuff) or Player:BuffUp(S.HowlBoarBuff) or Player:BuffUp(S.HowlBearBuff)) then
-    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command plcleave 14"; end
+  -- wildfire_bomb,if=buff.tip_of_the_spear.stack>0
+  if S.WildfireBomb:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff)) then
+    if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb plcleave 14"; end
   end
-  -- flanking_strike,if=buff.tip_of_the_spear.stack=2|buff.tip_of_the_spear.stack=1
-  if S.FlankingStrike:IsReady() and (Player:BuffStack(S.TipoftheSpearBuff) == 2 or Player:BuffStack(S.TipoftheSpearBuff) == 1) then
-    if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike plcleave 16"; end
+  -- kill_command,if=(buff.howl_of_the_pack_leader_wyvern.remains|buff.howl_of_the_pack_leader_boar.remains|buff.howl_of_the_pack_leader_bear.remains)
+  if S.KillCommand:IsReady() and (Player:BuffUp(S.HowlWyvernBuff) or Player:BuffUp(S.HowlBoarBuff) or Player:BuffUp(S.HowlBearBuff)) then
+    if Cast(S.KillCommand, nil, nil, not Target:IsInRange(50)) then return "kill_command plcleave 16"; end
   end
-  -- butchery
-  if S.Butchery:IsReady() then
-    if Cast(S.Butchery, Settings.Survival.GCDasOffGCD.Butchery, nil, not Target:IsInMeleeRange(5)) then return "butchery plcleave 18"; end
+  -- flanking_strike,if=buff.tip_of_the_spear.stack>0
+  if S.FlankingStrike:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff)) then
+    if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike plcleave 18"; end
   end
-  -- coordinated_assault
-  if CDsON() and S.CoordinatedAssault:IsCastable() then
-    if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, not Target:IsSpellInRange(S.CoordinatedAssault)) then return "coordinated_assault plcleave 20"; end
+  -- butchery,if=cooldown.wildfire_bomb.charges_fractional<1.5
+  if S.Butchery:IsReady() and (S.WildfireBomb:ChargesFractional() < 1.5) then
+    if Cast(S.Butchery, Settings.Survival.GCDasOffGCD.Butchery, nil, not Target:IsInMeleeRange(8)) then return "butchery plcleave 20"; end
   end
-  -- fury_of_the_eagle,if=buff.tip_of_the_spear.stack>0
-  -- Note: Duplicate of several lines above...
-  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max
+  -- coordinated_assault,if=buff.howl_of_the_pack_leader_cooldown.remains-buff.lead_from_the_front.duration<buff.lead_from_the_front.duration%gcd*0.6
+  if CDsON() and S.CoordinatedAssault:IsCastable() and (Player:BuffRemains(S.HowlofthePackLeaderCDBuff) - 12 < 12 / Player:GCD() * 0.6) then
+    if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, not Target:IsInRange(40)) then return "coordinated_assault plcleave 22"; end
+  end
+  -- kill_command,if=focus+cast_regen<focus.max
   if S.KillCommand:IsCastable() and (CheckFocusCap(S.KillCommand:ExecuteTime(), 15)) then
-    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command plcleave 22"; end
+    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command plcleave 24"; end
   end
   -- explosive_shot
   if S.ExplosiveShot:IsReady() then
-    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot plcleave 24"; end
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot plcleave 26"; end
   end
   -- kill_shot,if=buff.deathblow.remains&talent.sic_em
   if S.KillShot:IsReady() and (Player:BuffUp(S.DeathblowBuff) and S.SicEm:IsAvailable()) then
-    if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot plcleave 26"; end
+    if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot plcleave 28"; end
   end
   -- raptor_bite,target_if=min:dot.serpent_sting.remains,if=!talent.contagious_reagents
   -- raptor_bite,target_if=max:dot.serpent_sting.remains
   -- Note: Second line covers the condition of the first line...
   if MBRS:IsReady() then
-    if Everyone.CastTargetIf(MBRS, EnemyList, "max", EvaluateTargetIfFilterSerpentStingRemains, nil, not Target:IsInRange(MBRSRange)) then return MBRS:Name() .. " plcleave 28"; end
-  end  
+    if Everyone.CastTargetIf(MBRS, EnemyList, "max", EvaluateTargetIfFilterSerpentStingRemains, nil, not Target:IsInRange(MBRSRange)) then return MBRS:Name() .. " plcleave 30"; end
+  end
 end
 
 local function PLST()
-  -- kill_command,target_if=min:bloodseeker.remains,if=(buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<1)|(buff.howl_of_the_pack_leader_wyvern.remains|buff.howl_of_the_pack_leader_boar.remains|buff.howl_of_the_pack_leader_bear.remains)
-  if S.KillCommand:IsCastable() and ((S.RelentlessPrimalFerocity:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff) and Player:BuffDown(S.TipoftheSpearBuff)) or (Player:BuffUp(S.HowlWyvernBuff) or Player:BuffUp(S.HowlBoarBuff) or Player:BuffUp(S.HowlBearBuff))) then
-    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command plst 2"; end
+  -- kill_command,if=(buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<1)|(buff.howl_of_the_pack_leader_wyvern.remains|buff.howl_of_the_pack_leader_boar.remains|buff.howl_of_the_pack_leader_bear.remains)
+  if S.KillCommand:IsReady() and ((RelentlessPrimalFerocityUp() and Player:BuffDown(S.TipoftheSpearBuff)) or (Player:BuffUp(S.HowlWyvernBuff) or Player:BuffUp(S.HowlBoarBuff) or Player:BuffUp(S.HowlBearBuff))) then
+    if Cast(S.KillCommand, nil, nil, not Target:IsInRange(50)) then return "kill_command plst 2"; end
   end
   -- spearhead,if=cooldown.coordinated_assault.remains
   if CDsON() and S.Spearhead:IsCastable() and (S.CoordinatedAssault:CooldownDown()) then
     if Cast(S.Spearhead, Settings.Survival.GCDasOffGCD.Spearhead, nil, not Target:IsSpellInRange(S.Spearhead)) then return "spearhead plst 4"; end
   end
-  -- flanking_strike,if=buff.tip_of_the_spear.stack>0
-  if S.FlankingStrike:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff)) then
-    if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike plst 6"; end
+  -- flanking_strike,if=buff.tip_of_the_spear.stack>0&(cooldown.spearhead.remains>5|!talent.spearhead&cooldown.coordinated_assault.remains>5)
+  if S.FlankingStrike:IsCastable() and (S.Spearhead:CooldownDown() or (not S.Spearhead:IsAvailable() and S.CoordinatedAssault:CooldownDown())) then
+    if Cast(S.FlankingStrike, Settings.Survival.GCDasOffGCD.FlankingStrike, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike plst 6"; end
   end
   -- raptor_bite,target_if=min:dot.serpent_sting.remains,if=!dot.serpent_sting.ticking&target.time_to_die>12&(!talent.contagious_reagents|active_dot.serpent_sting=0)
   if MBRS:IsReady() and (not S.ContagiousReagents:IsAvailable() or S.SerpentStingDebuff:AuraActiveCount() == 0) then
@@ -295,13 +313,9 @@ local function PLST()
   if MBRS:IsReady() and (S.ContagiousReagents:IsAvailable() and S.SerpentStingDebuff:AuraActiveCount() < EnemyCount) then
     if Everyone.CastTargetIf(MBRS, EnemyList, "max", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfMBRSPLST2, not Target:IsInRange(MBRSRange)) then return MBRS:Name() .. " plst 10"; end
   end
-  -- butchery
-  if S.Butchery:IsReady() then
-    if Cast(S.Butchery, Settings.Survival.GCDasOffGCD.Butchery, nil, not Target:IsInMeleeRange(5)) then return "butchery plst 12"; end
-  end
   -- kill_command,if=buff.strike_it_rich.remains&buff.tip_of_the_spear.stack<1
   if S.KillCommand:IsCastable() and (Player:BuffUp(S.StrikeItRichBuff) and Player:BuffDown(S.TipoftheSpearBuff)) then
-    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command plst 14"; end
+    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command plst 12"; end
   end
   -- raptor_bite,if=buff.strike_it_rich.remains&buff.tip_of_the_spear.stack>0
   if MBRS:IsReady() and (Player:BuffUp(S.StrikeItRichBuff) and Player:BuffStack(S.TipoftheSpearBuff) > 0) then
@@ -311,25 +325,29 @@ local function PLST()
   if S.FuryoftheEagle:IsCastable() and (Player:BuffUp(S.TipoftheSpearBuff)) then
     if Cast(S.FuryoftheEagle, nil, Settings.CommonsDS.DisplayStyle.FuryOfTheEagle, not Target:IsInMeleeRange(5)) then return "fury_of_the_eagle plst 18"; end
   end
-  -- coordinated_assault
-  if CDsON() and S.CoordinatedAssault:IsCastable() then
-    if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, not Target:IsSpellInRange(S.CoordinatedAssault)) then return "coordinated_assault plst 20"; end
+  -- coordinated_assault,if=buff.howl_of_the_pack_leader_cooldown.remains-buff.lead_from_the_front.duration<buff.lead_from_the_front.duration%gcd*0.6|time_to_die<20|!talent.spearhead
+  if CDsON() and S.CoordinatedAssault:IsCastable() and (Player:BuffRemains(S.HowlofthePackLeaderCDBuff) - 12 < 12 / Player:GCD() * 0.6 or BossFightRemains < 20 or not S.Spearhead:IsAvailable()) then
+    if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, not Target:IsInRange(40)) then return "coordinated_assault plst 20"; end
   end
-  -- wildfire_bomb
-  if S.WildfireBomb:IsReady() then
+  -- wildfire_bomb,if=buff.tip_of_the_spear.stack>0
+  if S.WildfireBomb:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff)) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb plst 22"; end
   end
   -- raptor_bite,target_if=max:dot.serpent_sting.remains,if=buff.howl_of_the_pack_leader_cooldown.up&buff.howl_of_the_pack_leader_cooldown.remains<2*gcd
   if MBRS:IsReady() and (Player:BuffUp(S.HowlofthePackLeaderCDBuff) and Player:BuffRemains(S.HowlofthePackLeaderCDBuff) < 2 * Player:GCD()) then
     if Everyone.CastTargetIf(MBRS, EnemyList, "max", EvaluateTargetIfFilterSerpentStingRemains, EvaluateTargetIfMBRSPLST, not Target:IsInRange(MBRSRange)) then return MBRS:Name() .. " plst 24"; end
   end
-  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&(!buff.relentless_primal_ferocity.up|(buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<1|focus<30))
-  if S.KillCommand:IsReady() and (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and (not (S.RelentlessPrimalFerocity:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff)) or (S.RelentlessPrimalFerocity:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff) and Player:BuffStack(S.TipoftheSpearBuff) < 2 or Player:Focus() < 30))) then
-    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command plst 26"; end
+  -- kill_command,if=focus+cast_regen<focus.max&(!buff.relentless_primal_ferocity.up|(buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<2|focus<30))
+  if S.KillCommand:IsCastable() and (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and (not RelentlessPrimalFerocityUp() or (RelentlessPrimalFerocityUp() and Player:BuffStack(S.TipoftheSpearBuff) < 2 or Player:Focus() < 30))) then
+    if Cast(S.KillCommand, nil, nil, not Target:IsInRange(50)) then return "kill_command plst 26"; end
   end
-  -- explosive_shot,if=active_enemies=2
-  if S.ExplosiveShot:IsReady() and (EnemyCount == 2) then
+  -- explosive_shot,if=active_enemies>1
+  if S.ExplosiveShot:IsReady() and (EnemyCount > 1) then
     if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot plst 28"; end
+  end
+  -- kill_shot,if=talent.cull_the_herd
+  if S.KillShot:IsReady() and (S.CulltheHerd:IsAvailable()) then
+    if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot plst 30"; end
   end
   -- raptor_bite,target_if=min:dot.serpent_sting.remains,if=!talent.contagious_reagents
   -- raptor_bite,target_if=max:dot.serpent_sting.remains
@@ -345,7 +363,6 @@ local function PLST()
   if S.ExplosiveShot:IsReady() then
     if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot plst 34"; end
   end
-  
 end
 
 local function SentCleave()
@@ -353,12 +370,12 @@ local function SentCleave()
   if S.WildfireBomb:IsReady() and (Player:BuffDown(S.LunarStormCDBuff)) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb sentcleave 2"; end
   end
-  -- kill_command,target_if=min:bloodseeker.remains,if=buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<1
-  if S.KillCommand:IsCastable() and (S.RelentlessPrimalFerocity:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff) and Player:BuffDown(S.TipoftheSpearBuff)) then
-    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command sentcleave 4"; end
+  -- kill_command,if=buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<1
+  if S.KillCommand:IsReady() and (RelentlessPrimalFerocityUp() and Player:BuffDown(S.TipoftheSpearBuff)) then
+    if Cast(S.KillCommand, nil, nil, not Target:IsInRange(50)) then return "kill_command sentcleave 4"; end
   end
-  -- wildfire_bomb,if=buff.tip_of_the_spear.stack>0&cooldown.wildfire_bomb.charges_fractional>1.7|cooldown.wildfire_bomb.charges_fractional>1.9|(talent.bombardier&cooldown.coordinated_assault.remains<2*gcd)|talent.butchery&cooldown.butchery.remains<gcd
-  if S.WildfireBomb:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff) and S.WildfireBomb:ChargesFractional() > 1.7 or S.WildfireBomb:ChargesFractional() > 1.9 or (S.Bombardier:IsAvailable() and S.CoordinatedAssault:CooldownRemains() < 2 * Player:GCD()) or S.Butchery:IsAvailable() and S.Butchery:CooldownRemains() < Player:GCD()) then
+  -- wildfire_bomb,if=buff.tip_of_the_spear.stack>0|cooldown.wildfire_bomb.charges_fractional>1.9|(talent.bombardier&cooldown.coordinated_assault.remains<2*gcd)|talent.butchery&cooldown.butchery.remains<gcd
+  if S.WildfireBomb:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff) or S.WildfireBomb:ChargesFractional() > 1.9 or (S.Bombardier:IsAvailable() and S.CoordinatedAssault:CooldownRemains() < 2 * Player:GCD()) or S.Butchery:IsAvailable() and S.Butchery:CooldownRemains() < Player:GCD()) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb sentcleave 6"; end
   end
   -- fury_of_the_eagle,if=buff.tip_of_the_spear.stack>0
@@ -377,15 +394,15 @@ local function SentCleave()
   if S.ExplosiveShot:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff)) then
     if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not Target:IsSpellInRange(S.ExplosiveShot)) then return "explosive_shot sentcleave 14"; end
   end
-  -- coordinated_assault,if=!talent.bombardier|talent.bombardier&cooldown.wildfire_bomb.charges_fractional<1
-  if CDsON() and S.CoordinatedAssault:IsCastable() and (not S.Bombardier:IsAvailable() or S.Bombardier:IsAvailable() and S.WildfireBomb:ChargesFractional() < 1) then
+  -- coordinated_assault
+  if CDsON() and S.CoordinatedAssault:IsCastable() then
     if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, not Target:IsSpellInRange(S.CoordinatedAssault)) then return "coordinated_assault sentcleave 16"; end
   end
   -- flanking_strike,if=(buff.tip_of_the_spear.stack=2|buff.tip_of_the_spear.stack=1)
   if S.FlankingStrike:IsReady() and (Player:BuffStack(S.TipoftheSpearBuff) == 2 or Player:BuffStack(S.TipoftheSpearBuff) == 1) then
     if Cast(S.FlankingStrike, nil, nil, not Target:IsSpellInRange(S.FlankingStrike)) then return "flanking_strike sentcleave 18"; end
   end
-  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max
+  -- kill_command,if=focus+cast_regen<focus.max
   if S.KillCommand:IsCastable() and (CheckFocusCap(S.KillCommand:ExecuteTime(), 15)) then
     if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command sentcleave 20"; end
   end
@@ -401,7 +418,7 @@ local function SentCleave()
   if S.KillShot:IsReady() and (Player:BuffUp(S.DeathblowBuff) and S.SicEm:IsAvailable()) then
     if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot sentcleave 26"; end
   end
-  -- raptor_bite,target_if=min:dot.serpent_sting.remains,if=!talent.contagious_reagents4
+  -- raptor_bite,target_if=min:dot.serpent_sting.remains,if=!talent.contagious_reagents
   -- raptor_bite,target_if=max:dot.serpent_sting.remains
   -- Note: Second line covers the condition of the first line...
   if MBRS:IsReady() then
@@ -410,13 +427,13 @@ local function SentCleave()
 end
 
 local function SentST()
-  -- wildfire_bomb,if=!buff.lunar_storm_cooldown.remains
-  if S.WildfireBomb:IsReady() and (Player:BuffDown(S.LunarStormCDBuff)) then
+  -- wildfire_bomb,if=!buff.lunar_storm_cooldown.remains&buff.tip_of_the_spear.stack>0
+  if S.WildfireBomb:IsReady() and (Player:BuffDown(S.LunarStormCDBuff) and Player:BuffUp(S.TipoftheSpearBuff)) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb sentst 2"; end
   end
-  -- kill_command,target_if=min:bloodseeker.remains,if=(buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<1)
-  if S.KillCommand:IsCastable() and (S.RelentlessPrimalFerocity:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff) and Player:BuffDown(S.TipoftheSpearBuff)) then
-    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command sentst 4"; end
+  -- kill_command,if=(buff.relentless_primal_ferocity.up&buff.tip_of_the_spear.stack<1)
+  if S.KillCommand:IsReady() and (RelentlessPrimalFerocityUp() and Player:BuffDown(S.TipoftheSpearBuff)) then
+    if Cast(S.KillCommand, nil, nil, not Target:IsInRange(50)) then return "kill_command sentst 4"; end
   end
   -- spearhead,if=cooldown.coordinated_assault.remains
   if CDsON() and S.Spearhead:IsCastable() and (S.CoordinatedAssault:CooldownDown()) then
@@ -434,37 +451,37 @@ local function SentST()
   if MBRS:IsReady() and (Player:BuffUp(S.StrikeItRichBuff) and Player:BuffUp(S.CoordinatedAssaultBuff)) then
     if Cast(MBRS, nil, nil, not Target:IsInRange(MBRSRange)) then return MBRS:Name() .. " sentst 12"; end
   end
-  -- wildfire_bomb,if=(buff.lunar_storm_cooldown.remains>full_recharge_time-gcd)&(buff.tip_of_the_spear.stack>0&cooldown.wildfire_bomb.charges_fractional>1.7|cooldown.wildfire_bomb.charges_fractional>1.9)|(talent.bombardier&cooldown.coordinated_assault.remains<2*gcd)
-  if S.WildfireBomb:IsReady() and ((Player:BuffRemains(S.LunarStormCDBuff) > S.WildfireBomb:FullRechargeTime() - Player:GCD()) and (Player:BuffUp(S.TipoftheSpearBuff) and S.WildfireBomb:ChargesFractional() > 1.7 or S.WildfireBomb:ChargesFractional() > 1.9) or (S.Bombardier:IsAvailable() and S.CoordinatedAssault:CooldownRemains() < 2 * Player:GCD())) then
+  -- wildfire_bomb,if=cooldown.wildfire_bomb.charges_fractional>1.7
+  if S.WildfireBomb:IsReady() and (S.WildfireBomb:ChargesFractional() > 1.7) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb sentst 14"; end
   end
   -- butchery
   if S.Butchery:IsReady() then
     if Cast(S.Butchery, Settings.Survival.GCDasOffGCD.Butchery, nil, not Target:IsInMeleeRange(5)) then return "butchery sentst 16"; end
   end
-  -- coordinated_assault,if=!talent.bombardier|talent.bombardier&cooldown.wildfire_bomb.charges_fractional<1
-  if CDsON() and S.CoordinatedAssault:IsCastable() and (not S.Bombardier:IsAvailable() or S.Bombardier:IsAvailable() and S.WildfireBomb:ChargesFractional() < 1) then
+  -- coordinated_assault,if=!talent.bombardier|talent.bombardier&cooldown.wildfire_bomb.charges_fractional<2
+  if CDsON() and S.CoordinatedAssault:IsCastable() and (not S.Bombardier:IsAvailable() or S.Bombardier:IsAvailable() and S.WildfireBomb:ChargesFractional() < 2) then
     if Cast(S.CoordinatedAssault, Settings.Survival.GCDasOffGCD.CoordinatedAssault, nil, not Target:IsSpellInRange(S.CoordinatedAssault)) then return "coordinated_assault sentst 18"; end
   end
   -- fury_of_the_eagle,if=buff.tip_of_the_spear.stack>0
   if S.FuryoftheEagle:IsCastable() and (Player:BuffUp(S.TipoftheSpearBuff)) then
     if Cast(S.FuryoftheEagle, nil, Settings.CommonsDS.DisplayStyle.FuryOfTheEagle, not Target:IsInMeleeRange(5)) then return "fury_of_the_eagle sentst 20"; end
   end
-  -- kill_command,target_if=min:bloodseeker.remains,if=buff.tip_of_the_spear.stack<1&cooldown.flanking_strike.remains<gcd
+  -- kill_command,if=buff.tip_of_the_spear.stack<1&cooldown.flanking_strike.remains<gcd
   if S.KillCommand:IsReady() and (Player:BuffDown(S.TipoftheSpearBuff) and S.FlankingStrike:CooldownRemains() < Player:GCD()) then
-    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command sentst 22"; end
+    if Cast(S.KillCommand, nil, nil, not Target:IsInRange(50)) then return "kill_command sentst 22"; end
   end
-  -- kill_command,target_if=min:bloodseeker.remains,if=focus+cast_regen<focus.max&(!buff.relentless_primal_ferocity.up|(buff.relentless_primal_ferocity.up&(buff.tip_of_the_spear.stack<1|focus<30)))4
-  if S.KillCommand:IsReady() and (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and (not (S.RelentlessPrimalFerocity:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff)) or (S.RelentlessPrimalFerocity:IsAvailable() and Player:BuffUp(S.CoordinatedAssaultBuff) and (Player:BuffDown(S.TipoftheSpearBuff) or Player:Focus() < 30)))) then
-    if Everyone.CastTargetIf(S.KillCommand, EnemyList, "min", EvaluateTargetIfFilterBloodseekerRemains, nil, not Target:IsInRange(50)) then return "kill_command sentst 24"; end
+  -- kill_command,if=focus+cast_regen<focus.max&(!buff.relentless_primal_ferocity.up|(buff.relentless_primal_ferocity.up&(buff.tip_of_the_spear.stack<1|focus<30)))
+  if S.KillCommand:IsReady() and (CheckFocusCap(S.KillCommand:ExecuteTime(), 15) and (not RelentlessPrimalFerocityUp() or (RelentlessPrimalFerocityUp() and (Player:BuffDown(S.TipoftheSpearBuff) or Player:Focus() < 30)))) then
+    if Cast(S.KillCommand, nil, nil, not Target:IsInRange(50)) then return "kill_command sentst 24"; end
   end
   -- mongoose_bite,if=buff.mongoose_fury.remains<gcd&buff.mongoose_fury.stack>0
   -- Note: Reversed conditions so we don't bother checking BuffRemains if buff is down.
   if MBRS:IsReady() and (Player:BuffUp(S.MongooseFuryBuff) and Player:BuffRemains(S.MongooseFuryBuff) < Player:GCD()) then
     if Cast(MBRS, nil, nil, not Target:IsInRange(MBRSRange)) then return MBRS:Name() .. " sentst 26"; end
   end
-  -- wildfire_bomb,if=buff.tip_of_the_spear.stack>0&buff.lunar_storm_cooldown.remains>full_recharge_time&(!raid_event.adds.exists|raid_event.adds.exists&raid_event.adds.in>15)
-  if S.WildfireBomb:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff) and Player:BuffRemains(S.LunarStormCDBuff) > S.WildfireBomb:FullRechargeTime()) then
+  -- wildfire_bomb,if=buff.tip_of_the_spear.stack>0
+  if S.WildfireBomb:IsReady() and (Player:BuffUp(S.TipoftheSpearBuff)) then
     if Cast(S.WildfireBomb, nil, nil, not Target:IsSpellInRange(S.WildfireBomb)) then return "wildfire_bomb sentst 28"; end
   end
   -- explosive_shot
@@ -574,7 +591,7 @@ local function APL()
     local ShouldReturn = Everyone.Interrupt(S.Muzzle, Settings.CommonsDS.DisplayStyle.Interrupts, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- auto_attack
     -- Manually added: If out of range, use Aspect of the Eagle, otherwise Harpoon to get back into range
-    if not EagleUp and not Target:IsInMeleeRange(8) then
+    if not EagleUp and not Target:IsInMeleeRange(8) and not Player:PrevOffGCD(1, S.Harpoon) then
       if S.AspectoftheEagle:IsCastable() and Settings.Survival.AspectOfTheEagle then
         if Cast(S.AspectoftheEagle, Settings.Survival.OffGCDasOffGCD.AspectOfTheEagle) then return "aspect_of_the_eagle oor"; end
       end
@@ -624,7 +641,7 @@ end
 local function OnInit ()
   S.SerpentStingDebuff:RegisterAuraTracking()
 
-  HR.Print("Survival Hunter rotation has been updated for patch 11.1.5.")
+  HR.Print("Survival Hunter rotation has been updated for patch 11.2.0.")
 end
 
 HR.SetAPL(255, APL, OnInit)
