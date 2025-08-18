@@ -80,6 +80,7 @@ local VarTrinket1Spell, VarTrinket2Spell
 local VarTrinket1Range, VarTrinket2Range
 local VarTrinket1CastTime, VarTrinket2CastTime
 local VarTrinket1CD, VarTrinket2CD
+local VarTrinket1CDRemains, VarTrinket2CDRemains = 0, 0
 local VarTrinket1Ex, VarTrinket2Ex
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
@@ -113,12 +114,12 @@ local function SetTrinketVariables()
 
   VarTrinket1Ex = T1.Excluded
   VarTrinket2Ex = T2.Excluded
+
+  -- Avoid nil errors. This is later handled in Variables().
+  VarTrinket1CDRemains = VarTrinket1ID == I.UnyieldingNetherprism:ID() and (120 - (10 * (1 + Player:BuffStack(S.LatentEnergyBuff)))) or Trinket1:CooldownRemains()
+  VarTrinket2CDRemains = VarTrinket2ID == I.UnyieldingNetherprism:ID() and (120 - (10 * (1 + Player:BuffStack(S.LatentEnergyBuff)))) or Trinket2:CooldownRemains()
 end
 SetTrinketVariables()
-
--- Avoid nil errors. This is later handled in Variables().
-local VarTrinket1CDRemains = VarTrinket1ID == I.UnyieldingNetherprism:ID() and (120 - (10 * (1 + Player:BuffStack(S.LatentEnergyBuff)))) or Trinket1:CooldownRemains()
-local VarTrinket2CDRemains = VarTrinket2ID == I.UnyieldingNetherprism:ID() and (120 - (10 * (1 + Player:BuffStack(S.LatentEnergyBuff)))) or Trinket2:CooldownRemains()
 
 --- ===== Stun Interrupts List =====
 local InterruptStuns = {
