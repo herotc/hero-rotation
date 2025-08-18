@@ -509,7 +509,7 @@ local function SpellQueueMacro (BaseSpell, ReturnSpellOnly)
       -- Outside of stealth could be AR -> Vanish -> BtE so check for this first then fallback into normal finisher.
       if not Player:StealthUp(true, true) then
         -- AR->Coup Highest prio, outside of stealth especially if double coup
-        if S.CoupDeGrace:IsCastable() and Player:BuffUp(S.AdrenalineRush) then
+        if S.CoupDeGrace:IsCastable() then
           MacroAbility = S.CoupDeGrace
         else
           local MacroAbilities = StealthCDs(true)
