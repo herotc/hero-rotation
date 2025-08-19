@@ -25,6 +25,18 @@ local GetTime = GetTime
 
 --- ============================ CONTENT ============================
 -- Beast Mastery, ID: 253
+local OldBMIsAvailable
+OldBMIsAvailable = HL.AddCoreOverride("Spell.IsAvailable",
+  function (self, CheckPet)
+    local BaseCheck = OldBMIsAvailable(self, CheckPet)
+    if self == SpellBM.BlackArrow then
+      return self:IsLearned()
+    else
+      return BaseCheck
+    end
+  end
+, 253)
+
 local OldBMIsCastable
 OldBMIsCastable = HL.AddCoreOverride("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)

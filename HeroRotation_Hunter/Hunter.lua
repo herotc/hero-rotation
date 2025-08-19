@@ -83,7 +83,6 @@ Spell.Hunter.DarkRanger = {
   -- Abilities
   BlackArrow                            = Spell(466930),
   -- Talents
-  BlackArrowTalent                      = Spell(466932),
   BleakArrows                           = Spell(467749),
   BleakArrowsBMAbility                  = Spell(472084),
   BleakArrowsMMAbility                  = Spell(467914),
