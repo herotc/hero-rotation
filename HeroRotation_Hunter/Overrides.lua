@@ -27,74 +27,87 @@ local GetTime = GetTime
 -- Beast Mastery, ID: 253
 local OldBMIsCastable
 OldBMIsCastable = HL.AddCoreOverride("Spell.IsCastable",
-function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-  local BaseCheck = OldBMIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-  if self == SpellBM.SummonPet then
-    if Hunter.Pet.Status ~= 1 and Pet:IsActive() then Hunter.Pet.Status = 1 end
-    return (Hunter.Pet.Status == 0 or Hunter.Pet.Status == 3) and not (Player:IsMounted() or Player:IsInVehicle()) and BaseCheck
-  elseif self == SpellBM.RevivePet then
-    return (Pet:IsDeadOrGhost() or Hunter.Pet.Status == 2 and Hunter.Pet.FeignGUID == 0) and not (Player:IsMounted() or Player:IsInVehicle()) and BaseCheck
-  elseif self == SpellBM.MendPet then
-    return Pet:HealthPercentage() > 0 and Pet:HealthPercentage() <= Settings.Commons.MendPetHP and not (Player:IsMounted() or Player:IsInVehicle()) and BaseCheck
-  else
-    return BaseCheck
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = OldBMIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    if self == SpellBM.SummonPet then
+      if Hunter.Pet.Status ~= 1 and Pet:IsActive() then Hunter.Pet.Status = 1 end
+      return (Hunter.Pet.Status == 0 or Hunter.Pet.Status == 3) and not (Player:IsMounted() or Player:IsInVehicle()) and BaseCheck
+    elseif self == SpellBM.RevivePet then
+      return (Pet:IsDeadOrGhost() or Hunter.Pet.Status == 2 and Hunter.Pet.FeignGUID == 0) and not (Player:IsMounted() or Player:IsInVehicle()) and BaseCheck
+    elseif self == SpellBM.MendPet then
+      return Pet:HealthPercentage() > 0 and Pet:HealthPercentage() <= Settings.Commons.MendPetHP and not (Player:IsMounted() or Player:IsInVehicle()) and BaseCheck
+    else
+      return BaseCheck
+    end
   end
-end
 , 253)
 
 local BMPetBuffRemains
 BMPetBuffRemains = HL.AddCoreOverride ("Pet.BuffRemains",
-function (self, Spell, AnyCaster, Offset)
-  local BaseCheck = BMPetBuffRemains(self, Spell, AnyCaster, Offset)
-  -- For short duration pet buffs, if we are in the process of casting an instant spell, fake the duration calculation until we know what it is
-  -- This is due to the fact that instant spells don't trigger SPELL_CAST_START and we could have a refresh in progress 50-150ms before we know about it
-  if Spell == SpellBM.FrenzyBuff then
-    if Player:IsPrevCastPending() then
-      return BaseCheck + (GetTime() - Player:GCDStartTime())
+  function (self, Spell, AnyCaster, Offset)
+    local BaseCheck = BMPetBuffRemains(self, Spell, AnyCaster, Offset)
+    -- For short duration pet buffs, if we are in the process of casting an instant spell, fake the duration calculation until we know what it is
+    -- This is due to the fact that instant spells don't trigger SPELL_CAST_START and we could have a refresh in progress 50-150ms before we know about it
+    if Spell == SpellBM.FrenzyBuff then
+      if Player:IsPrevCastPending() then
+        return BaseCheck + (GetTime() - Player:GCDStartTime())
+      end
+    elseif Spell == SpellBM.BeastCleaveBuff then
+      -- If the player buff has duration, grab that one instead. It can be applid a few MS earlier due to latency
+      BaseCheck = mathmax(BaseCheck, Player:BuffRemains(SpellBM.BeastCleavePlayerBuff))
+      if Player:IsPrevCastPending() then
+        return BaseCheck + (GetTime() - Player:GCDStartTime())
+      end
     end
-  elseif Spell == SpellBM.BeastCleaveBuff then
-    -- If the player buff has duration, grab that one instead. It can be applid a few MS earlier due to latency
-    BaseCheck = mathmax(BaseCheck, Player:BuffRemains(SpellBM.BeastCleavePlayerBuff))
-    if Player:IsPrevCastPending() then
-      return BaseCheck + (GetTime() - Player:GCDStartTime())
-    end
+    return BaseCheck
   end
-  return BaseCheck
-end
 , 253)
 
 -- Marksmanship, ID: 254
 local OldMMIsCastable
 OldMMIsCastable = HL.AddCoreOverride("Spell.IsCastable",
-function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-  local BaseCheck = OldMMIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-  if self == SpellMM.SummonPet then
-    return Hunter.Pet.Status == 0 and BaseCheck
-  else
-    return BaseCheck
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = OldMMIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    if self == SpellMM.SummonPet then
+      return Hunter.Pet.Status == 0 and BaseCheck
+    else
+      return BaseCheck
+    end
   end
-end
 , 254)
 
 local OldMMIsReady
 OldMMIsReady = HL.AddCoreOverride("Spell.IsReady",
-function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  --local BaseCheck = OldMMIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset) and Player:FocusP() >= self:Cost()
-  local BaseCheck = self:IsCastable() and self:IsUsable() and Player:FocusP() >= self:Cost()
-  if self == SpellMM.AimedShot then
-    if Player:IsCasting(self) then return false end
-    if Settings.Marksmanship.HideAimedWhileMoving then
-      return BaseCheck and SpellMM.AimedShot:Charges() >= 1 and (not Player:IsMoving() or Player:BuffUp(SpellMM.LockandLoadBuff))
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    --local BaseCheck = OldMMIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset) and Player:FocusP() >= self:Cost()
+    local BaseCheck = self:IsCastable() and self:IsUsable() and Player:FocusP() >= self:Cost()
+    if self == SpellMM.AimedShot then
+      if Player:IsCasting(self) then return false end
+      if Settings.Marksmanship.HideAimedWhileMoving then
+        return BaseCheck and SpellMM.AimedShot:Charges() >= 1 and (not Player:IsMoving() or Player:BuffUp(SpellMM.LockandLoadBuff))
+      else
+        return BaseCheck and SpellMM.AimedShot:Charges() >= 1
+      end
+    elseif self == SpellMM.BlackArrow then
+      return BaseCheck and not Player:IsCasting(self)
     else
-      return BaseCheck and SpellMM.AimedShot:Charges() >= 1
+      return BaseCheck
     end
-  elseif self == SpellMM.BlackArrow then
-    return BaseCheck and not Player:IsCasting(self)
-  else
-    return BaseCheck
   end
-end
 , 254)
+
+local OldMMIsAvailable
+OldMMIsAvailable = HL.AddCoreOverride("Spell.IsAvailable",
+  function (self, CheckPet)
+    local BaseCheck = OldMMIsAvailable(self, CheckPet)
+    if self == SpellMM.BlackArrow then
+      return self:IsLearned()
+    else
+      return BaseCheck
+    end
+  end
+, 254)
+
 
 local OldMMBuffUp
 OldMMBuffUp = HL.AddCoreOverride("Player.BuffUp",
@@ -169,34 +182,34 @@ HL.AddCoreOverride("Player.FocusP",
 -- Survival, ID: 255
 local OldSVIsCastable
 OldSVIsCastable = HL.AddCoreOverride("Spell.IsCastable",
-function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-  local BaseCheck = OldSVIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
-  if self == SpellSV.SummonPet then
-    return Hunter.Pet.Status == 0 and BaseCheck
-  elseif self == SpellSV.RevivePet then
-    return (Pet:IsDeadOrGhost() or Hunter.Pet.Status == 2) and BaseCheck
-  elseif self == SpellSV.MendPet then
-    return Pet:HealthPercentage() > 0 and Pet:HealthPercentage() <= Settings.Commons.MendPetHP and BaseCheck
-  elseif self == SpellSV.AspectoftheEagle then
-    return Settings.Survival.AspectOfTheEagle and BaseCheck
-  elseif self == SpellSV.Harpoon then
-    return BaseCheck and not Target:IsInRange(8)
-  else
-    return BaseCheck
+  function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    local BaseCheck = OldSVIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
+    if self == SpellSV.SummonPet then
+      return Hunter.Pet.Status == 0 and BaseCheck
+    elseif self == SpellSV.RevivePet then
+      return (Pet:IsDeadOrGhost() or Hunter.Pet.Status == 2) and BaseCheck
+    elseif self == SpellSV.MendPet then
+      return Pet:HealthPercentage() > 0 and Pet:HealthPercentage() <= Settings.Commons.MendPetHP and BaseCheck
+    elseif self == SpellSV.AspectoftheEagle then
+      return Settings.Survival.AspectOfTheEagle and BaseCheck
+    elseif self == SpellSV.Harpoon then
+      return BaseCheck and not Target:IsInRange(8)
+    else
+      return BaseCheck
+    end
   end
-end
 , 255)
 
 local OldSVIsReady
 OldSVIsReady = HL.AddCoreOverride("Spell.IsReady",
-function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  local BaseCheck = OldSVIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
-  if self == SpellSV.Butchery then
-    return BaseCheck and (Player:BuffDown(SpellSV.AspectoftheEagle) or Player:BuffUp(SpellSV.AspectoftheEagle) and Target:IsInMeleeRange(8))
-  else
-    return BaseCheck
+  function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    local BaseCheck = OldSVIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
+    if self == SpellSV.Butchery then
+      return BaseCheck and (Player:BuffDown(SpellSV.AspectoftheEagle) or Player:BuffUp(SpellSV.AspectoftheEagle) and Target:IsInMeleeRange(8))
+    else
+      return BaseCheck
+    end
   end
-end
 , 255)
 
 -- Example (Arcane Mage)
