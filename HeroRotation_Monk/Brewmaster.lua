@@ -105,7 +105,7 @@ local function Precombat()
   -- Note: Not adding potion, as they're not needed pre-combat any longer
   -- chi_burst
   if S.ChiBurst:IsCastable() then
-    if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst precombat 2"; end
+    if Cast(S.ChiBurst, Settings.CommonsOGCD.GCDasOffGCD.ChiBurst, nil, not Target:IsInRange(40)) then return "chi_burst precombat 2"; end
   end
   -- Manually added opener
   if S.KegSmash:IsCastable() then 
@@ -278,11 +278,11 @@ local function APL()
     end
     -- chi_burst,if=!talent.aspect_of_harmony.enabled|buff.balanced_stratagem_magic.stack>3
     if S.ChiBurst:IsCastable() and (not S.AspectofHarmony:IsAvailable() or Player:BuffStack(S.BalancedStratagemMagic) > 3) then
-      if Cast(S.ChiBurst, nil, nil, not Target:IsInRange(40)) then return "chi_burst main 8"; end
+      if Cast(S.ChiBurst, Settings.CommonsOGCD.GCDasOffGCD.ChiBurst, nil, not Target:IsInRange(40)) then return "chi_burst main 8"; end
     end
     -- weapons_of_order
     if S.WeaponsofOrder:IsReady() then
-      if Cast(S.WeaponsofOrder) then return "weapons_of_order main 10"; end
+      if Cast(S.WeaponsofOrder, Settings.CommonsDS.DisplayStyle.WeaponsOfOrder) then return "weapons_of_order main 10"; end
     end
     -- invoke_niuzao,if=!talent.call_to_arms.enabled
     if S.InvokeNiuzao:IsCastable() and (not S.CalltoArms:IsAvailable()) then
