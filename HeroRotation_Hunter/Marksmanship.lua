@@ -69,7 +69,6 @@ local VarTrinket1Range, VarTrinket2Range
 local VarTrinket1CastTime, VarTrinket2CastTime
 local VarTrinket1CD, VarTrinket2CD
 local VarTrinket1Ex, VarTrinket2Ex
-local VarStrongerTrinketSlot
 local VarTrinketFailures = 0
 local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData(OnUseExcludes)
@@ -101,11 +100,6 @@ local function SetTrinketVariables()
 
   VarTrinket1Ex = T1.Excluded
   VarTrinket2Ex = T2.Excluded
-
-  VarStrongerTrinketSlot = 2
-  if VarTrinket2ID ~= I.HouseofCards:ID() and (VarTrinket1ID == I.HouseofCards:ID() or not Trinket2:HasCooldown() or Trinket1:HasUseBuff() and (not Trinket2:HasUseBuff() or VarTrinket2CD < VarTrinket1CD or VarTrinket2CastTime < VarTrinket1CastTime or VarTrinket2CastTime == VarTrinket1CastTime and VarTrinket2CD == VarTrinket1CD) or not Trinket1:HasUseBuff() and (not Trinket2:HasUseBuff() and (VarTrinket2CD < VarTrinket1CD or VarTrinket2CastTime < VarTrinket1CastTime or VarTrinket2CastTime == VarTrinket1CastTime and VarTrinket2CD == VarTrinket1CD))) then
-    VarStrongerTrinketSlot = 1
-  end
 end
 SetTrinketVariables()
 
@@ -182,8 +176,6 @@ end
 --- ===== Rotation Functions =====
 local function Precombat()
   -- snapshot_stats
-  -- variable,name=stronger_trinket_slot,op=setif,value=1,value_else=2,condition=!trinket.2.is.house_of_cards&(trinket.1.is.house_of_cards|!trinket.2.has_cooldown|trinket.1.has_use_buff&(!trinket.2.has_use_buff|trinket.2.cooldown.duration<trinket.1.cooldown.duration|trinket.2.cast_time<trinket.1.cast_time|trinket.2.cast_time=trinket.1.cast_time&trinket.2.cooldown.duration=trinket.1.cooldown.duration)|!trinket.1.has_use_buff&(!trinket.2.has_use_buff&(trinket.2.cooldown.duration<trinket.1.cooldown.duration|trinket.2.cast_time<trinket.1.cast_time|trinket.2.cast_time=trinket.1.cast_time&trinket.2.cooldown.duration=trinket.1.cooldown.duration)))
-  -- Note: Moved to variable declarations and PLAYER_EQUIPMENT_CHANGED registration.
   -- summon_pet,if=talent.unbreakable_bond
   -- Note: Moved to APL()
   -- Manually added: hunters_mark,if=debuff.hunters_mark.down
@@ -260,16 +252,16 @@ local function Trinkets()
 end
 
 local function DRST()
-  -- explosive_shot,if=talent.precision_detonation&action.aimed_shot.in_flight&buff.trueshot.down&buff.lock_and_load.down
-  if S.ExplosiveShot:IsReady() and (S.PrecisionDetonation:IsAvailable() and S.AimedShot:InFlight() and Player:BuffDown(S.TrueshotBuff) and Player:BuffDown(S.LockandLoadBuff)) then
+  -- explosive_shot,if=talent.precision_detonation&buff.lock_and_load.down&cooldown.aimed_shot.charges<1&buff.trueshot.down
+  if S.ExplosiveShot:IsReady() and (S.PrecisionDetonation:IsAvailable() and Player:BuffDown(S.LockandLoadBuff) and S.AimedShot:Charges() < 1 and Player:BuffDown(S.TrueshotBuff)) then
     if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot dr_st 2"; end
   end
   -- volley,if=buff.double_tap.down&(!raid_event.adds.exists|raid_event.adds.in>cooldown)
   if S.Volley:IsReady() and (Player:BuffDown(S.DoubleTapBuff)) then
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley dr_st 4"; end
   end
-  -- steady_shot,if=(talent.black_arrow|bugs)&focus+cast_regen<focus.max&action.aimed_shot.in_flight&(!action.black_arrow.cooldown_react)&buff.trueshot.down&cooldown.trueshot.remains
-  if S.SteadyShot:IsCastable() and (CheckFocusCap(S.SteadyShot:CastTime()) and S.AimedShot:InFlight() and (not S.BlackArrow:IsReady()) and Player:BuffDown(S.TrueshotBuff) and S.Trueshot:CooldownDown()) then
+  -- steady_shot,if=focus+cast_regen<focus.max&action.aimed_shot.in_flight&!action.black_arrow.cooldown_react&buff.trueshot.down&cooldown.trueshot.remains
+  if S.SteadyShot:IsCastable() and (CheckFocusCap(S.SteadyShot:CastTime()) and S.AimedShot:InFlight() and not S.BlackArrow:IsReady() and Player:BuffDown(S.TrueshotBuff) and S.Trueshot:CooldownDown()) then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot dr_st 6"; end
   end
   -- black_arrow,if=!talent.headshot|talent.headshot&buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)
@@ -284,8 +276,8 @@ local function DRST()
   if S.RapidFire:IsCastable() and (Player:BuffDown(S.DeathblowBuff)) then
     if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire dr_st 12"; end
   end
-  -- trueshot,if=variable.trueshot_ready&buff.double_tap.down&buff.deathblow.down
-  if CDsON() and S.Trueshot:IsReady() and (VarTrueshotReady and Player:BuffDown(S.DoubleTapBuff) and Player:BuffDown(S.DeathblowBuff)) then
+  -- trueshot,if=variable.trueshot_ready&buff.double_tap.down&!buff.deathblow.react&cooldown.aimed_shot.charges>0
+  if CDsON() and S.Trueshot:IsReady() and (VarTrueshotReady and Player:BuffDown(S.DoubleTapBuff) and Player:BuffDown(S.DeathblowBuff) and S.AimedShot:Charges() > 0) then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot dr_st 14"; end
   end
   -- arcane_shot,if=buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)
