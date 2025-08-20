@@ -87,6 +87,8 @@ AffOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
       return BaseCheck and not Player:IsCasting(self) and not self:InFlight()
     elseif self == SpellAffli.MaleficRapture then
       return BaseCheck and Player:SoulShardsP() > 0 and (Target:DebuffUp(SpellAffli.CorruptionDebuff) or Target:DebuffUp(SpellAffli.WitherDebuff) or Target:DebuffUp(SpellAffli.AgonyDebuff) or Target:DebuffUp(SpellAffli.UnstableAfflictionDebuff) or Target:DebuffUp(SpellAffli.SiphonLifeDebuff) or Target:DebuffUp(SpellAffli.HauntDebuff) or Target:DebuffUp(SpellAffli.SoulRotDebuff) or Target:DebuffUp(SpellAffli.VileTaintDebuff))
+    elseif self == SpellAffli.Agony then
+      return BaseCheck and not Player:IsCasting(SpellAffli.VileTaint)
     else
       return BaseCheck
     end
