@@ -318,8 +318,9 @@ local function Finish (ReturnSpellOnly, ForceStealth)
   end
 
   -- actions.finish+=/eviscerate,if=cooldown.flagellation.remains>=10|variable.targets>=3
+  print("do we get here")
   if S.Eviscerate:IsCastable() then
-    if S.Flagellation:CooldownRemains() >= 10 or MeleeEnemies10yCount >= 3 then
+    if (S.Flagellation:IsReady() or S.Flagellation:CooldownRemains() >= 10) or MeleeEnemies10yCount >= 3 then
       if ReturnSpellOnly then
         return S.Eviscerate
       else
