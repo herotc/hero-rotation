@@ -190,6 +190,7 @@ Spell.Paladin.Retribution = MergeTableByKey(Spell.Paladin.Commons, {
   RadiantDecreeTalent                   = Spell(384052),
   RadiantGlory                          = Spell(458359),
   RighteousVerdict                      = Spell(267610),
+  RushofLight                           = Spell(407067),
   ShieldofVengeance                     = Spell(184662),
   TempestoftheLightbringer              = Spell(383396),
   TemplarSlash                          = Spell(406647),

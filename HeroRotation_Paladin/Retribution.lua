@@ -270,15 +270,15 @@ local function Cooldowns()
   if S.Crusade:IsCastable() and (HolyPower >= 5 and HL.CombatTime() < 5 or HolyPower >= 3 and HL.CombatTime() >= 5) then
     if Cast(S.Crusade, Settings.Retribution.OffGCDasOffGCD.AvengingWrath) then return "crusade cooldowns 24" end
   end
-  -- final_reckoning,if=(holy_power>=4&time<8|holy_power>=3&time>=8|holy_power>=2&(talent.divine_auxiliary|talent.radiant_glory))&(cooldown.avenging_wrath.remains>10|cooldown.crusade.remains&(!buff.crusade.up|buff.crusade.stack>=10)|talent.radiant_glory&(buff.avenging_wrath.up|talent.crusade&cooldown.wake_of_ashes.remains<gcd))&(!raid_event.adds.exists|raid_event.adds.up|raid_event.adds.in>40)
-  if S.FinalReckoning:IsCastable() and ((HolyPower >= 4 and HL.CombatTime() < 8 or HolyPower >= 3 and HL.CombatTime() >= 8 or HolyPower >= 2 and (S.DivineAuxiliary:IsAvailable() or S.RadiantGlory:IsAvailable())) and (Settings.Retribution.DisableCrusadeAWCDCheck or S.AvengingWrath:CooldownRemains() > 10 or S.Crusade:CooldownDown() and (Player:BuffDown(S.CrusadeBuff) or Player:BuffStack(S.CrusadeBuff) >= 10) or S.RadiantGlory:IsAvailable() and (Player:BuffUp(S.AvengingWrathBuff) or S.Crusade:IsAvailable() and S.WakeofAshes:CooldownRemains() < PlayerGCD))) then
+  -- final_reckoning,if=(holy_power>=4&time<8|holy_power>=3&time>=8|holy_power>=2&(talent.divine_auxiliary|talent.radiant_glory))&(cooldown.avenging_wrath.remains>10|cooldown.crusade.remains&(!buff.crusade.up|buff.crusade.stack>=10)|talent.radiant_glory&(buff.avenging_wrath.up|talent.crusade&cooldown.wake_of_ashes.remains<gcd))&(!raid_event.adds.exists|raid_event.adds.up|raid_event.adds.in>40)&(cooldown.divine_hammer.remains>5|buff.divine_hammer.up|!talent.divine_hammer)
+  if S.FinalReckoning:IsCastable() and ((HolyPower >= 4 and HL.CombatTime() < 8 or HolyPower >= 3 and HL.CombatTime() >= 8 or HolyPower >= 2 and (S.DivineAuxiliary:IsAvailable() or S.RadiantGlory:IsAvailable())) and (Settings.Retribution.DisableCrusadeAWCDCheck or S.AvengingWrath:CooldownRemains() > 10 or S.Crusade:CooldownDown() and (Player:BuffDown(S.CrusadeBuff) or Player:BuffStack(S.CrusadeBuff) >= 10) or S.RadiantGlory:IsAvailable() and (Player:BuffUp(S.AvengingWrathBuff) or S.Crusade:IsAvailable() and S.WakeofAshes:CooldownRemains() < PlayerGCD)) and (S.DivineHammer:CooldownRemains() > 5 or Paladin.DivineHammerActive or not S.DivineHammer:IsAvailable())) then
     if Cast(S.FinalReckoning, Settings.Retribution.GCDasOffGCD.FinalReckoning, nil, not Target:IsInRange(30)) then return "final_reckoning cooldowns 26" end
   end
 end
 
 local function Finishers()
-  -- variable,name=ds_castable,value=(spell_targets.divine_storm>=2|buff.empyrean_power.up|!talent.final_verdict&talent.tempest_of_the_lightbringer)&!buff.empyrean_legacy.up&!(buff.divine_arbiter.up&buff.divine_arbiter.stack>24)
-  VarDSCastable = (EnemiesCount8y >= 2 or Player:BuffUp(S.EmpyreanPowerBuff) or not S.FinalVerdict:IsAvailable() and S.TempestoftheLightbringer:IsAvailable()) and Player:BuffDown(S.EmpyreanLegacyBuff) and not (Player:BuffUp(S.DivineArbiterBuff) and Player:BuffStack(S.DivineArbiterBuff) > 24)
+  -- variable,name=ds_castable,value=(spell_targets.divine_storm>=3|spell_targets.divine_storm>=2&talent.tempest_of_the_lightbringer&!talent.rush_of_light|buff.empyrean_power.up|!talent.final_verdict&talent.tempest_of_the_lightbringer)&!buff.empyrean_legacy.up&!(buff.divine_arbiter.up&buff.divine_arbiter.stack>24)
+  VarDSCastable = (EnemiesCount8y >= 3 or EnemiesCount8y >= 2 and S.TempestoftheLightbringer:IsAvailable() and not S.RushofLight:IsAvailable() or Player:BuffUp(S.EmpyreanPowerBuff) or not S.FinalVerdict:IsAvailable() and S.TempestoftheLightbringer:IsAvailable()) and Player:BuffDown(S.EmpyreanLegacyBuff) and not (Player:BuffUp(S.DivineArbiterBuff) and Player:BuffStack(S.DivineArbiterBuff) > 24)
   -- hammer_of_light,if=buff.hammer_of_light_ready.up|!talent.divine_hammer|buff.divine_hammer.up|cooldown.divine_hammer.remains>10
   if S.HammerofLight:IsReady() and (S.HammerofLight:IsReady() or not S.DivineHammer:IsAvailable() or Paladin.DivineHammerActive or S.DivineHammer:CooldownRemains() > 10) then
     if Cast(S.HammerofLight, Settings.Retribution.GCDasOffGCD.WakeOfAshes, nil, not Target:IsInRange(12)) then return "hammer_of_light finishers 2"; end
@@ -287,8 +287,8 @@ local function Finishers()
   if S.DivineHammer:IsReady() and (not Paladin.DivineHammerActive) then
     if Cast(S.DivineHammer, nil, nil, not Target:IsInRange(8)) then return "divine_hammer finishers 4"; end
   end
-  -- divine_storm,if=variable.ds_castable&!buff.hammer_of_light_ready.up&(cooldown.divine_hammer.remains|buff.divine_hammer.up|!talent.divine_hammer)&(!talent.crusade|cooldown.crusade.remains>gcd*3|buff.crusade.up&buff.crusade.stack<10|talent.radiant_glory)
-  if S.DivineStorm:IsReady() and (VarDSCastable and not S.HammerofLight:IsReady() and (S.DivineHammer:CooldownDown() or Paladin.DivineHammerActive or not S.DivineHammer:IsAvailable()) and (Settings.Retribution.DisableCrusadeAWCDCheck or not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > PlayerGCD * 3 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10 or S.RadiantGlory:IsAvailable())) then
+  -- divine_storm,if=variable.ds_castable&(!buff.hammer_of_light_ready.up|buff.empyrean_power.up)&(cooldown.divine_hammer.remains|buff.divine_hammer.up|!talent.divine_hammer)&(!talent.crusade|cooldown.crusade.remains>gcd*3|buff.crusade.up&buff.crusade.stack<10|talent.radiant_glory)
+  if S.DivineStorm:IsReady() and (VarDSCastable and (not S.HammerofLight:IsReady() or Player:BuffUp(S.EmpyreanPowerBuff)) and (S.DivineHammer:CooldownDown() or Paladin.DivineHammerActive or not S.DivineHammer:IsAvailable()) and (Settings.Retribution.DisableCrusadeAWCDCheck or not S.Crusade:IsAvailable() or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10 or S.RadiantGlory:IsAvailable())) then
     if Cast(S.DivineStorm, nil, nil, not Target:IsInRange(8)) then return "divine_storm finishers 6" end
   end
   -- justicars_vengeance,if=(!talent.crusade|cooldown.crusade.remains>gcd*3|buff.crusade.up&buff.crusade.stack<10|talent.radiant_glory)&!buff.hammer_of_light_ready.up&(cooldown.divine_hammer.remains|buff.divine_hammer.up|!talent.divine_hammer)
@@ -314,16 +314,18 @@ local function Generators()
   if S.BladeofJustice:IsCastable() and (Target:DebuffDown(S.ExpurgationDebuff) and S.HolyFlames:IsAvailable() and S.DivineToll:CooldownDown()) then
     if Cast(S.BladeofJustice, nil, nil, not Target:IsSpellInRange(S.BladeofJustice)) then return "blade_of_justice generators 4"; end
   end
-  -- wake_of_ashes,if=(!talent.lights_guidance|holy_power>=2&talent.lights_guidance)&(cooldown.avenging_wrath.remains>6|cooldown.crusade.remains>6|talent.radiant_glory)&(!talent.execution_sentence|cooldown.execution_sentence.remains>4|target.time_to_die<8)&(!raid_event.adds.exists|raid_event.adds.in>10|raid_event.adds.up)
-  if S.WakeofAshes:IsCastable() and ((not S.LightsGuidance:IsAvailable() or HolyPower >= 2 and S.LightsGuidance:IsAvailable()) and (Settings.Retribution.DisableCrusadeAWCDCheck or S.AvengingWrath:CooldownRemains() > 6 or S.Crusade:CooldownRemains() > 6 or S.RadiantGlory:IsAvailable()) and (not S.ExecutionSentence:IsAvailable() or S.ExecutionSentence:CooldownRemains() > 4 or Target:TimeToDie() < 8)) then
+  -- wake_of_ashes,if=(!talent.lights_guidance|holy_power>=2&talent.lights_guidance)&(cooldown.avenging_wrath.remains>6|cooldown.crusade.remains>6|talent.radiant_glory)&(!talent.execution_sentence|cooldown.execution_sentence.remains>4|target.time_to_die<8)&(!talent.final_reckoning|cooldown.final_reckoning.remains>4)&(!raid_event.adds.exists|raid_event.adds.in>10|raid_event.adds.up)
+  if S.WakeofAshes:IsCastable() and ((not S.LightsGuidance:IsAvailable() or HolyPower >= 2 and S.LightsGuidance:IsAvailable()) and (Settings.Retribution.DisableCrusadeAWCDCheck or S.AvengingWrath:CooldownRemains() > 6 or S.Crusade:CooldownRemains() > 6 or S.RadiantGlory:IsAvailable()) and (not S.ExecutionSentence:IsAvailable() or S.ExecutionSentence:CooldownRemains() > 4 or Target:TimeToDie() < 8) and (not S.FinalReckoning:IsAvailable() or S.FinalReckoning:CooldownRemains() > 4)) then
     if Cast(S.WakeofAshes, Settings.Retribution.GCDasOffGCD.WakeOfAshes, nil, not Target:IsInRange(14)) then return "wake_of_ashes generators 6"; end
   end
   -- divine_toll,if=holy_power<=2&(!raid_event.adds.exists|raid_event.adds.in>10|raid_event.adds.up)&(cooldown.avenging_wrath.remains>15|cooldown.crusade.remains>15|talent.radiant_glory|fight_remains<8)
   if S.DivineToll:IsCastable() and (HolyPower <= 2 and (Settings.Retribution.DisableCrusadeAWCDCheck or S.AvengingWrath:CooldownRemains() > 15 or S.Crusade:CooldownRemains() > 15 or S.RadiantGlory:IsAvailable() or BossFightRemains < 8)) then
     if Cast(S.DivineToll, nil, Settings.CommonsDS.DisplayStyle.DivineToll, not Target:IsInRange(30)) then return "divine_toll generators 8"; end
   end
-  -- call_action_list,name=finishers
-  local ShouldReturn = Finishers(); if ShouldReturn then return ShouldReturn; end
+  -- call_action_list,name=finishers,if=holy_power>=4|buff.crusade.up&buff.crusade.stack<10|buff.divine_hammer.up|spell_targets.divine_storm>=4
+  if HolyPower >= 4 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10 or Player:BuffUp(S.DivineHammerBuff) or EnemiesCount8y >= 4 then
+    local ShouldReturn = Finishers(); if ShouldReturn then return ShouldReturn; end
+  end
   -- templar_slash,if=buff.templar_strikes.remains<gcd&spell_targets.divine_storm>=2
   if S.TemplarSlash:IsReady() and (TemplarStrikesRemains() < PlayerGCD and EnemiesCount8y >= 2) then
     if Cast(S.TemplarSlash, nil, nil, not Target:IsSpellInRange(S.TemplarSlash)) then return "templar_slash generators 10"; end
@@ -348,6 +350,8 @@ local function Generators()
   if S.BladeofJustice:IsCastable() then
     if Cast(S.BladeofJustice, nil, nil, not Target:IsSpellInRange(S.BladeofJustice)) then return "blade_of_justice generators 20"; end
   end
+  -- call_action_list,name=finishers
+  local ShouldReturn = Finishers(); if ShouldReturn then return ShouldReturn; end
   -- hammer_of_wrath,if=(spell_targets.divine_storm<2|!talent.blessed_champion)
   if S.HammerofWrath:IsReady() and (EnemiesCount8y < 2 or not S.BlessedChampion:IsAvailable()) then
     if Cast(S.HammerofWrath, Settings.CommonsOGCD.GCDasOffGCD.HammerOfWrath, nil, not Target:IsSpellInRange(S.HammerofWrath)) then return "hammer_of_wrath generators 22"; end
@@ -412,7 +416,7 @@ local function APL()
 end
 
 local function OnInit()
-  HR.Print("Retribution Paladin rotation has been updated for patch 11.1.5.")
+  HR.Print("Retribution Paladin rotation has been updated for patch 11.2.0.")
 end
 
 HR.SetAPL(70, APL, OnInit)
