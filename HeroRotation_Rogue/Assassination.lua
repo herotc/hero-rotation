@@ -63,7 +63,6 @@ local OnUseExcludeTrinkets = {
   I.ImperfectAscendancySerum:ID(),
   I.JunkmaestrosMegaMagnet:ID(),
   I.MadQueensMandate:ID(),
-  I.SignetofthePriory:ID(),
   I.TreacherousTransmitter:ID(),
   I.UnyieldingNetherprism:ID()
 }
@@ -557,7 +556,7 @@ local function Vanish ()
   end
 
   -- # Don't Vanish if deathstalker's mark isn't up and we're at a finish condition
-  if Target:BuffDown(S.DeathStalkersMarkDebuff) and ComboPoints >= EffectiveCPSpend then
+  if S.DeathStalkersMark:IsAvailable() and Target:BuffDown(S.DeathStalkersMarkDebuff) and ComboPoints >= EffectiveCPSpend then
     return
   end
 
@@ -1132,7 +1131,7 @@ local function Direct ()
 
   -- # Ambush on Blindside/Subterfuge. Do not use Ambush from stealth during Kingsbane & Deathmark if possible.
   -- actions.direct+=/ambush,if=variable.use_filler&(buff.blindside.up|stealthed.rogue)&(!dot.kingsbane.ticking|debuff.deathmark.down|buff.blindside.up)
-  if (S.Ambush:IsCastable() or S.AmbushOverride:IsReady()) and (Player:BuffUp(S.BlindsideBuff) or Player:StealthUp(true, false))
+  if (S.Ambush:IsCastable() or S.AmbushOverride:IsReady()) and UseFiller and (Player:BuffUp(S.BlindsideBuff) or Player:StealthUp(true, false))
     and (Target:DebuffDown(S.Kingsbane) or Target:DebuffDown(S.Deathmark) or Player:BuffUp(S.BlindsideBuff)) then
     if CastPooling(S.Ambush, nil, not TargetInMeleeRange) then
       return "Cast Ambush"
