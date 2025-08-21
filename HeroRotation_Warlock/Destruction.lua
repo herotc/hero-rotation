@@ -267,19 +267,19 @@ local function EvaluateTargetIfHavoc(TargetUnit)
 end
 
 local function EvaluateTargetIfImmolateAoE(TargetUnit)
-  -- if=dot.immolate.refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&(!(talent.raging_demonfire&talent.channel_demonfire)|cooldown.channel_demonfire.remains>remains|time<5)&(active_dot.immolate<=6&!(talent.diabolic_ritual&talent.inferno)|active_dot.immolate<=4)&target.time_to_die>18
+  -- if=dot.immolate.refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&(!(talent.raging_demonfire&talent.channel_demonfire)|cooldown.channel_demonfire.remains>remains|time<5)&active_dot.immolate<=6&target.time_to_die>18
   -- Note: active_dot.immolate handled before CastCycle
   return TargetUnit:DebuffRefreshable(S.ImmolateDebuff) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff)) and (not (S.RagingDemonfire:IsAvailable() and S.ChannelDemonfire:IsAvailable()) or S.ChannelDemonfire:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff) or HL.CombatTime() < 5) and TargetUnit:TimeToDie() > 18
 end
 
 local function EvaluateTargetIfImmolateAoE2(TargetUnit)
-  -- if=((dot.immolate.refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains))|active_enemies>active_dot.immolate)&target.time_to_die>10&!havoc_active&!(talent.diabolic_ritual&talent.inferno)
-  return ((TargetUnit:DebuffRefreshable(S.ImmolateDebuff) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff))) or EnemiesCount8ySplash > S.ImmolateDebuff:AuraActiveCount()) and TargetUnit:TimeToDie() > 10 and not VarHavocActive and not (S.DiabolicRitual:IsAvailable() and S.Inferno:IsAvailable())
+  -- if=((dot.immolate.refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains))|active_enemies>active_dot.immolate)&target.time_to_die>10&!havoc_active
+  return ((TargetUnit:DebuffRefreshable(S.ImmolateDebuff) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff))) or EnemiesCount8ySplash > S.ImmolateDebuff:AuraActiveCount()) and TargetUnit:TimeToDie() > 10 and not VarHavocActive
 end
 
 local function EvaluateTargetIfImmolateAoE3(TargetUnit)
-  -- if=((dot.immolate.refreshable&variable.havoc_immo_time<5.4)|(dot.immolate.remains<2&dot.immolate.remains<havoc_remains)|!dot.immolate.ticking|(variable.havoc_immo_time<2)*havoc_active)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&target.time_to_die>11&!(talent.diabolic_ritual&talent.inferno)
-  return ((TargetUnit:DebuffRefreshable(S.ImmolateDebuff) and VarHavocImmoTime < 5.4) or (TargetUnit:DebuffRemains(S.ImmolateDebuff) < 2 and TargetUnit:DebuffRemains(S.ImmolateDebuff) < VarHavocRemains) or TargetUnit:DebuffDown(S.ImmolateDebuff) or bool(num(VarHavocImmoTime < 2) * num(VarHavocActive))) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff)) and TargetUnit:TimeToDie() > 11 and not (S.DiabolicRitual:IsAvailable() and S.Inferno:IsAvailable())
+  -- if=((dot.immolate.refreshable&variable.havoc_immo_time<5.4)|(dot.immolate.remains<2&dot.immolate.remains<havoc_remains)|!dot.immolate.ticking|(variable.havoc_immo_time<2)*havoc_active)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&target.time_to_die>11
+  return ((TargetUnit:DebuffRefreshable(S.ImmolateDebuff) and VarHavocImmoTime < 5.4) or (TargetUnit:DebuffRemains(S.ImmolateDebuff) < 2 and TargetUnit:DebuffRemains(S.ImmolateDebuff) < VarHavocRemains) or TargetUnit:DebuffDown(S.ImmolateDebuff) or bool(num(VarHavocImmoTime < 2) * num(VarHavocActive))) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemains() > TargetUnit:DebuffRemains(S.ImmolateDebuff)) and TargetUnit:TimeToDie() > 11
 end
 
 local function EvaluateTargetIfImmolateCleave(TargetUnit)
@@ -458,8 +458,9 @@ local function Havoc()
   if S.Shadowburn:IsReady() and (EnemiesCount8ySplash <= 4 and VarHavocRemains <= Player:GCD() * 3) then
     if Cast(S.Shadowburn, nil, nil, not Target:IsSpellInRange(S.Shadowburn)) then return "shadowburn havoc 16"; end
   end
+  -- chaos_bolt,if=cast_time<havoc_remains&((!talent.improved_chaos_bolt&active_enemies<=2)|(talent.improved_chaos_bolt&(active_enemies<=3|(!talent.wither&talent.cataclysm&active_enemies<=5))))
   -- chaos_bolt,if=cast_time<havoc_remains&((!talent.improved_chaos_bolt&active_enemies<=2)|(talent.improved_chaos_bolt&((talent.wither&talent.inferno&active_enemies<=2)|(((talent.wither&talent.cataclysm)|(!talent.wither&talent.inferno))&active_enemies<=3)|(!talent.wither&talent.cataclysm&active_enemies<=5))))
-  if S.ChaosBolt:IsReady() and (S.ChaosBolt:CastTime() < VarHavocRemains and ((not S.ImprovedChaosBolt:IsAvailable() and EnemiesCount8ySplash <= 2) or (S.ImprovedChaosBolt:IsAvailable() and ((S.Wither:IsAvailable() and S.Inferno:IsAvailable() and EnemiesCount8ySplash <= 2) or (((S.Wither:IsAvailable() and S.Cataclysm:IsAvailable()) or (not S.Wither:IsAvailable() and S.Inferno:IsAvailable())) and EnemiesCount8ySplash <= 3) or (not S.Wither:IsAvailable() and S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 5))))) then
+  if S.ChaosBolt:IsReady() and (S.ChaosBolt:CastTime() < VarHavocRemains and ((not S.ImprovedChaosBolt:IsAvailable() and EnemiesCount8ySplash <= 2) or (S.ImprovedChaosBolt:IsAvailable() and (EnemiesCount8ySplash <= 3 or (not S.Wither:IsAvailable() and S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 5))))) then
     if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt havoc 18"; end
   end
   -- rain_of_fire,if=active_enemies>=3
@@ -515,8 +516,8 @@ local function Aoe()
   if CDsON() and S.DimensionalRift:IsCastable() and (SoulShards < 4.7 and (S.DimensionalRift:Charges() > 2 or FightRemains < S.DimensionalRift:Cooldown())) then
     if Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift, nil, not Target:IsSpellInRange(S.DimensionalRift)) then return "dimensional_rift aoe 8"; end
   end
-  -- rain_of_fire,if=!talent.inferno&soul_shard>=(4.5-0.1*(active_dot.immolate+active_dot.wither))|soul_shard>=(3.5-0.1*(active_dot.immolate+active_dot.wither))|buff.ritual_of_ruin.up
-  if S.RainofFire:IsReady() and (not S.Inferno:IsAvailable() and SoulShards >= (4.5 - 0.1 * (S.ImmolateDebuff:AuraActiveCount() + S.WitherDebuff:AuraActiveCount())) or SoulShards >= (3.5 - 0.1 * (S.ImmolateDebuff:AuraActiveCount() + S.WitherDebuff:AuraActiveCount())) or Player:BuffUp(S.RitualofRuinBuff)) then
+  -- rain_of_fire,if=soul_shard>=(4.5-0.1*(active_dot.immolate+active_dot.wither))|soul_shard>=(3.5-0.1*(active_dot.immolate+active_dot.wither))|buff.ritual_of_ruin.up
+  if S.RainofFire:IsReady() and (SoulShards >= (4.5 - 0.1 * (S.ImmolateDebuff:AuraActiveCount() + S.WitherDebuff:AuraActiveCount())) or SoulShards >= (3.5 - 0.1 * (S.ImmolateDebuff:AuraActiveCount() + S.WitherDebuff:AuraActiveCount())) or Player:BuffUp(S.RitualofRuinBuff)) then
     if Cast(S.RainofFire, Settings.Destruction.GCDasOffGCD.RainOfFire, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "rain_of_fire aoe 10"; end
   end
   -- wither,target_if=min:dot.wither.remains+99*debuff.havoc.remains+99*!dot.wither.ticking,if=dot.wither.refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.wither.remains)&(!(talent.raging_demonfire&talent.channel_demonfire)|cooldown.channel_demonfire.remains>remains|time<5)&(active_dot.wither<=4|time>15)&target.time_to_die>18
@@ -527,12 +528,12 @@ local function Aoe()
   if S.ChannelDemonfire:IsReady() and (Target:DebuffRemains(S.ImmolateDebuff) + Target:DebuffRemains(S.WitherDebuff) > ChannelDemonfireCastTime() and S.RagingDemonfire:IsAvailable()) then
     if Cast(S.ChannelDemonfire, Settings.Destruction.GCDasOffGCD.ChannelDemonfire, nil, not Target:IsInRange(40)) then return "channel_demonfire aoe 14"; end
   end
-  -- shadowburn,if=((buff.malevolence.up&((talent.cataclysm&active_enemies<=10)|(talent.inferno&active_enemies<=6)))|(talent.wither&talent.cataclysm&active_enemies<=6)|(!talent.wither&talent.cataclysm&active_enemies<=4)|active_enemies<=3)&((cooldown.shadowburn.full_recharge_time<=gcd.max*3|debuff.eradication.remains<=gcd.max&talent.eradication&!action.chaos_bolt.in_flight&!talent.diabolic_ritual)&(talent.conflagration_of_chaos|talent.blistering_atrophy)|fight_remains<=8)
-  if S.Shadowburn:IsReady() and (((Player:BuffUp(S.MalevolenceBuff) and ((S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 10) or (S.Inferno:IsAvailable() and EnemiesCount8ySplash <= 6))) or (S.Wither:IsAvailable() and S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 6) or (not S.Wither:IsAvailable() and S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 4) or EnemiesCount8ySplash <= 3) and ((S.Shadowburn:FullRechargeTime() <= Player:GCD() * 3 or Target:DebuffRemains(S.EradicationDebuff) <= Player:GCD() and S.Eradication:IsAvailable() and not S.ChaosBolt:InFlight() and not S.DiabolicRitual:IsAvailable()) and (S.ConflagrationofChaos:IsAvailable() or S.BlisteringAtrophy:IsAvailable()) or BossFightRemains <= 8)) then
+  -- shadowburn,if=((buff.malevolence.up&((talent.cataclysm&active_enemies<=10)))|(talent.wither&talent.cataclysm&active_enemies<=6)|(!talent.wither&talent.cataclysm&active_enemies<=4)|active_enemies<=3)&((cooldown.shadowburn.full_recharge_time<=gcd.max*3|debuff.eradication.remains<=gcd.max&talent.eradication&!action.chaos_bolt.in_flight&!talent.diabolic_ritual)&(talent.conflagration_of_chaos|talent.blistering_atrophy)|fight_remains<=8)
+  if S.Shadowburn:IsReady() and (((Player:BuffUp(S.MalevolenceBuff) and (S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 10)) or (S.Wither:IsAvailable() and S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 6) or (not S.Wither:IsAvailable() and S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 4) or EnemiesCount8ySplash <= 3) and ((S.Shadowburn:FullRechargeTime() <= Player:GCD() * 3 or Target:DebuffRemains(S.EradicationDebuff) <= Player:GCD() and S.Eradication:IsAvailable() and not S.ChaosBolt:InFlight() and not S.DiabolicRitual:IsAvailable()) and (S.ConflagrationofChaos:IsAvailable() or S.BlisteringAtrophy:IsAvailable()) or BossFightRemains <= 8)) then
     if Cast(S.Shadowburn, nil, nil, not Target:IsSpellInRange(S.Shadowburn)) then return "shadowburn aoe 16"; end
   end
-  -- shadowburn,target_if=min:time_to_die,if=((buff.malevolence.up&((talent.cataclysm&active_enemies<=10)|(talent.inferno&active_enemies<=6)))|(talent.wither&talent.cataclysm&active_enemies<=6)|(!talent.wither&talent.cataclysm&active_enemies<=4)|active_enemies<=3)&((cooldown.shadowburn.full_recharge_time<=gcd.max*3|debuff.eradication.remains<=gcd.max&talent.eradication&!action.chaos_bolt.in_flight&!talent.diabolic_ritual)&(talent.conflagration_of_chaos|talent.blistering_atrophy)&time_to_die<5|fight_remains<=8)
-  if S.Shadowburn:IsReady() and (((Player:BuffUp(S.MalevolenceBuff) and ((S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 10) or (S.Inferno:IsAvailable() and EnemiesCount8ySplash <= 6))) or (S.Wither:IsAvailable() and S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 6) or (not S.Wither:IsAvailable() and S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 4) or EnemiesCount8ySplash <= 3) and ((S.Shadowburn:FullRechargeTime() <= Player:GCD() * 3 or Target:DebuffRemains(S.EradicationDebuff) <= Player:GCD() and S.Eradication:IsAvailable() and not S.ChaosBolt:InFlight() and not S.DiabolicRitual:IsAvailable()) and (S.ConflagrationofChaos:IsAvailable() or S.BlisteringAtrophy:IsAvailable()) and Target:TimeToDie() < 5 or BossFightRemains <= 8)) then
+  -- shadowburn,target_if=min:time_to_die,if=((buff.malevolence.up&((talent.cataclysm&active_enemies<=10)))|(talent.wither&talent.cataclysm&active_enemies<=6)|(!talent.wither&talent.cataclysm&active_enemies<=4)|active_enemies<=3)&((cooldown.shadowburn.full_recharge_time<=gcd.max*3|debuff.eradication.remains<=gcd.max&talent.eradication&!action.chaos_bolt.in_flight&!talent.diabolic_ritual)&(talent.conflagration_of_chaos|talent.blistering_atrophy)&time_to_die<5|fight_remains<=8)
+  if S.Shadowburn:IsReady() and (((Player:BuffUp(S.MalevolenceBuff) and (S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 10)) or (S.Wither:IsAvailable() and S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 6) or (not S.Wither:IsAvailable() and S.Cataclysm:IsAvailable() and EnemiesCount8ySplash <= 4) or EnemiesCount8ySplash <= 3) and ((S.Shadowburn:FullRechargeTime() <= Player:GCD() * 3 or Target:DebuffRemains(S.EradicationDebuff) <= Player:GCD() and S.Eradication:IsAvailable() and not S.ChaosBolt:InFlight() and not S.DiabolicRitual:IsAvailable()) and (S.ConflagrationofChaos:IsAvailable() or S.BlisteringAtrophy:IsAvailable()) and Target:TimeToDie() < 5 or BossFightRemains <= 8)) then
     if Everyone.CastTargetIf(S.Shadowburn, Enemies8ySplash, "min", EvaluateTargetIfFilterTTD, EvaluateTargetIfShadowburn, not Target:IsSpellInRange(S.Shadowburn)) then return "shadowburn aoe 18"; end
   end
   -- ruination
@@ -563,14 +564,12 @@ local function Aoe()
   if S.Cataclysm:IsReady() then
     if Cast(S.Cataclysm, Settings.Destruction.GCDasOffGCD.Cataclysm, nil, not Target:IsInRange(40)) then return "cataclysm aoe 32"; end
   end
-  -- havoc,target_if=min:((-target.time_to_die)<?-15)+dot.immolate.remains+99*(self.target=target),if=(!cooldown.summon_infernal.up|!talent.summon_infernal|(talent.inferno&active_enemies>4))&target.time_to_die>8&(cooldown.malevolence.remains>15|!talent.malevolence)|time<5
-  if S.Havoc:IsReady() and ((S.SummonInfernal:CooldownDown() or not S.SummonInfernal:IsAvailable() or (S.Inferno:IsAvailable() and EnemiesCount8ySplash > 4)) and (S.Malevolence:CooldownRemains() > 15 or not S.Malevolence:IsAvailable()) or HL.CombatTime() < 5) then
+  -- havoc,target_if=min:((-target.time_to_die)<?-15)+dot.immolate.remains+99*(self.target=target),if=(!cooldown.summon_infernal.up|!talent.summon_infernal)&target.time_to_die>8&(cooldown.malevolence.remains>15|!talent.malevolence)|time<5
+  if S.Havoc:IsReady() and ((S.SummonInfernal:CooldownDown() or not S.SummonInfernal:IsAvailable()) and (S.Malevolence:CooldownRemains() > 15 or not S.Malevolence:IsAvailable()) or HL.CombatTime() < 5) then
     local BestUnit, BestConditionValue, CUCV = nil, nil, nil
     for _, CycleUnit in pairs(Enemies8ySplash) do
       if CycleUnit:GUID() ~= Target:GUID() then
-        if BestConditionValue then
-          CUCV = EvaluateTargetIfFilterHavoc(CycleUnit)
-        end
+        CUCV = EvaluateTargetIfFilterHavoc(CycleUnit)
         if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy())
           and (not BestConditionValue or Utils.CompareThis("min", CUCV, BestConditionValue)) then
           BestUnit, BestConditionValue = CycleUnit, CUCV
@@ -585,8 +584,8 @@ local function Aoe()
   if S.Wither:IsReady() and (S.WitherDebuff:AuraActiveCount() <= EnemiesCount8ySplash) then
     if Everyone.CastTargetIf(S.Wither, Enemies8ySplash, "min", EvaluateTargetIfFilterWitherRemains2, EvaluateTargetIfWitherAoE2, not Target:IsSpellInRange(S.Wither)) then return "wither aoe 34"; end
   end
-  -- immolate,target_if=min:dot.immolate.remains+99*debuff.havoc.remains,if=dot.immolate.refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&(!(talent.raging_demonfire&talent.channel_demonfire)|cooldown.channel_demonfire.remains>remains|time<5)&(active_dot.immolate<=6&!(talent.diabolic_ritual&talent.inferno)|active_dot.immolate<=4)&target.time_to_die>18
-  if S.Immolate:IsCastable() and (S.ImmolateDebuff:AuraActiveCount() <= 6 and not (S.DiabolicRitual:IsAvailable() and S.Inferno:IsAvailable()) or S.ImmolateDebuff:AuraActiveCount() <= 4) then
+  -- immolate,target_if=min:dot.immolate.remains+99*debuff.havoc.remains,if=dot.immolate.refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&(!(talent.raging_demonfire&talent.channel_demonfire)|cooldown.channel_demonfire.remains>remains|time<5)&active_dot.immolate<=6&target.time_to_die>18
+  if S.Immolate:IsCastable() and (S.ImmolateDebuff:AuraActiveCount() <= 6) then
     if Everyone.CastTargetIf(S.Immolate, Enemies8ySplash, "min", EvaluateTargetIfFilterImmolate, EvaluateTargetIfImmolateAoE, not Target:IsSpellInRange(S.Immolate)) then return "immolate aoe 36"; end
   end
   -- call_action_list,name=ogcd
@@ -604,11 +603,11 @@ local function Aoe()
   if S.ChannelDemonfire:IsReady() and (Target:DebuffRemains(S.ImmolateDebuff) + Target:DebuffRemains(S.WitherDebuff) > ChannelDemonfireCastTime()) then
     if Cast(S.ChannelDemonfire, Settings.Destruction.GCDasOffGCD.ChannelDemonfire, nil, not Target:IsInRange(40)) then return "channel_demonfire aoe 42"; end
   end
-  -- immolate,target_if=min:dot.immolate.remains+99*debuff.havoc.remains,if=((dot.immolate.refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains))|active_enemies>active_dot.immolate)&target.time_to_die>10&!havoc_active&!(talent.diabolic_ritual&talent.inferno)
+  -- immolate,target_if=min:dot.immolate.remains+99*debuff.havoc.remains,if=((dot.immolate.refreshable&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains))|active_enemies>active_dot.immolate)&target.time_to_die>10&!havoc_active
   if S.Immolate:IsCastable() then
     if Everyone.CastTargetIf(S.Immolate, Enemies8ySplash, "min", EvaluateTargetIfFilterImmolate, EvaluateTargetIfImmolateAoE2, not Target:IsSpellInRange(S.Immolate)) then return "immolate aoe 44"; end
   end
-  -- immolate,target_if=min:dot.immolate.remains+99*debuff.havoc.remains,if=((dot.immolate.refreshable&variable.havoc_immo_time<5.4)|(dot.immolate.remains<2&dot.immolate.remains<havoc_remains)|!dot.immolate.ticking|(variable.havoc_immo_time<2)*havoc_active)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&target.time_to_die>11&!(talent.diabolic_ritual&talent.inferno)
+  -- immolate,target_if=min:dot.immolate.remains+99*debuff.havoc.remains,if=((dot.immolate.refreshable&variable.havoc_immo_time<5.4)|(dot.immolate.remains<2&dot.immolate.remains<havoc_remains)|!dot.immolate.ticking|(variable.havoc_immo_time<2)*havoc_active)&(!talent.cataclysm.enabled|cooldown.cataclysm.remains>dot.immolate.remains)&target.time_to_die>11
   if S.Immolate:IsCastable() then
     if Everyone.CastTargetIf(S.Immolate, Enemies8ySplash, "min", EvaluateTargetIfFilterImmolate, EvaluateTargetIfImmolateAoE3, not Target:IsSpellInRange(S.Immolate)) then return "immolate aoe 46"; end
   end
@@ -658,9 +657,7 @@ local function Cleave()
     local BestUnit, BestConditionValue, CUCV = nil, nil, nil
     for _, CycleUnit in pairs(Enemies40y) do
       if CycleUnit:GUID() ~= Target:GUID() then
-        if BestConditionValue then
-          CUCV = EvaluateTargetIfFilterHavoc(CycleUnit)
-        end
+        CUCV = EvaluateTargetIfFilterHavoc(CycleUnit)
         if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy())
           and (not BestConditionValue or Utils.CompareThis("min", CUCV, BestConditionValue)) then
           BestUnit, BestConditionValue = CycleUnit, CUCV
@@ -874,31 +871,29 @@ local function APL()
     if S.Malevolence:IsReady() and (S.SummonInfernal:CooldownRemains() >= 55) then
       if Cast(S.Malevolence, nil, Settings.CommonsDS.DisplayStyle.Malevolence) then return "malevolence main 2"; end
     end
-    -- wait,sec=((buff.diabolic_ritual_mother_of_chaos.remains+buff.diabolic_ritual_overlord.remains+buff.diabolic_ritual_pit_lord.remains)),if=(diabolic_ritual&(buff.diabolic_ritual_mother_of_chaos.remains+buff.diabolic_ritual_overlord.remains+buff.diabolic_ritual_pit_lord.remains)<gcd.max*0.25)&soul_shard>2
-    -- TODO: Add wait?
-    -- chaos_bolt,if=demonic_art
-    if S.ChaosBolt:IsReady() and (DemonicArt()) then
-      if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 4"; end
+    -- summon_infernal,if=demonic_art
+    if S.SummonInfernal:IsReady() and (DemonicArt()) then
+      if Cast(S.SummonInfernal, Settings.Destruction.GCDasOffGCD.SummonInfernal, nil, not Target:IsSpellInRange(S.SummonInfernal)) then return "summon_infernal main 4"; end
+    end
+    -- chaos_bolt,if=talent.diabolic_ritual&(demonic_art|((buff.diabolic_ritual_mother_of_chaos.remains+buff.diabolic_ritual_overlord.remains+buff.diabolic_ritual_pit_lord.remains)<(action.chaos_bolt.execute_time)))
+    if S.ChaosBolt:IsReady() and (S.DiabolicRitual:IsAvailable() and (DemonicArt() or ((Player:BuffRemains(S.DiabolicRitualMotherBuff) + Player:BuffRemains(S.DiabolicRitualOverlordBuff) + Player:BuffRemains(S.DiabolicRitualPitLordBuff)) < S.ChaosBolt:ExecuteTime()))) then
+      if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 6"; end
     end
     -- soul_fire,if=buff.decimation.react&(soul_shard<=4|buff.decimation.remains<=gcd.max*2)&debuff.conflagrate.remains>=execute_time
     if S.SoulFire:IsReady() and (Player:BuffUp(S.DecimationBuff) and (SoulShards <= 4 or Player:BuffRemains(S.DecimationBuff) <= Player:GCD() * 2) and Target:DebuffRemains(S.ConflagrateDebuff) >= S.SoulFire:ExecuteTime()) then
-      if Cast(S.SoulFire, Settings.Destruction.GCDasOffGCD.SoulFire, nil, not Target:IsSpellInRange(S.SoulFire)) then return "soul_fire main 6"; end
+      if Cast(S.SoulFire, Settings.Destruction.GCDasOffGCD.SoulFire, nil, not Target:IsSpellInRange(S.SoulFire)) then return "soul_fire main 8"; end
     end
     -- wither,if=talent.internal_combustion&(((dot.wither.remains-5*action.chaos_bolt.in_flight)<dot.wither.duration*0.4)|dot.wither.remains<3|(dot.wither.remains-action.chaos_bolt.execute_time)<5&action.chaos_bolt.usable)&(!talent.soul_fire|cooldown.soul_fire.remains+action.soul_fire.cast_time>(dot.wither.remains-5))&target.time_to_die>8&!action.soul_fire.in_flight_to_target
     if S.Wither:IsReady() and (S.InternalCombustion:IsAvailable() and (((Target:DebuffRemains(S.WitherDebuff) - 5 * num(S.ChaosBolt:InFlight())) < S.WitherDebuff:MaxDuration() * 4) or Target:DebuffRemains(S.WitherDebuff) < 3 or (Target:DebuffRemains(S.WitherDebuff) - S.ChaosBolt:ExecuteTime()) < 5 and S.ChaosBolt:IsReady()) and (not S.SoulFire:IsAvailable() or VarSFCDRPlusCT > (Target:DebuffRemains(S.WitherDebuff) - 5)) and Target:TimeToDie() > 8 and not S.SoulFire:InFlight()) then
-      if Cast(S.Wither, nil, nil, not Target:IsInRange(40)) then return "wither main 8"; end
+      if Cast(S.Wither, nil, nil, not Target:IsInRange(40)) then return "wither main 10"; end
     end
     -- conflagrate,if=talent.roaring_blaze&debuff.conflagrate.remains<1.5|full_recharge_time<=gcd.max*2|recharge_time<=8&(diabolic_ritual&(buff.diabolic_ritual_mother_of_chaos.remains+buff.diabolic_ritual_overlord.remains+buff.diabolic_ritual_pit_lord.remains)<gcd.max)&soul_shard>=1.5
     if S.Conflagrate:IsReady() and (S.RoaringBlaze:IsAvailable() and Target:DebuffRemains(S.RoaringBlazeDebuff) < 1.5 or S.Conflagrate:FullRechargeTime() <= Player:GCD() * 2 or S.Conflagrate:Recharge() <= 8 and (DiabolicRitual() and VarDRSum < Player:GCD()) and SoulShards >= 1.5) then
-      if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate main 10"; end
+      if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate main 12"; end
     end
-    -- shadowburn,if=(cooldown.shadowburn.full_recharge_time<=gcd.max*3|debuff.eradication.remains<=gcd.max&talent.eradication&!action.chaos_bolt.in_flight&!talent.diabolic_ritual)&(talent.conflagration_of_chaos|talent.blistering_atrophy)&!demonic_art|fight_remains<=8
-    if S.Shadowburn:IsReady() and ((S.Shadowburn:FullRechargeTime() <= Player:GCD() * 3 or Target:DebuffRemains(S.EradicationDebuff) <= Player:GCD() and S.Eradication:IsAvailable() and not S.ChaosBolt:InFlight() and not S.DiabolicRitual:IsAvailable()) and (S.ConflagrationofChaos:IsAvailable() or S.BlisteringAtrophy:IsAvailable()) and not DemonicArt() or BossFightRemains <= 8) then
-      if Cast(S.Shadowburn, nil, nil, not Target:IsSpellInRange(S.Shadowburn)) then return "shadowburn main 12"; end
-    end
-    -- chaos_bolt,if=buff.ritual_of_ruin.up
-    if S.ChaosBolt:IsReady() and (Player:BuffUp(S.RitualofRuinBuff)) then
-      if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 14"; end
+    -- shadowburn,if=talent.wither&((cooldown.shadowburn.full_recharge_time<=gcd.max*3|debuff.eradication.remains<=gcd.max&talent.eradication&!action.chaos_bolt.in_flight&!talent.diabolic_ritual)&(talent.conflagration_of_chaos|talent.blistering_atrophy)|fight_remains<=8)
+    if S.Shadowburn:IsReady() and (S.Wither:IsAvailable() and ((S.Shadowburn:FullRechargeTime() <= Player:GCD() * 3 or Target:DebuffRemains(S.EradicationDebuff) <= Player:GCD() and S.Eradication:IsAvailable() and not S.ChaosBolt:InFlight() and not S.DiabolicRitual:IsAvailable()) and (S.ConflagrationofChaos:IsAvailable() or S.BlisteringAtrophy:IsAvailable()) or BossFightRemains <= 8)) then
+      if Cast(S.Shadowburn, nil, nil, not Target:IsSpellInRange(S.Shadowburn)) then return "shadowburn main 14"; end
     end
     -- shadowburn,if=(cooldown.summon_infernal.remains>=90&talent.rain_of_chaos)|buff.malevolence.up
     if S.Shadowburn:IsReady() and ((S.SummonInfernal:CooldownRemains() >= 90 and S.RainofChaos:IsAvailable()) or Player:BuffUp(S.MalevolenceBuff)) then
@@ -906,38 +901,35 @@ local function APL()
     end
     -- chaos_bolt,if=(cooldown.summon_infernal.remains>=90&talent.rain_of_chaos)|buff.malevolence.up
     if S.ChaosBolt:IsReady() and ((S.SummonInfernal:CooldownRemains() >= 90 and S.RainofChaos:IsAvailable()) or Player:BuffUp(S.MalevolenceBuff)) then
-      if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 16"; end
+      if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 18"; end
     end
-    -- ruination,if=(debuff.eradication.remains>=execute_time|!talent.eradication|!talent.shadowburn)
-    if S.RuinationAbility:IsReady() and (Target:DebuffRemains(S.EradicationDebuff) >= S.RuinationAbility:ExecuteTime() or not S.Eradication:IsAvailable() or not S.Shadowburn:IsAvailable()) then
-      if Cast(S.RuinationAbility, nil, nil, not Target:IsSpellInRange(S.RuinationAbility)) then return "ruination main 18"; end
+    -- ruination
+    if S.RuinationAbility:IsReady() then
+      if Cast(S.RuinationAbility, nil, nil, not Target:IsSpellInRange(S.RuinationAbility)) then return "ruination main 20"; end
     end
     -- cataclysm,if=raid_event.adds.in>15&(talent.wither&dot.wither.refreshable)
     if S.Cataclysm:IsReady() and (S.Wither:IsAvailable() and Target:DebuffRefreshable(S.WitherDebuff)) then
-      if Cast(S.Cataclysm, Settings.Destruction.GCDasOffGCD.Cataclysm, nil, not Target:IsInRange(40)) then return "cataclysm main 20"; end
+      if Cast(S.Cataclysm, Settings.Destruction.GCDasOffGCD.Cataclysm, nil, not Target:IsInRange(40)) then return "cataclysm main 22"; end
     end
     -- channel_demonfire,if=talent.raging_demonfire&(dot.immolate.remains+dot.wither.remains-5*(action.chaos_bolt.in_flight&talent.internal_combustion))>cast_time
     if S.ChannelDemonfire:IsReady() and (S.RagingDemonfire:IsAvailable() and (Target:DebuffRemains(S.ImmolateDebuff) + Target:DebuffRemains(S.WitherDebuff) - 5 * num(S.ChaosBolt:InFlight() and S.InternalCombustion:IsAvailable())) > S.ChannelDemonfire:CastTime()) then
-      if Cast(S.ChannelDemonfire, Settings.Destruction.GCDasOffGCD.ChannelDemonfire, nil, not Target:IsInRange(40)) then return "channel_demonfire main 22"; end
+      if Cast(S.ChannelDemonfire, Settings.Destruction.GCDasOffGCD.ChannelDemonfire, nil, not Target:IsInRange(40)) then return "channel_demonfire main 24"; end
     end
     -- wither,if=!talent.internal_combustion&(((dot.wither.remains-5*(action.chaos_bolt.in_flight))<dot.wither.duration*0.3)|dot.wither.remains<3)&(!talent.cataclysm|cooldown.cataclysm.remains>dot.wither.remains)&(!talent.soul_fire|cooldown.soul_fire.remains+action.soul_fire.cast_time>(dot.wither.remains))&target.time_to_die>8&!action.soul_fire.in_flight_to_target
     if S.Wither:IsReady() and (not S.InternalCombustion:IsAvailable() and (((Target:DebuffRemains(S.WitherDebuff) - 5 * num(S.ChaosBolt:InFlight())) < S.WitherDebuff:PandemicThreshold()) or Target:DebuffRemains(S.WitherDebuff) < 3) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemains() > Target:DebuffRemains(S.WitherDebuff)) and (not S.SoulFire:IsAvailable() or VarSFCDRPlusCT > Target:DebuffRemains(S.WitherDebuff)) and Target:TimeToDie() > 8 and not S.SoulFire:InFlight()) then
-      if Cast(S.Wither, nil, nil, not Target:IsInRange(40)) then return "wither main 24"; end
+      if Cast(S.Wither, nil, nil, not Target:IsInRange(40)) then return "wither main 26"; end
     end
     -- immolate,if=(((dot.immolate.remains-5*(action.chaos_bolt.in_flight&talent.internal_combustion))<dot.immolate.duration*0.3)|dot.immolate.remains<3|(dot.immolate.remains-action.chaos_bolt.execute_time)<5&talent.internal_combustion&action.chaos_bolt.usable)&(!talent.soul_fire|cooldown.soul_fire.remains+action.soul_fire.cast_time>(dot.immolate.remains-5*talent.internal_combustion))&target.time_to_die>8&!action.soul_fire.in_flight_to_target
     if S.Immolate:IsReady() and ((((Target:DebuffRemains(S.ImmolateDebuff) - 5 * num(S.ChaosBolt:InFlight() and S.InternalCombustion:IsAvailable())) < S.ImmolateDebuff:PandemicThreshold()) or Target:DebuffRemains(S.ImmolateDebuff) < 3 or (Target:DebuffRemains(S.ImmolateDebuff) - S.ChaosBolt:ExecuteTime()) < 5 and S.InternalCombustion:IsAvailable() and S.ChaosBolt:IsReady()) and (not S.Cataclysm:IsAvailable() or S.Cataclysm:CooldownRemains() > Target:DebuffRemains(S.ImmolateDebuff)) and (not S.SoulFire:IsAvailable() or VarSFCDRPlusCT > (Target:DebuffRemains(S.ImmolateDebuff) - 5 * num(S.InternalCombustion:IsAvailable()))) and Target:TimeToDie() > 8 and not S.SoulFire:InFlight()) then
-      if Cast(S.Immolate, nil, nil, not Target:IsSpellInRange(S.Immolate)) then return "immolate main 26"; end
+      if Cast(S.Immolate, nil, nil, not Target:IsSpellInRange(S.Immolate)) then return "immolate main 28"; end
     end
     -- summon_infernal
     if CDsON() and S.SummonInfernal:IsCastable() then
-      if Cast(S.SummonInfernal, Settings.Destruction.GCDasOffGCD.SummonInfernal) then return "summon_infernal main 28"; end
+      if Cast(S.SummonInfernal, Settings.Destruction.GCDasOffGCD.SummonInfernal) then return "summon_infernal main 30"; end
     end
-    -- incinerate,if=talent.diabolic_ritual&(diabolic_ritual&(buff.diabolic_ritual_mother_of_chaos.remains+buff.diabolic_ritual_overlord.remains+buff.diabolic_ritual_pit_lord.remains-2-!variable.disable_cb_2t*action.chaos_bolt.cast_time-variable.disable_cb_2t*gcd.max)<=0)
-    if S.Incinerate:IsCastable() and (S.DiabolicRitual:IsAvailable() and (DiabolicRitual() and (VarDRSum - 2 - num(not VarDisableCB2T) * S.ChaosBolt:CastTime() - num(VarDisableCB2T) * Player:GCD()) <= 0)) then
-      if Cast(S.Incinerate, nil, nil, not Target:IsSpellInRange(S.Incinerate)) then return "incinerate main 30"; end
-    end
+    -- chaos_bolt,if=(variable.pooling_condition_cb&(cooldown.summon_infernal.remains>=gcd.max*3|soul_shard>4))&(talent.wither|((buff.diabolic_ritual_mother_of_chaos.remains+buff.diabolic_ritual_overlord.remains+buff.diabolic_ritual_pit_lord.remains)>(action.chaos_bolt.execute_time+2*gcd.max)))
     -- chaos_bolt,if=variable.pooling_condition_cb&(cooldown.summon_infernal.remains>=gcd.max*3|soul_shard>4|!talent.rain_of_chaos)
-    if S.ChaosBolt:IsReady() and (VarPoolingConditionCB and (S.SummonInfernal:CooldownRemains() >= Player:GCD() * 3 or SoulShards > 4 or not S.RainofChaos:IsAvailable())) then
+    if S.ChaosBolt:IsReady() and ((VarPoolingConditionCB and (S.SummonInfernal:CooldownRemains() >= Player:GCD() * 3 or SoulShards > 4)) and (S.Wither:IsAvailable() or ((Player:BuffRemains(S.DiabolicRitualMotherBuff) + Player:BuffRemains(S.DiabolicRitualOverlordBuff) + Player:BuffRemains(S.DiabolicRitualPitLordBuff)) > (S.ChaosBolt:ExecuteTime() + Player:GCD() * 2)))) then
       if Cast(S.ChaosBolt, nil, nil, not Target:IsSpellInRange(S.ChaosBolt)) then return "chaos_bolt main 32"; end
     end
     -- channel_demonfire
@@ -948,21 +940,17 @@ local function APL()
     if CDsON() and S.DimensionalRift:IsCastable() then
       if Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift, nil, not Target:IsSpellInRange(S.DimensionalRift)) then return "dimensional_rift main 36"; end
     end
-    -- infernal_bolt
-    if S.InfernalBolt:IsCastable() then
+    -- infernal_bolt,if=soul_shard<=3
+    if S.InfernalBolt:IsCastable() and (SoulShards <= 3) then
       if Cast(S.InfernalBolt, nil, nil, not Target:IsSpellInRange(S.InfernalBolt)) then return "infernal_bolt main 38"; end
     end
     -- conflagrate,if=charges>(max_charges-1)|fight_remains<gcd.max*charges
     if S.Conflagrate:IsCastable() and (S.Conflagrate:Charges() > (S.Conflagrate:MaxCharges() - 1) or FightRemains < Player:GCD() * S.Conflagrate:Charges()) then
       if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate main 40"; end
     end
-    -- soul_fire,if=buff.backdraft.up
-    if S.SoulFire:IsReady() and (Player:BuffUp(S.BackdraftBuff)) then
-    if Cast(S.SoulFire, Settings.Destruction.GCDasOffGCD.SoulFire, nil, not Target:IsSpellInRange(S.SoulFire)) then return "soul_fire main 42"; end
-  end
     -- incinerate
     if S.Incinerate:IsCastable() then
-      if Cast(S.Incinerate, nil, nil, not Target:IsSpellInRange(S.Incinerate)) then return "incinerate main 36"; end
+      if Cast(S.Incinerate, nil, nil, not Target:IsSpellInRange(S.Incinerate)) then return "incinerate main 42"; end
     end
   end
 end
@@ -971,7 +959,7 @@ local function OnInit()
   S.ImmolateDebuff:RegisterAuraTracking()
   S.WitherDebuff:RegisterAuraTracking()
 
-  HR.Print("Destruction Warlock rotation has been updated for patch 11.1.5.")
+  HR.Print("Destruction Warlock rotation has been updated for patch 11.2.0.")
 end
 
 HR.SetAPL(267, APL, OnInit)
