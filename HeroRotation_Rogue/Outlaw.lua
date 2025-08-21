@@ -58,7 +58,8 @@ local OnUseExcludes = {
   I.ImperfectAscendancySerum:ID(),
   I.UnyieldingNetherprism:ID(),
   I.JunkmaestrosMegaMagnet:ID(),
-  I.MadQueensMandate:ID()
+  I.MadQueensMandate:ID(),
+  I.SoleahsSecretTechnique:ID()
 }
 
 -- Trinkets

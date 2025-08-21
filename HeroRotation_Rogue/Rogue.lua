@@ -328,6 +328,7 @@ if not Item.Rogue then Item.Rogue = {} end
 Item.Rogue.Assassination = {
   -- Trinkets
   AlgetharPuzzleBox        = Item(193701, {13, 14}),
+  ArazsRitualForge         = Item(242402, {13, 14}),
   AshesoftheEmbersoul      = Item(207167, {13, 14}),
   AstralGladiatorsBadge    = Item(230638, {13, 14}),
   BottledFlayedwingToxin   = Item(178742, {13, 14}),
@@ -337,6 +338,7 @@ Item.Rogue.Assassination = {
   MadQueensMandate         = Item(212454, {13, 14}),
   PerfidiousProjector      = Item(242403, {13, 14}),
   SignetofthePriory        = Item(219308, {13, 14}),
+  SoleahsSecretTechnique   = Item(190958, {13, 14}),
   TreacherousTransmitter   = Item(221023, {13, 14}),
   UnyieldingNetherprism    = Item(242396, {13, 14}),
   WitherbarksBranch        = Item(109999, {13, 14}),
@@ -344,6 +346,7 @@ Item.Rogue.Assassination = {
 
 Item.Rogue.Outlaw = {
   -- Trinkets
+  ArazsRitualForge         = Item(242402, {13, 14}),
   BottledFlayedwingToxin   = Item(178742, {13, 14}),
   CursedStoneIdol          = Item(246344, {13, 14}),
   ImperfectAscendancySerum = Item(225654, {13, 14}),
@@ -351,16 +354,19 @@ Item.Rogue.Outlaw = {
   MadQueensMandate         = Item(212454, {13, 14}),
   PerfidiousProjector      = Item(242403, {13, 14}),
   ScrollOfMomentum         = Item(226539, {13, 14}),
+  SoleahsSecretTechnique   = Item(190958, {13, 14}),
   UnyieldingNetherprism    = Item(242396, {13, 14}),
 }
 
 Item.Rogue.Subtlety = {
   -- Trinkets
+  ArazsRitualForge         = Item(242402, {13, 14}),
   BottledFlayedwingToxin   = Item(178742, {13, 14}),
   CursedStoneIdol          = Item(246344, {13, 14}),
   ImperfectAscendancySerum = Item(225654, {13, 14}),
   MadQueensMandate         = Item(212454, {13, 14}),
   PerfidiousProjector      = Item(242403, {13, 14}),
+  SoleahsSecretTechnique   = Item(190958, {13, 14}),
   TreacherousTransmitter   = Item(221023, {13, 14}),
   UnyieldingNetherprism    = Item(242396, {13, 14}),
 }
