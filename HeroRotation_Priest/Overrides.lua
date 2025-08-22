@@ -72,6 +72,8 @@ OldShadowIsCastable = HL.AddCoreOverride("Spell.IsCastable",
       return BaseCheck and not Player:IsCasting(self)
     elseif self == SpellShadow.VoidBolt then
       return BaseCheck or Player:IsCasting(SpellShadow.VoidEruption)
+    elseif self == SpellShadow.ShadowCrash or self == SpellShadow.ShadowCrashTarget then
+      return BaseCheck and not self:InFlight()
     else
       return BaseCheck
     end
@@ -96,8 +98,8 @@ local OldShadowInFlight
 OldShadowInFlight = HL.AddCoreOverride("Spell.InFlight",
   function(self)
     local BaseCheck = OldShadowInFlight(self)
-    if self == SpellShadow.ShadowCrash then
-      return SpellShadow.ShadowCrash:TimeSinceLastCast() < 2
+    if self == SpellShadow.ShadowCrash or self == SpellShadow.ShadowCrashTarget then
+      return self:TimeSinceLastCast() < 2
     else
       return BaseCheck
     end

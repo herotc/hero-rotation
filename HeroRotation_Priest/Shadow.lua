@@ -141,12 +141,12 @@ HL:RegisterForEvent(function()
   Fiend = (S.Mindbender:IsAvailable() and S.Mindbender) or (S.VoidWraith:IsAvailable() and S.VoidWraithAbility) or S.Shadowfiend
   S.ShadowCrash:RegisterInFlightEffect(205386)
   S.ShadowCrash:RegisterInFlight()
-  S.ShadowCrashTarget:RegisterInFlightEffect(205386)
+  S.ShadowCrashTarget:RegisterInFlightEffect(465522)
   S.ShadowCrashTarget:RegisterInFlight()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 S.ShadowCrash:RegisterInFlightEffect(205386)
 S.ShadowCrash:RegisterInFlight()
-S.ShadowCrashTarget:RegisterInFlightEffect(205386)
+S.ShadowCrashTarget:RegisterInFlightEffect(465522)
 S.ShadowCrashTarget:RegisterInFlight()
 
 --- ===== Helper Functions =====
@@ -359,9 +359,10 @@ local function AoEVariables()
   -- variable,name=dots_up,op=set,value=(active_dot.vampiric_touch+8*(action.shadow_crash.in_flight&action.shadow_crash.enabled))>=variable.max_vts|!variable.is_vt_possible
   VarDotsUp = ((S.VampiricTouchDebuff:AuraActiveCount() + 8 * num(Crash:InFlight() and Crash:IsAvailable())) >= VarMaxVTs or not VarIsVTPossible)
   -- variable,name=holding_crash,op=set,value=(variable.max_vts-active_dot.vampiric_touch)<4&raid_event.adds.in>15|raid_event.adds.in<10&raid_event.adds.count>(variable.max_vts-active_dot.vampiric_touch),if=variable.holding_crash&action.shadow_crash.enabled&raid_event.adds.exists
-  if VarHoldingCrash and Crash:IsAvailable() then
+  -- Note: Skipping the check for VarHoldingCrash already being true, as it caused a double Crash at the start of an AoE fight.
+  --if VarHoldingCrash and Crash:IsAvailable() then
     VarHoldingCrash = (VarMaxVTs - S.VampiricTouchDebuff:AuraActiveCount()) < 4
-  end
+  --end
   -- variable,name=manual_vts_applied,op=set,value=(active_dot.vampiric_touch+8*!variable.holding_crash)>=variable.max_vts|!variable.is_vt_possible
   VarManualVTsApplied = ((S.VampiricTouchDebuff:AuraActiveCount() + 8 * num(not VarHoldingCrash)) >= VarMaxVTs or not VarIsVTPossible)
 end
@@ -519,8 +520,6 @@ local function HealForToF()
 end
 
 local function Main()
-  -- Reset variable.holding_crash to false for ST, in case it was set to true during AoE.
-  VarHoldingCrash = false
   -- variable,name=dots_up,op=set,value=active_dot.vampiric_touch=active_enemies|action.shadow_crash.in_flight,if=active_enemies<3
   if EnemiesCount10ySplash < 3 then
     VarDotsUp = S.VampiricTouchDebuff:AuraActiveCount() == EnemiesCount10ySplash or Crash:InFlight() or Player:IsCasting(S.VampiricTouch) and S.VampiricTouchDebuff:AuraActiveCount() == EnemiesCount10ySplash - 1
@@ -685,7 +684,7 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(S.Silence, Settings.CommonsDS.DisplayStyle.Interrupts); if ShouldReturn then return ShouldReturn; end
     -- variable,name=holding_crash,op=set,value=raid_event.adds.in<15
-    -- Note: We have no way of knowing if adds are coming, so don't ever purposely hold crash
+    -- Note: We have no way of knowing if adds are coming, so default to false.
     VarHoldingCrash = false
     PreferVT = Settings.Shadow.PreferVTWhenSTinDungeon and EnemiesCount10ySplash == 1 and Player:IsInDungeonArea() and Player:IsInParty() and not Player:IsInRaidArea()
     -- variable,name=pool_for_cds,op=set,value=(cooldown.void_eruption.remains<=gcd.max*3&talent.void_eruption|cooldown.dark_ascension.up&talent.dark_ascension)|talent.void_torrent&talent.psychic_link&cooldown.void_torrent.remains<=4&(!raid_event.adds.exists&spell_targets.vampiric_touch>1|raid_event.adds.in<=5|raid_event.adds.remains>=6&!variable.holding_crash)&!buff.voidform.up
