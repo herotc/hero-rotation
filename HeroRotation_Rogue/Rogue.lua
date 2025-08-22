@@ -189,6 +189,7 @@ Spell.Rogue.Assassination = MergeTableByKey(Spell.Rogue.Commons, {
   LightweightShiv         = Spell(394983),
   MasterAssassin          = Spell(255989),
   MasterAssassinBuff      = Spell(256735),
+  PoisonBomb              = Spell(255544),
   PreyontheWeak           = Spell(131511),
   PreyontheWeakDebuff     = Spell(255909),
   SanguineBlades          = Spell(200806),

@@ -925,7 +925,7 @@ local function CDs ()
   -- actions.cds+=/thistle_tea,if=talent.darkest_night&(!buff.thistle_tea.up&debuff.shiv.remains>=6|!buff.thistle_tea.up
   -- &dot.kingsbane.ticking&dot.kingsbane.remains<=6|!buff.thistle_tea.up&fight_remains<=cooldown.thistle_tea.charges*6)
   if S.ThistleTea:IsCastable() then
-    if not S.DarkestNight:IsAvailable() and (Player:BuffDown(S.ThistleTea) and Target:DebuffRemains(S.ShivDebuff) >= 6
+    if S.DarkestNight:IsAvailable() and (Player:BuffDown(S.ThistleTea) and Target:DebuffRemains(S.ShivDebuff) >= 6
       or Player:BuffDown(S.ThistleTea) and Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) <= 6
       or Player:BuffDown(S.ThistleTea) and HL.BossFilteredFightRemains("<", S.ThistleTea:Charges() * 6)) then
       if Cast(S.ThistleTea, Settings.CommonsOGCD.OffGCDasOffGCD.ThistleTea) then
