@@ -83,6 +83,7 @@ Spell.Shaman.Farseer = {
   ElementalReverb                       = Spell(443418),
   PrimordialCapacity                    = Spell(443448),
   -- Buffs
+  AncestralSwiftnessBuff                = Spell(443454),
   AncestralWisdomBuff                   = Spell(1238279), -- TWW S3 4pc Buff
 }
 
