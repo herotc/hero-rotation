@@ -281,8 +281,8 @@ end
 
 --- ===== CastCycle Functions =====
 local function EvaluateCycleOutbreakCDs(TargetUnit)
-  -- target_if=target.time_to_die>dot.virulent_plague.remains&dot.virulent_plague.ticks_remain<5,if=(dot.virulent_plague.refreshable|talent.superstrain&(dot.frost_fever.refreshable|dot.blood_plague.refreshable))&(!talent.unholy_blight|talent.plaguebringer)&(!talent.raise_abomination|talent.raise_abomination&cooldown.raise_abomination.remains>dot.virulent_plague.ticks_remain*3)
-  return (TargetUnit:TimeToDie() > TargetUnit:DebuffRemains(S.VirulentPlagueDebuff) and TargetUnit:DebuffTicksRemain(S.VirulentPlagueDebuff) < 5) and ((TargetUnit:DebuffRefreshable(S.VirulentPlagueDebuff) or S.Superstrain:IsAvailable() and (TargetUnit:DebuffRefreshable(S.FrostFeverDebuff) or TargetUnit:DebuffRefreshable(S.BloodPlagueDebuff))) and (not S.UnholyBlight:IsAvailable() or S.Plaguebringer:IsAvailable()) and (not S.RaiseAbomination:IsAvailable() or S.RaiseAbomination:IsAvailable() and S.RaiseAbomination:CooldownRemains() > TargetUnit:DebuffTicksRemain(S.VirulentPlagueDebuff) * 3))
+  -- target_if=target.time_to_die>dot.virulent_plague.remains&dot.virulent_plague.ticks_remain<5,if=(dot.virulent_plague.refreshable|talent.superstrain&(dot.frost_fever.refreshable|dot.blood_plague.refreshable))&(!talent.unholy_blight|talent.plaguebringer)&(!talent.raise_abomination|!pet.abomination.active&talent.raise_abomination&cooldown.raise_abomination.remains>dot.virulent_plague.ticks_remain*3)
+  return (TargetUnit:TimeToDie() > TargetUnit:DebuffRemains(S.VirulentPlagueDebuff) and TargetUnit:DebuffTicksRemain(S.VirulentPlagueDebuff) < 5) and ((TargetUnit:DebuffRefreshable(S.VirulentPlagueDebuff) or S.Superstrain:IsAvailable() and (TargetUnit:DebuffRefreshable(S.FrostFeverDebuff) or TargetUnit:DebuffRefreshable(S.BloodPlagueDebuff))) and (not S.UnholyBlight:IsAvailable() or S.Plaguebringer:IsAvailable()) and (not S.RaiseAbomination:IsAvailable() or not VarAbomActive and S.RaiseAbomination:IsAvailable() and S.RaiseAbomination:CooldownRemains() > TargetUnit:DebuffTicksRemain(S.VirulentPlagueDebuff) * 3))
 end
 
 local function EvaluateCycleOutbreakCDsCleaveSan(TargetUnit)
@@ -482,15 +482,15 @@ local function CDs()
   if S.DarkTransformation:IsCastable() and (VarSTPlanning or BossFightRemains < 20) then
     if Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation cds 2"; end
   end
-  -- unholy_assault,if=variable.st_planning&(cooldown.apocalypse.remains<gcd*2|!talent.apocalypse|active_enemies>=2&buff.dark_transformation.up)|fight_remains<20
-  if S.UnholyAssault:IsCastable() and (VarSTPlanning and (S.Apocalypse:CooldownRemains() < Player:GCD() * 2 or not S.Apocalypse:IsAvailable() or ActiveEnemies >= 2 and Pet:BuffUp(S.DarkTransformation)) or BossFightRemains < 20) then
+  -- unholy_assault,if=variable.st_planning&(cooldown.apocalypse.remains<gcd*1.5|!talent.apocalypse|active_enemies>=2&buff.dark_transformation.up)|fight_remains<20
+  if S.UnholyAssault:IsCastable() and (VarSTPlanning and (S.Apocalypse:CooldownRemains() < Player:GCD() * 1.5 or not S.Apocalypse:IsAvailable() or ActiveEnemies >= 2 and Pet:BuffUp(S.DarkTransformation)) or BossFightRemains < 20) then
     if Cast(S.UnholyAssault, Settings.Unholy.GCDasOffGCD.UnholyAssault, nil, not Target:IsInMeleeRange(5)) then return "unholy_assault cds 4"; end
   end
   -- apocalypse,if=variable.st_planning|fight_remains<20
   if S.Apocalypse:IsReady() and (VarSTPlanning or BossFightRemains < 20) then
     if Cast(S.Apocalypse, Settings.Unholy.GCDasOffGCD.Apocalypse, nil, not Target:IsInMeleeRange(5)) then return "apocalypse cds 6"; end
   end
-  -- outbreak,target_if=target.time_to_die>dot.virulent_plague.remains&dot.virulent_plague.ticks_remain<5,if=(dot.virulent_plague.refreshable|talent.superstrain&(dot.frost_fever.refreshable|dot.blood_plague.refreshable))&(!talent.unholy_blight|talent.plaguebringer)&(!talent.raise_abomination|talent.raise_abomination&cooldown.raise_abomination.remains>dot.virulent_plague.ticks_remain*3)
+  -- outbreak,target_if=target.time_to_die>dot.virulent_plague.remains&dot.virulent_plague.ticks_remain<5,if=(dot.virulent_plague.refreshable|talent.superstrain&(dot.frost_fever.refreshable|dot.blood_plague.refreshable))&(!talent.unholy_blight|talent.plaguebringer)&(!talent.raise_abomination|!pet.abomination.active&talent.raise_abomination&cooldown.raise_abomination.remains>dot.virulent_plague.ticks_remain*3)
   if S.Outbreak:IsReady() then
     if Everyone.CastCycle(S.Outbreak, Enemies10ySplash, EvaluateCycleOutbreakCDs, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak cds 8"; end
   end
