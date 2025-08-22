@@ -268,7 +268,9 @@ Item.Warrior.Commons = {
   -- DF Trinkets
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
   -- TWW Trinkets
+  CursedStoneIdol                       = Item(246344, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
+  UnyieldingNetherprism                 = Item(242396, {13, 14}),
   -- TWW Items
   BestinSlots                           = Item(232526, {16}),
 }
