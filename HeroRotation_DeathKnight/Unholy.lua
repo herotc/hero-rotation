@@ -601,7 +601,7 @@ local function CDsShared()
   end
   -- legion_of_souls,if=(variable.st_planning|variable.adds_remain)&(death_knight.fwounded_targets<active_enemies|(cooldown.apocalypse.remains<3|cooldown.dark_transformation.remains<3))
   if S.LegionofSouls:IsReady() and ((VarSTPlanning or VarAddsRemain) and (FesterTargets < ActiveEnemies or (S.Apocalypse:CooldownRemains() < 3 or S.DarkTransformation:CooldownRemains() < 3))) then
-    if Cast(S.LegionofSouls, Settings.Unholy.GCDasOffGCD.LegionofSouls) then return "legion_of_souls cds_shared 8"; end
+    if Cast(S.LegionofSouls, Settings.Unholy.GCDasOffGCD.LegionofSouls, Settings.Unholy.DisplayStyle.LegionOfSouls) then return "legion_of_souls cds_shared 8"; end
   end
   -- summon_gargoyle,use_off_gcd=1,if=(variable.st_planning|variable.adds_remain)&(buff.commander_of_the_dead.up|!talent.commander_of_the_dead&active_enemies>=1)|fight_remains<25
   if S.SummonGargoyle:IsReady() and ((VarSTPlanning or VarAddsRemain) and (Player:BuffUp(S.CommanderoftheDeadBuff) or not S.CommanderoftheDead:IsAvailable() and ActiveEnemies >= 1) or BossFightRemains < 25) then

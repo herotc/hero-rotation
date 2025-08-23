@@ -102,12 +102,14 @@ HR.GUISettings.APL.DeathKnight = {
     },
     DisplayStyle = {
       ArmyOfTheDead = "SuggestedRight",
+      LegionOfSouls = "SuggestedRight",
     },
     GCDasOffGCD = {
       -- Abilities4
       Apocalypse = false,
       DarkTransformation = true,
       Epidemic = false,
+      LegionofSouls = true,
       RaiseAbomination = false,
       SummonGargoyle = false,
       UnholyAssault = true,
