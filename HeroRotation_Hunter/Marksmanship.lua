@@ -229,17 +229,16 @@ end
 
 local function Trinkets()
   if Settings.Commons.Enabled.Trinkets then
-    -- use_item,name=unyielding_netherprism,if=buff.latent_energy.stack>7&(buff.trueshot.remains>13|buff.latent_energy.stack=18|fight_remains<25)
-    if I.UnyieldingNetherprism:IsEquippedAndReady() and (Player:BuffStack(S.LatentEnergyBuff) > 7 and (Player:BuffRemains(S.TrueshotBuff) > 13 or Player:BuffStack(S.LatentEnergyBuff) == 18 or BossFightRemains < 25)) then
-      if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "unyielding_netherprism trinket 2"; end
+    -- use_items,slots=trinket1:trinket2,if=!this_trinket.has_use_buff|buff.trueshot.remains>13|cooldown.trueshot.remains>45
+    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not Trinket1:HasUseBuff() or Player:BuffRemains(S.TrueshotBuff) > 13 or S.Trueshot:CooldownRemains() > 45) then
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") trinkets 2"; end
     end
-    -- use_items,slots=trinket1:trinket2,if=!this_trinket.is.unyielding_prism&(!this_trinket.has_use_buff|buff.trueshot.up|cooldown.trueshot.remains>30)
-    -- Note: Unyielding Netherprism is excluded via VarTrinket1Ex.
-    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (not Trinket1:HasUseBuff() or Player:BuffUp(S.TrueshotBuff) or S.Trueshot:CooldownRemains() > 30) then
-      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") trinkets 4"; end
+    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not Trinket2:HasUseBuff() or Player:BuffRemains(S.TrueshotBuff) > 13 or S.Trueshot:CooldownRemains() > 45) then
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") trinkets 4"; end
     end
-    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (not Trinket2:HasUseBuff() or Player:BuffUp(S.TrueshotBuff) or S.Trueshot:CooldownRemains() > 30) then
-      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") trinkets 6"; end
+    -- use_item,name=unyielding_netherprism,if=buff.latent_energy.stack>5&(buff.trueshot.remains>13|buff.latent_energy.stack=18|fight_remains<25)
+    if I.UnyieldingNetherprism:IsEquippedAndReady() and (Player:BuffStack(S.LatentEnergyBuff) > 5 and (Player:BuffRemains(S.TrueshotBuff) > 13 or Player:BuffStack(S.LatentEnergyBuff) == 18 or BossFightRemains < 25)) then
+      if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "unyielding_netherprism trinket 6"; end
     end
   end
   if Settings.Commons.Enabled.Items then
@@ -252,8 +251,8 @@ local function Trinkets()
 end
 
 local function DRST()
-  -- explosive_shot,if=talent.precision_detonation&buff.lock_and_load.down&cooldown.aimed_shot.charges<1&buff.trueshot.down
-  if S.ExplosiveShot:IsReady() and (S.PrecisionDetonation:IsAvailable() and Player:BuffDown(S.LockandLoadBuff) and S.AimedShot:Charges() < 1 and Player:BuffDown(S.TrueshotBuff)) then
+  -- explosive_shot,if=talent.precision_detonation&buff.lock_and_load.down&cooldown.aimed_shot.charges_fractional<=1.1&buff.trueshot.down
+  if S.ExplosiveShot:IsReady() and (S.PrecisionDetonation:IsAvailable() and Player:BuffDown(S.LockandLoadBuff) and S.AimedShot:ChargesFractional() <= 1.1 and Player:BuffDown(S.TrueshotBuff)) then
     if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot dr_st 2"; end
   end
   -- volley,if=buff.double_tap.down&(!raid_event.adds.exists|raid_event.adds.in>cooldown)
@@ -264,72 +263,76 @@ local function DRST()
   if S.SteadyShot:IsCastable() and (CheckFocusCap(S.SteadyShot:CastTime()) and S.AimedShot:InFlight() and not S.BlackArrow:IsReady() and Player:BuffDown(S.TrueshotBuff) and S.Trueshot:CooldownDown()) then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot dr_st 6"; end
   end
-  -- black_arrow,if=!talent.headshot|talent.headshot&buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)
-  if S.BlackArrow:IsReady() and (not S.Headshot:IsAvailable() or S.Headshot:IsAvailable() and Player:BuffUp(S.PreciseShotsBuff) and VarSpotterOrMovingDown) then
-    if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "bl;ack_arrow dr_st 8"; end
+  -- trueshot,if=variable.trueshot_ready&buff.double_tap.down&!action.black_arrow.cooldown_react&(!talent.bulletstorm|buff.bulletstorm.up)
+  if CDsON() and S.Trueshot:IsReady() and (VarTrueshotReady and Player:BuffDown(S.DoubleTapBuff) and not S.BlackArrow:IsReady() and (not S.Bulletstorm:IsAvailable() or Player:BuffUp(S.BulletstormBuff))) then
+    if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot dr_st 8"; end
+  end
+  -- black_arrow,if=talent.headshot&buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)|!talent.headshot
+  if S.BlackArrow:IsReady() and (S.Headshot:IsAvailable() and Player:BuffUp(S.PreciseShotsBuff) and VarSpotterOrMovingDown or not S.Headshot:IsAvailable()) then
+    if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "bl;ack_arrow dr_st 10"; end
   end
   -- aimed_shot,if=buff.trueshot.up&buff.precise_shots.down|buff.lock_and_load.up&buff.moving_target.up
   if S.AimedShot:IsReady() and (Player:BuffUp(S.TrueshotBuff) and Player:BuffDown(S.PreciseShotsBuff) or Player:BuffUp(S.LockandLoadBuff) and Player:BuffUp(S.MovingTargetBuff)) then
-    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot dr_st 10"; end
+    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot dr_st 12"; end
   end
   -- rapid_fire,if=!buff.deathblow.react
   if S.RapidFire:IsCastable() and (Player:BuffDown(S.DeathblowBuff)) then
-    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire dr_st 12"; end
+    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire dr_st 14"; end
   end
-  -- trueshot,if=variable.trueshot_ready&buff.double_tap.down&!buff.deathblow.react&cooldown.aimed_shot.charges>0
-  if CDsON() and S.Trueshot:IsReady() and (VarTrueshotReady and Player:BuffDown(S.DoubleTapBuff) and Player:BuffDown(S.DeathblowBuff) and S.AimedShot:Charges() > 0) then
-    if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot dr_st 14"; end
+  -- trueshot,if=variable.trueshot_ready&buff.double_tap.down&!buff.deathblow.react
+  if CDsON() and S.Trueshot:IsReady() and (VarTrueshotReady and Player:BuffDown(S.DoubleTapBuff) and Player:BuffDown(S.DeathblowBuff)) then
+    if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot dr_st 16"; end
   end
   -- arcane_shot,if=buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)
   if S.ArcaneShot:IsReady() and (Player:BuffUp(S.PreciseShotsBuff) and VarSpotterOrMovingDown) then
-    if Cast(S.ArcaneShot, Settings.Marksmanship.GCDasOffGCD.ArcaneShot, nil, not TargetInRange40y) then return "arcane_shot dr_st 16"; end
+    if Cast(S.ArcaneShot, Settings.Marksmanship.GCDasOffGCD.ArcaneShot, nil, not TargetInRange40y) then return "arcane_shot dr_st 18"; end
   end
   -- aimed_shot,if=buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up
   if S.AimedShot:IsReady() and (Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)) then
-    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot dr_st 18"; end
+    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot dr_st 20"; end
   end
   -- explosive_shot,if=talent.shrapnel_shot&buff.lock_and_load.down
   if S.ExplosiveShot:IsReady() and (S.ShrapnelShot:IsAvailable() and Player:BuffDown(S.LockandLoadBuff)) then
-    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot dr_st 20"; end
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot dr_st 22"; end
   end
   -- steady_shot
   if S.SteadyShot:IsCastable() then
-    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot dr_st 22"; end
+    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot dr_st 24"; end
   end
 end
 
 local function SentST()
-  -- explosive_shot,if=talent.precision_detonation&action.aimed_shot.in_flight&buff.trueshot.down
-  if S.ExplosiveShot:IsReady() and (S.PrecisionDetonation:IsAvailable() and S.AimedShot:InFlight() and Player:BuffDown(S.TrueshotBuff)) then
+  -- explosive_shot,if=talent.shrapnel_shot&buff.lock_and_load.down&cooldown.aimed_shot.charges_fractional<=1.1&buff.trueshot.down
+  if S.ExplosiveShot:IsReady() and (S.ShrapnelShot:IsAvailable() and Player:BuffDown(S.LockandLoadBuff) and S.AimedShot:ChargesFractional() <= 1.1 and Player:BuffDown(S.TrueshotBuff)) then
     if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot sent_st 2"; end
   end
   -- volley,if=buff.double_tap.down&(!raid_event.adds.exists|raid_event.adds.in>cooldown)
   if S.Volley:IsReady() and (Player:BuffDown(S.DoubleTapBuff)) then
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley sent_st 4"; end
   end
-  -- trueshot,if=variable.trueshot_ready&buff.double_tap.down
-  if CDsON() and S.Trueshot:IsReady() and (VarTrueshotReady and Player:BuffDown(S.DoubleTapBuff)) then
-    if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot sent_st 6"; end
-  end
-  -- steady_shot,if=(talent.black_arrow|bugs)&focus+cast_regen<focus.max&action.aimed_shot.in_flight&!buff.deathblow.react&buff.trueshot.down&cooldown.trueshot.remains
-  if S.SteadyShot:IsCastable() and (CheckFocusCap(S.SteadyShot:CastTime()) and S.AimedShot:InFlight() and Player:BuffDown(S.DeathblowBuff) and Player:BuffDown(S.TrueshotBuff) and S.Trueshot:CooldownDown()) then
-    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot sent_st 8"; end
-  end
   -- rapid_fire,if=talent.lunar_storm&buff.lunar_storm_cooldown.down
   if S.RapidFire:IsCastable() and (S.LunarStorm:IsAvailable() and Player:BuffDown(S.LunarStormCDBuff)) then
-    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire sent_st 10"; end
+    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire sent_st 6"; end
+  end
+  -- trueshot,if=variable.trueshot_ready&buff.double_tap.down&(!talent.bulletstorm|buff.bulletstorm.up)
+  if CDsON() and S.Trueshot:IsReady() and (VarTrueshotReady and Player:BuffDown(S.DoubleTapBuff) and (not S.Bulletstorm:IsAvailable() or Player:BuffUp(S.BulletstormBuff))) then
+    if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot sent_st 8"; end
   end
   -- kill_shot,if=talent.headshot&buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)|!talent.headshot&buff.razor_fragments.up
   if S.KillShot:IsReady() and (S.Headshot:IsAvailable() and Player:BuffUp(S.PreciseShotsBuff) and VarSpotterOrMovingDown or not S.Headshot:IsAvailable() and Player:BuffUp(S.RazorFragmentsBuff)) then
-    if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot sent_st 12"; end
+    if Cast(S.KillShot, nil, nil, not TargetInRange40y) then return "kill_shot sent_st 10"; end
+  end
+  -- aimed_shot,if=buff.trueshot.up&buff.precise_shots.down|buff.lock_and_load.up&buff.moving_target.up
+  if S.AimedShot:IsReady() and (Player:BuffUp(S.TrueshotBuff) and Player:BuffDown(S.PreciseShotsBuff) or Player:BuffUp(S.LockandLoadBuff) and Player:BuffUp(S.MovingTargetBuff)) then
+    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot sent_st 12"; end
+  end
+  -- rapid_fire,if=!talent.no_scope|buff.precise_shots.down
+  if S.RapidFire:IsCastable() and (not S.NoScope:IsAvailable() or Player:BuffDown(S.PreciseShotsBuff)) then
+    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire sent_st 14"; end
   end
   -- arcane_shot,if=buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)
   if S.ArcaneShot:IsReady() and (Player:BuffUp(S.PreciseShotsBuff) and VarSpotterOrMovingDown) then
-    if Cast(S.ArcaneShot, Settings.Marksmanship.GCDasOffGCD.ArcaneShot, nil, not TargetInRange40y) then return "arcane_shot sent_st 14"; end
-  end
-  -- aimed_shot,if=(buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up)&full_recharge_time<action.rapid_fire.execute_time+cast_time&(!talent.bulletstorm|buff.bulletstorm.up)&talent.windrunner_quiver
-  if S.AimedShot:IsReady() and ((Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)) and S.AimedShot:FullRechargeTime() < S.RapidFire:ExecuteTime() + S.AimedShot:CastTime() and (not S.Bulletstorm:IsAvailable() or Player:BuffUp(S.BulletstormBuff)) and S.WindrunnerQuiver:IsAvailable()) then
-    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot sent_st 16"; end
+    if Cast(S.ArcaneShot, Settings.Marksmanship.GCDasOffGCD.ArcaneShot, nil, not TargetInRange40y) then return "arcane_shot sent_st 16"; end
   end
   -- rapid_fire
   if S.RapidFire:IsCastable() then
@@ -428,70 +431,125 @@ local function Cleave()
   end
 end
 
-local function Trickshots()
+local function DRTrickshots()
   -- explosive_shot,if=talent.precision_detonation&action.aimed_shot.in_flight&buff.trueshot.down&(!talent.shrapnel_shot|buff.lock_and_load.down)
   if S.ExplosiveShot:IsReady() and (S.PrecisionDetonation:IsAvailable() and S.AimedShot:InFlight() and Player:BuffDown(S.TrueshotBuff) and (not S.ShrapnelShot:IsAvailable() or Player:BuffDown(S.LockandLoadBuff))) then
-    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot trickshots 2"; end
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot dr_trickshots 2"; end
   end
   -- volley,if=buff.double_tap.down&(!talent.shrapnel_shot|buff.lock_and_load.down)
   if S.Volley:IsReady() and (Player:BuffDown(S.DoubleTapBuff) and (not S.ShrapnelShot:IsAvailable() or Player:BuffDown(S.LockandLoadBuff))) then
-    if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley trickshots 4"; end
+    if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley dr_trickshots 4"; end
   end
   -- rapid_fire,if=talent.bulletstorm&buff.bulletstorm.down&buff.trick_shots.remains>execute_time
   if S.RapidFire:IsCastable() and (S.Bulletstorm:IsAvailable() and Player:BuffDown(S.BulletstormBuff) and Player:BuffRemains(S.TrickShotsBuff) > S.RapidFire:ExecuteTime()) then
-    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire trickshots 6"; end
+    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire dr_trickshots 6"; end
   end
   -- rapid_fire,if=hero_tree.sentinel&buff.lunar_storm_cooldown.down&buff.trick_shots.remains>execute_time
   if S.RapidFire:IsCastable() and (Player:HeroTreeID() == 42 and Player:BuffDown(S.LunarStormCDBuff) and Player:BuffRemains(S.TrickShotsBuff) > S.RapidFire:ExecuteTime()) then
-    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire trickshots 8"; end
+    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire dr_trickshots 8"; end
   end
   -- steady_shot,if=talent.black_arrow&focus+cast_regen<focus.max&action.aimed_shot.in_flight&!buff.deathblow.react&buff.trueshot.down&cooldown.trueshot.remains
   if S.SteadyShot:IsCastable() and (S.BlackArrow:IsAvailable() and Player:Focus() + Player:FocusCastRegen(S.SteadyShot:CastTime()) < Player:FocusMax() and S.AimedShot:InFlight() and Player:BuffDown(S.DeathblowBuff) and Player:BuffDown(S.TrueshotBuff) and S.Trueshot:CooldownDown()) then
-    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot trickshots 10"; end
+    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot dr_trickshots 10"; end
   end
   -- black_arrow,if=!talent.headshot|buff.precise_shots.up|buff.trick_shots.down
   if S.BlackArrow:IsReady() and (not S.Headshot:IsAvailable() or Player:BuffUp(S.PreciseShotsBuff) or Player:BuffDown(S.TrickShotsBuff)) then
-    if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "black_arrow trickshots 12"; end
+    if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "black_arrow dr_trickshots 12"; end
   end
   -- multishot,target_if=max:debuff.spotters_mark.down|action.aimed_shot.in_flight_to_target,if=buff.precise_shots.up&buff.moving_target.down|buff.trick_shots.down
   if S.MultiShot:IsReady() and (Player:BuffUp(S.PreciseShotsBuff) and Player:BuffDown(S.MovingTargetBuff) or Player:BuffDown(S.TrickShotsBuff)) then
-    if Everyone.CastCycle(S.MultiShot, Enemies10ySplash, EvaluateCycleMultiShotTS, not TargetInRange40y) then return "multishot trickshots 14"; end
+    if Everyone.CastCycle(S.MultiShot, Enemies10ySplash, EvaluateCycleMultiShotTS, not TargetInRange40y) then return "multishot dr_trickshots 14"; end
   end
   -- trueshot,if=variable.trueshot_ready&buff.double_tap.down
   if CDsON() and S.Trueshot:IsReady() and (VarTrueshotReady and Player:BuffDown(S.DoubleTapBuff)) then
-    if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot trickshots 16"; end
+    if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot dr_trickshots 16"; end
   end
   -- volley,if=buff.double_tap.down&(!talent.salvo|!talent.precision_detonation|(buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up))
   if S.Volley:IsReady() and (Player:BuffDown(S.DoubleTapBuff) and (not S.Salvo:IsAvailable() or not S.PrecisionDetonation:IsAvailable() or (Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)))) then
-    if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley trickshots 18"; end
+    if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley dr_trickshots 18"; end
   end
   -- aimed_shot,if=(buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up)&buff.trick_shots.up&buff.bulletstorm.up&full_recharge_time<gcd
   if S.AimedShot:IsReady() and ((Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)) and Player:BuffUp(S.TrickShotsBuff) and Player:BuffUp(S.BulletstormBuff) and S.AimedShot:FullRechargeTime() < Player:GCD()) then
-    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot trickshots 20"; end
+    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot dr_trickshots 20"; end
   end
   -- rapid_fire,if=buff.trick_shots.remains>execute_time&(!talent.black_arrow|buff.deathblow.down)&(!talent.no_scope|debuff.spotters_mark.down)&(talent.no_scope|buff.bulletstorm.down)
   if S.RapidFire:IsCastable() and (Player:BuffRemains(S.TrickShotsBuff) > S.RapidFire:ExecuteTime() and (not S.BlackArrow:IsAvailable() or Player:BuffDown(S.DeathblowBuff)) and (not S.NoScope:IsAvailable() or Target:DebuffDown(S.SpottersMarkDebuff)) and (S.NoScope:IsAvailable() or Player:BuffDown(S.BulletstormBuff))) then
-    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire trickshots 22"; end
+    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire dr_trickshots 22"; end
   end
   -- explosive_shot,if=talent.precision_detonation&talent.shrapnel_shot&buff.lock_and_load.down&(buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up)
   if S.ExplosiveShot:IsReady() and (S.PrecisionDetonation:IsAvailable() and S.ShrapnelShot:IsAvailable() and Player:BuffDown(S.LockandLoadBuff) and (Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff))) then
-    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot trickshots 24"; end
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot dr_trickshots 24"; end
   end
   -- aimed_shot,if=(buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up)&buff.trick_shots.up
   if S.AimedShot:IsReady() and ((Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)) and Player:BuffUp(S.TrickShotsBuff)) then
-    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot trickshots 26"; end
+    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot dr_trickshots 26"; end
   end
   -- explosive_shot,if=talent.precision_detonation&!talent.shrapnel_shot
   if S.ExplosiveShot:IsReady() and (S.PrecisionDetonation:IsAvailable() and not S.ShrapnelShot:IsAvailable()) then
-    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot trickshots 28"; end
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot dr_trickshots 28"; end
   end
-  -- ssteady_shot,if=(talent.lunar_storm&focus+cast_regen<focus.max)|talent.black_arrow
+  -- steady_shot,if=(talent.lunar_storm&focus+cast_regen<focus.max)|talent.black_arrow
   if S.SteadyShot:IsCastable() and ((S.LunarStorm:IsAvailable() and Player:Focus() + Player:FocusCastRegen(S.SteadyShot:CastTime()) < Player:FocusMax()) or S.BlackArrow:IsAvailable()) then
-    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot trickshots 30"; end
+    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot dr_trickshots 30"; end
   end
   -- multishot,if=!talent.black_arrow
   if S.MultiShot:IsReady() and (not S.BlackArrow:IsAvailable()) then
-    if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "multishot trickshots 24"; end
+    if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "multishot dr_trickshots 24"; end
+  end
+end
+
+local function SentTrickshots()
+  -- explosive_shot,if=talent.shrapnel_shot&buff.lock_and_load.down&cooldown.aimed_shot.charges_fractional<=1.1&buff.trueshot.down
+  if S.ExplosiveShot:IsReady() and (S.ShrapnelShot:IsAvailable() and Player:BuffDown(S.LockandLoadBuff) and S.AimedShot:ChargesFractional() <= 1.1 and Player:BuffDown(S.TrueshotBuff)) then
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot sent_trickshots 2"; end
+  end
+  -- volley,if=buff.double_tap.down&(!talent.shrapnel_shot|buff.lock_and_load.down)
+  if S.Volley:IsReady() and (Player:BuffDown(S.DoubleTapBuff) and (not S.ShrapnelShot:IsAvailable() or Player:BuffDown(S.LockandLoadBuff))) then
+    if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley sent_trickshots 4"; end
+  end
+  -- rapid_fire,if=buff.trick_shots.remains>execute_time&(talent.bulletstorm&buff.bulletstorm.down|buff.lunar_storm_cooldown.down)
+  if S.RapidFire:IsCastable() and (Player:BuffRemains(S.TrickShotsBuff) > S.RapidFire:ExecuteTime() and (S.Bulletstorm:IsAvailable() and Player:BuffDown(S.BulletstormBuff) or Player:BuffDown(S.LunarStormCDBuff))) then
+    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire sent_trickshots 6"; end
+  end
+  -- multishot,target_if=max:debuff.spotters_mark.down|action.aimed_shot.in_flight_to_target,if=buff.precise_shots.up&buff.moving_target.down|buff.trick_shots.down
+  if S.MultiShot:IsReady() and (Player:BuffUp(S.PreciseShotsBuff) and Player:BuffDown(S.MovingTargetBuff) or Player:BuffDown(S.TrickShotsBuff)) then
+    if Everyone.CastCycle(S.MultiShot, Enemies10ySplash, EvaluateCycleMultiShotTS, not TargetInRange40y) then return "multishot sent_trickshots 8"; end
+  end
+  -- trueshot,if=variable.trueshot_ready&buff.double_tap.down
+  if CDsON() and S.Trueshot:IsReady() and (VarTrueshotReady and Player:BuffDown(S.DoubleTapBuff)) then
+    if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot sent_trickshots 10"; end
+  end
+  -- volley,if=buff.double_tap.down&(!talent.salvo|!talent.precision_detonation|(buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up))
+  if S.Volley:IsReady() and (Player:BuffDown(S.DoubleTapBuff) and (not S.Salvo:IsAvailable() or not S.PrecisionDetonation:IsAvailable() or (Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)))) then
+    if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley sent_trickshots 12"; end
+  end
+  -- aimed_shot,if=buff.trick_shots.remains>execute_time&(buff.trueshot.up&buff.precise_shots.down|buff.lock_and_load.up&buff.moving_target.up)
+  if S.AimedShot:IsReady() and (Player:BuffRemains(S.TrickShotsBuff) > S.RapidFire:ExecuteTime() and (Player:BuffUp(S.TrueshotBuff) and Player:BuffDown(S.PreciseShotsBuff) or Player:BuffUp(S.LockandLoadBuff) and Player:BuffUp(S.MovingTargetBuff))) then
+    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot sent_trickshots 14"; end
+  end
+  -- rapid_fire,if=buff.trick_shots.remains>execute_time
+  if S.RapidFire:IsCastable() and (Player:BuffRemains(S.TrickShotsBuff) > S.RapidFire:ExecuteTime()) then
+    if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire sent_trickshots 16"; end
+  end
+  -- explosive_shot,if=talent.shrapnel_shot&buff.lock_and_load.down
+  if S.ExplosiveShot:IsReady() and (S.ShrapnelShot:IsAvailable() and Player:BuffDown(S.LockandLoadBuff)) then
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot sent_trickshots 18"; end
+  end
+  -- aimed_shot,if=buff.trick_shots.remains>execute_time&(buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up)
+  if S.AimedShot:IsReady() and (Player:BuffRemains(S.TrickShotsBuff) > S.AimedShot:ExecuteTime() and (Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff))) then
+    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot sent_trickshots 20"; end
+  end
+  -- explosive_shot,if=talent.precision_detonation&!talent.shrapnel_shot
+  if S.ExplosiveShot:IsReady() and (S.PrecisionDetonation:IsAvailable() and not S.ShrapnelShot:IsAvailable()) then
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot sent_trickshots 22"; end
+  end
+  -- steady_shot,if=focus+cast_regen<focus.max
+  if S.SteadyShot:IsCastable() and (CheckFocusCap(S.SteadyShot:CastTime())) then
+    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot sent_trickshots 24"; end
+  end
+  -- multishot
+  if S.MultiShot:IsReady() then
+    if Cast(S.MultiShot, nil, nil, not TargetInRange40y) then return "multishot sent_trickshots 26"; end
   end
 end
 
@@ -536,9 +594,9 @@ local function APL()
     end
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(S.CounterShot, Settings.CommonsDS.DisplayStyle.Interrupts, StunInterrupts); if ShouldReturn then return ShouldReturn; end
-    -- variable,name=trueshot_ready,value=!talent.bullseye|fight_remains>cooldown.trueshot.duration+buff.trueshot.duration|buff.bullseye.stack=buff.bullseye.max_stack|fight_remains<25
+    -- variable,name=trueshot_ready,value=!talent.bullseye|fight_remains>cooldown.trueshot.duration+10|buff.bullseye.stack=buff.bullseye.max_stack|fight_remains<25
     local TrueshotCD = 120 - num(S.CallingtheShots:IsAvailable()) * 30 - num(Player:HasTier("TWW3", 2)) * 30
-    VarTrueshotReady = not S.Bullseye:IsAvailable() or FightRemains > TrueshotCD + 15 or Player:BuffStack(S.BullseyeBuff) == 30 or BossFightRemains < 25
+    VarTrueshotReady = not S.Bullseye:IsAvailable() or FightRemains > TrueshotCD + 10 or Player:BuffStack(S.BullseyeBuff) == 30 or BossFightRemains < 25
     -- auto_shot
     -- call_action_list,name=cds
     local ShouldReturn = CDs(); if ShouldReturn then return ShouldReturn; end
@@ -546,20 +604,28 @@ local function APL()
     if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=trickshots,if=active_enemies>2&talent.trick_shots
     if EnemiesCount10ySplash > 2 and S.TrickShots:IsAvailable() then
-      local ShouldReturn = Trickshots(); if ShouldReturn then return ShouldReturn; end
+      -- call_action_list,name=drtrickshots,if=active_enemies>2&talent.trick_shots&hero_tree.dark_ranger
+      if Player:HeroTreeID() == 44 then
+        local ShouldReturn = DRTrickshots(); if ShouldReturn then return ShouldReturn; end
+      end
+      -- call_action_list,name=senttrickshots,if=active_enemies>2&talent.trick_shots&hero_tree.sentinel
+      -- Note: Added level check to force this function for below level 70.
+      if Player:HeroTreeID() == 42 or Player:Level() < 71 then
+        local ShouldReturn = SentTrickshots(); if ShouldReturn then return ShouldReturn; end
+      end
     end
     -- call_action_list,name=cleave,if=active_enemies>1
     if EnemiesCount10ySplash > 1 then
       local ShouldReturn = Cleave(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=drst,if=active_enemies=1&talent.black_arrow
-    if EnemiesCount10ySplash == 1 and S.BlackArrow:IsAvailable() then
+    -- call_action_list,name=drst,if=active_enemies=1&hero_tree.dark_ranger
+    if EnemiesCount10ySplash == 1 and Player:HeroTreeID() == 44 then
       local ShouldReturn = DRST(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=sentst,if=active_enemies=1&!talent.black_arrow
-    if EnemiesCount10ySplash == 1 and not S.BlackArrow:IsAvailable() then
+    -- Note: Added level check to force this function for below level 70.
+    if EnemiesCount10ySplash == 1 and (Player:HeroTreeID() == 42 or Player:Level() < 71) then
       local ShouldReturn = SentST(); if ShouldReturn then return ShouldReturn; end
     end
     -- Pool Focus if nothing else to do

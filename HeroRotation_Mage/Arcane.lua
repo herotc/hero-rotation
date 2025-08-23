@@ -38,12 +38,7 @@ local I = Item.Mage.Arcane
 
 -- Create table to exclude above trinkets from On Use function
 local OnUseExcludes = {
-  -- TWW Trinkets
-  I.HighSpeakersAccretion:ID(),
-  I.ImperfectAscendancySerum:ID(),
-  I.NeuralSynapseEnhancer:ID(),
-  I.SpymastersWeb:ID(),
-  I.TreacherousTransmitter:ID(),
+  -- I.Trinket:ID(),
 }
 
 --- ===== GUI Settings =====
@@ -62,6 +57,7 @@ S.ArcaneBarrage:RegisterInFlight()
 
 --- ===== Rotation Variables =====
 local VarAoETargetCount = (not S.ArcingCleave:IsAvailable()) and 9 or 2
+local VarSoulBurst, VarSoulCD
 local VarOpener = true
 local VarAoEList = false
 local Enemies8ySplash, EnemiesCount8ySplash
@@ -81,7 +77,6 @@ local VarTrinket1CastTime, VarTrinket2CastTime
 local VarTrinket1CD, VarTrinket2CD
 local VarTrinket1Ex, VarTrinket2Ex
 local VarSteroidTrinketEquipped = false
-local VarNeuralOnMini = false
 local VarNonsteroidTrinketEquipped = false
 local VarSpymastersDoubleOnUse = false
 local VarTrinketFailures = 0
@@ -118,8 +113,6 @@ local function SetTrinketVariables()
 
   -- variable,name=steroid_trinket_equipped,op=set,value=equipped.gladiators_badge|equipped.signet_of_the_priory|equipped.imperfect_ascendancy_serum|equipped.quickwick_candlestick|equipped.soulletting_ruby|equipped.funhouse_lens|equipped.house_of_cards|equipped.flarendos_pilot_light|equipped.neural_synapse_enhancer|equipped.lily_of_the_eternal_weave|equipped.sunblood_amethyst|equipped.arazs_ritual_forge|equipped.incorporeal_essencegorger
   VarSteroidTrinketEquipped = Player:GladiatorsBadgeIsEquipped() or I.SignetOfThePriory:IsEquipped() or I.ImperfectAscendancySerum:IsEquipped() or I.QuickwickCandlestick:IsEquipped() or I.SoullettingRuby:IsEquipped() or I.FunhouseLens:IsEquipped() or I.HouseOfCards:IsEquipped() or I.FlarendosPilotLight:IsEquipped() or I.NeuralSynapseEnhancer:IsEquipped() or I.LilyoftheEternalWeave:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.ArazsRitualForge:IsEquipped() or I.IncorporealEssencegorger:IsEquipped()
-  -- variable,name=neural_on_mini,op=set,value=equipped.gladiators_badge|equipped.signet_of_the_priory|equipped.soulletting_ruby|equipped.funhouse_lens|equipped.house_of_cards|equipped.flarendos_pilot_light|equipped.lily_of_the_eternal_weave|equipped.sunblood_amethyst|equipped.arazs_ritual_forge|equipped.incorporeal_essencegorger
-  VarNeuralOnMini = Player:GladiatorsBadgeIsEquipped() or I.SignetOfThePriory:IsEquipped() or I.SoullettingRuby:IsEquipped() or I.FunhouseLens:IsEquipped() or I.HouseOfCards:IsEquipped() or I.FlarendosPilotLight:IsEquipped() or I.LilyoftheEternalWeave:IsEquipped() or I.SunbloodAmethyst:IsEquipped() or I.ArazsRitualForge:IsEquipped() or I.IncorporealEssencegorger:IsEquipped()
   -- variable,name=nonsteroid_trinket_equipped,op=set,value=equipped.blastmaster3000|equipped.ratfang_toxin|equipped.ingenious_mana_battery|equipped.geargrinders_spare_keys|equipped.ringing_ritual_mud|equipped.goo_blin_grenade|equipped.noggenfogger_ultimate_deluxe|equipped.garbagemancers_last_resort|equipped.mad_queens_mandate|equipped.fearbreakers_echo|equipped.mereldars_toll|equipped.gooblin_grenade|equipped.perfidious_projector|equipped.chaotic_nethergate
   VarNonsteroidTrinketEquipped = I.Blastmaster3000:IsEquipped() or I.RatfangToxin:IsEquipped() or I.IngeniousManaBattery:IsEquipped() or I.GeargrindersSpareKeys:IsEquipped() or I.RingingRitualMud:IsEquipped() or I.GooBlinGrenade:IsEquipped() or I.NoggenfoggerUltimateDeluxe:IsEquipped() or I.GarbagemancersLastResort:IsEquipped() or I.MadQueensMandate:IsEquipped() or I.FearbreakersEcho:IsEquipped() or I.MereldarsToll:IsEquipped() or I.PerfidiousProjector:IsEquipped() or I.ChaoticNethergate:IsEquipped()
 end
@@ -149,47 +142,39 @@ end, "PLAYER_EQUIPMENT_CHANGED")
 local function Precombat()
   -- arcane_intellect
   -- Note: Moved to top of APL()
+  -- variable,name=soul_burst,default=0,op=reset
+  VarSoulBurst = Settings.Arcane.SoulBurst
+  -- variable,name=soul_cd,op=set,value=1,if=set_bonus.thewarwithin_season_3_4pc&talent.spellfire_spheres&talent.resonance&!talent.magis_spark&(active_enemies>=3)&variable.soul_burst
+  -- Note: Can't check active_enemies in Precombat, so defaulting to false.
+  VarSoulCD = false
   -- variable,name=aoe_target_count,op=reset,default=2
   -- variable,name=aoe_target_count,op=set,value=9,if=!talent.arcing_cleave
   -- variable,name=opener,op=set,value=1
   -- variable,name=aoe_list,default=0,op=reset
   -- Note: Moved to variable declarations and Event Registrations to avoid potential nil errors.
   -- variable,name=steroid_trinket_equipped,op=set,value=equipped.gladiators_badge|equipped.signet_of_the_priory|equipped.imperfect_ascendancy_serum|equipped.quickwick_candlestick|equipped.soulletting_ruby|equipped.funhouse_lens|equipped.house_of_cards|equipped.flarendos_pilot_light|equipped.neural_synapse_enhancer|equipped.lily_of_the_eternal_weave|equipped.sunblood_amethyst|equipped.arazs_ritual_forge|equipped.incorporeal_essencegorger
-  -- variable,name=neural_on_mini,op=set,value=equipped.gladiators_badge|equipped.signet_of_the_priory|equipped.soulletting_ruby|equipped.funhouse_lens|equipped.house_of_cards|equipped.flarendos_pilot_light|equipped.lily_of_the_eternal_weave|equipped.sunblood_amethyst|equipped.arazs_ritual_forge|equipped.incorporeal_essencegorger
   -- variable,name=nonsteroid_trinket_equipped,op=set,value=equipped.blastmaster3000|equipped.ratfang_toxin|equipped.ingenious_mana_battery|equipped.geargrinders_spare_keys|equipped.ringing_ritual_mud|equipped.goo_blin_grenade|equipped.noggenfogger_ultimate_deluxe|equipped.garbagemancers_last_resort|equipped.mad_queens_mandate|equipped.fearbreakers_echo|equipped.mereldars_toll|equipped.gooblin_grenade|equipped.perfidious_projector|equipped.chaotic_nethergate
   -- Note: Moved to SetTrinketVariables().
   -- snapshot_stats
-  -- use_item,name=ingenious_mana_battery,target=self
-  if I.IngeniousManaBattery:IsEquippedAndReady() then
-    if Cast(I.IngeniousManaBattery, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "ingenious_mana_battery precombat 2"; end
-  end
-  -- variable,name=treacherous_transmitter_precombat_cast,value=11
-  -- Note: Can't utilize this in HR.
-  -- use_item,name=treacherous_transmitter
-  if I.TreacherousTransmitter:IsEquippedAndReady() then
-    if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter precombat 4"; end
-  end
   -- mirror_image
   if S.MirrorImage:IsCastable() and CDsON() and Settings.Arcane.MirrorImagesBeforePull then
     if Cast(S.MirrorImage, Settings.Arcane.GCDasOffGCD.MirrorImage) then return "mirror_image precombat 6"; end
-  end
-  -- use_item,name=imperfect_ascendancy_serum
-  if I.ImperfectAscendancySerum:IsEquippedAndReady() then
-    if Cast(I.ImperfectAscendancySerum, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "imperfect_ascendancy_serum precombat 8"; end
   end
   -- arcane_blast,if=!talent.evocation
   if S.ArcaneBlast:IsReady() and (not S.Evocation:IsAvailable()) then
     if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast precombat 10"; end
   end
-  -- evocation,if=talent.evocation
-  if S.Evocation:IsReady() then
+  -- evocation,if=talent.evocation&!variable.soul_cd
+  if S.Evocation:IsReady() and (not VarSoulCD) then
     if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation precombat 12"; end
   end
+  -- arcane_surge,if=variable.soul_cd
+  -- Note: We will never have soul_cd be true in Precombat. Skipping...
 end
 
 local function CDOpener()
-  -- touch_of_the_magi,use_off_gcd=1,if=prev_gcd.1.arcane_barrage&(action.arcane_barrage.in_flight_remains<=0.5|gcd.remains<=0.5)&(buff.arcane_surge.up|cooldown.arcane_surge.remains>30)|(prev_gcd.1.arcane_surge&(buff.arcane_charge.stack<4|buff.nether_precision.down))|(cooldown.arcane_surge.remains>30&cooldown.touch_of_the_magi.ready&buff.arcane_charge.stack<4&!prev_gcd.1.arcane_barrage)
-  if S.TouchoftheMagi:IsReady() and (Player:PrevGCDP(1, S.ArcaneBarrage) and (S.ArcaneBarrage:InFlightRemains() <= 0.5 or Player:GCDRemains() <= 0.5) and (Player:BuffUp(S.ArcaneSurgeBuff) or S.ArcaneSurge:CooldownRemains() > 30) or (Player:PrevGCDP(1, S.ArcaneSurge) and (Player:ArcaneCharges() < 4 or Player:BuffDown(S.NetherPrecisionBuff))) or (S.ArcaneSurge:CooldownRemains() > 30 and S.TouchoftheMagi:CooldownUp() and Player:ArcaneCharges() < 4 and not Player:PrevGCDP(1, S.ArcaneBarrage))) then
+  -- touch_of_the_magi,use_off_gcd=1,if=prev_gcd.1.arcane_surge|(cooldown.arcane_surge.remains>30&cooldown.touch_of_the_magi.ready&((buff.arcane_charge.stack<4&!prev_gcd.1.arcane_barrage)|prev_gcd.1.arcane_barrage))|fight_remains<15
+  if S.TouchoftheMagi:IsReady() and (Player:PrevGCDP(1, S.ArcaneSurge) or (S.ArcaneSurge:CooldownRemains() > 30 and S.TouchoftheMagi:CooldownUp() and ((Player:ArcaneCharges() < 4 and not Player:PrevGCDP(1, S.ArcaneBarrage)) or Player:PrevGCDP(1, S.ArcaneBarrage))) or BossFightRemains < 15) then
     if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi, nil, not Target:IsSpellInRange(S.TouchoftheMagi)) then return "touch_of_the_magi cd_opener 2"; end
   end
   -- wait,sec=0.05,if=prev_gcd.1.arcane_surge&time-action.touch_of_the_magi.last_used<0.015,line_cd=15
@@ -205,20 +190,35 @@ local function CDOpener()
   if S.ArcaneBarrage:IsReady() and S.ArcaneBarrage:TimeSinceLastCast() >= 11 and (Player:BuffUp(S.ArcaneTempoBuff) and S.Evocation:CooldownUp() and Player:BuffRemains(S.ArcaneTempoBuff) < Player:GCD() * 5) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsInRange(8)) then return "arcane_barrage cd_opener 8"; end
   end
-  -- evocation,if=cooldown.arcane_surge.remains<(gcd.max*3)&cooldown.touch_of_the_magi.remains<(gcd.max*5)
-  if S.Evocation:IsCastable() and (S.ArcaneSurge:CooldownRemains() < (Player:GCD() * 3) and S.TouchoftheMagi:CooldownRemains() < (Player:GCD() * 5)) then
+  -- evocation,if=cooldown.arcane_surge.remains<(gcd.max*3)&cooldown.touch_of_the_magi.remains<(gcd.max*5)|fight_remains<25
+  if S.Evocation:IsCastable() and (S.ArcaneSurge:CooldownRemains() < (Player:GCD() * 3) and S.TouchoftheMagi:CooldownRemains() < (Player:GCD() * 5) or BossFightRemains < 25) then
     if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation cd_opener 10"; end
   end
-  -- arcane_missiles,if=((prev_gcd.1.evocation|prev_gcd.1.arcane_surge)|variable.opener)&buff.nether_precision.down,interrupt_if=tick_time>gcd.remains&buff.aether_attunement.react=0,interrupt_immediate=1,interrupt_global=1,chain=1,line_cd=30
+  -- arcane_missiles,if=(prev_gcd.1.evocation|prev_gcd.1.arcane_surge|variable.opener)&buff.nether_precision.down,interrupt_if=tick_time>gcd.remains&buff.aether_attunement.react=0,interrupt_immediate=1,interrupt_global=1,chain=1,line_cd=30
   if Settings.Arcane.Enabled.ArcaneMissilesInterrupts and Player:IsChanneling(S.ArcaneMissiles) and (S.ArcaneMissiles:TickTime() > Player:GCDRemains() and Player:BuffDown(S.AetherAttunementBuff)) then
     if CastLeft(S.StopAM, "STOP AM") then return "arcane_missiles interrupt cd_opener 12"; end
   end
-  if S.ArcaneMissiles:IsReady() and S.ArcaneMissiles:TimeSinceLastCast() >= 30 and (((Player:PrevGCDP(1, S.Evocation) or Player:PrevGCDP(1, S.ArcaneSurge)) or VarOpener) and Player:BuffDown(S.NetherPrecisionBuff)) then
+  if S.ArcaneMissiles:IsReady() and S.ArcaneMissiles:TimeSinceLastCast() >= 30 and ((Player:PrevGCDP(1, S.Evocation) or Player:PrevGCDP(1, S.ArcaneSurge) or VarOpener) and Player:BuffDown(S.NetherPrecisionBuff)) then
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles cd_opener 14"; end
   end
-  -- arcane_surge,if=cooldown.touch_of_the_magi.remains<(action.arcane_surge.execute_time+(gcd.max*(buff.arcane_charge.stack=4)))
-  if S.ArcaneSurge:IsCastable() and (S.TouchoftheMagi:CooldownRemains() < (S.ArcaneSurge:ExecuteTime() + (Player:GCD() * num(Player:ArcaneCharges() == 4)))) then
+  -- arcane_surge,if=cooldown.touch_of_the_magi.remains<(action.arcane_surge.execute_time+(gcd.max*(buff.arcane_charge.stack=4)))|fight_remains<25
+  if S.ArcaneSurge:IsCastable() and (S.TouchoftheMagi:CooldownRemains() < (S.ArcaneSurge:ExecuteTime() + (Player:GCD() * num(Player:ArcaneCharges() == 4))) or BossFightRemains < 25) then
     if Cast(S.ArcaneSurge, Settings.Arcane.GCDasOffGCD.ArcaneSurge) then return "arcane_surge cd_opener 16"; end
+  end
+end
+
+local function CDOpenerSoul()
+  -- arcane_surge,if=(cooldown.touch_of_the_magi.remains<15)
+  if S.ArcaneSurge:IsCastable() and (S.TouchoftheMagi:CooldownRemains() < 15) then
+    if Cast(S.ArcaneSurge, Settings.Arcane.GCDasOffGCD.ArcaneSurge) then return "arcane_surge cd_opener_soul 2"; end
+  end
+  -- evocation,if=buff.arcane_surge.up&(buff.arcane_surge.remains<=8.5|((buff.glorious_incandescence.up|buff.intuition.react)&buff.arcane_surge.remains<=10))
+  if S.Evocation:IsCastable() and (Player:BuffUp(S.ArcaneSurgeBuff) and (Player:BuffRemains(S.ArcaneSurgeBuff) <= 8.5 or ((Player:BuffUp(S.GloriousIncandescenceBuff) or Player:BuffUp(S.IntuitionBuff)) and Player:BuffRemains(S.ArcaneSurgeBuff) <= 10))) then
+    if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation cd_opener_soul 4"; end
+  end
+  -- touch_of_the_magi,if=(buff.arcane_surge.remains<=2.5&prev_gcd.1.arcane_barrage)|(cooldown.evocation.remains>40&cooldown.evocation.remains<60&prev_gcd.1.arcane_barrage)
+  if S.TouchoftheMagi:IsCastable() and ((Player:BuffRemains(S.ArcaneSurgeBuff) <= 2.5 and Player:PrevGCDP(1, S.ArcaneBarrage)) or (S.Evocation:CooldownRemains() > 40 and S.Evocation:CooldownRemains() < 60 and Player:PrevGCDP(1, S.ArcaneBarrage))) then
+    if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi, nil, not Target:IsSpellInRange(S.TouchoftheMagi)) then return "touch_of_the_magi cd_opener_soul 6"; end
   end
 end
 
@@ -355,7 +355,7 @@ local function Sunfury()
   if Settings.Arcane.Enabled.ArcaneMissilesInterrupts and Player:IsChanneling(S.ArcaneMissiles) and LastSFAM == 1 and (S.ArcaneMissiles:TickTime() > Player:GCDRemains()) then
     if CastLeft(S.StopAM, "STOP AM") then return "arcane_missiles interrupt sunfury 2"; end
   end
-  if Settings.Arcane.Enabled.ArcaneMissilesInterrupts and Player:IsChanneling(S.ArcaneMissiles) and (LastSFAM == 2 or LastSFAM == 3) and (S.ArcaneMissiles:TickTime() > Player:GCDRemains() and (Player:BuffDown(S.AetherAttunementBuff) or (EnemiesCount8ySplash > 3 and (not S.TimeLoop:IsAvailable() or S.Resonance:IsAvailable())))) then
+  if Settings.Arcane.Enabled.ArcaneMissilesInterrupts and Player:IsChanneling(S.ArcaneMissiles) and LastSFAM == 2 and (S.ArcaneMissiles:TickTime() > Player:GCDRemains() and (Player:BuffDown(S.AetherAttunementBuff) or (EnemiesCount8ySplash > 3 and (not S.TimeLoop:IsAvailable() or S.Resonance:IsAvailable())))) then
     if CastLeft(S.StopAM, "STOP AM") then return "arcane_missiles interrupt sunfury 4"; end
   end
   -- shifting_power,if=((buff.arcane_surge.down&buff.siphon_storm.down&debuff.touch_of_the_magi.down&cooldown.evocation.remains>15&cooldown.touch_of_the_magi.remains>10)&fight_remains>10)&buff.arcane_soul.down&(buff.intuition.react=0|(buff.intuition.react&buff.intuition.remains>cast_time))
@@ -378,75 +378,81 @@ local function Sunfury()
   if S.ArcaneBarrage:IsCastable() and (Player:BuffUp(S.ArcaneSoulBuff)) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 12"; end
   end
-  -- arcane_barrage,if=(buff.arcane_tempo.up&buff.arcane_tempo.remains<gcd.max)|(buff.intuition.react&buff.intuition.remains<gcd.max)
-  if S.ArcaneBarrage:IsCastable() and ((Player:BuffUp(S.ArcaneTempoBuff) and Player:BuffRemains(S.ArcaneTempoBuff) < Player:GCD()) or (Player:BuffUp(S.IntuitionBuff) and Player:BuffRemains(S.IntuitionBuff) < Player:GCD())) then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 14"; end
+  -- arcane_missiles,if=buff.clearcasting.react&buff.arcane_surge.up&buff.arcane_surge.remains<gcd.max,interrupt_if=tick_time>gcd.remains,interrupt_immediate=1,interrupt_global=1,chain=1
+  if S.ArcaneMissiles:IsReady() and (Player:BuffUp(S.ClearcastingBuff) and Player:BuffUp(S.ArcaneSurgeBuff) and Player:BuffRemains(S.ArcaneSurgeBuff) < Player:GCD()) then
+    LastSFAM = 1
+    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles sunfury 14"; end
+  end
+  -- arcane_barrage,if=(buff.arcane_tempo.up&buff.arcane_tempo.remains<(gcd.max+(gcd.max*buff.nether_precision.stack=1)))|(buff.intuition.react&buff.intuition.remains<(gcd.max+(gcd.max*buff.nether_precision.stack=1)))
+  if S.ArcaneBarrage:IsReady() and ((Player:BuffUp(S.ArcaneTempoBuff) and Player:BuffRemains(S.ArcaneTempoBuff) < (Player:GCD() + (Player:GCD() * num(Player:BuffStack(S.NetherPrecisionBuff) == 1)))) or (Player:BuffUp(S.IntuitionBuff) and Player:BuffRemains(S.IntuitionBuff) < (Player:GCD() + (Player:GCD() * num(Player:BuffStack(S.NetherPrecisionBuff) == 1))))) then
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 16"; end
   end
   -- arcane_barrage,if=(talent.orb_barrage&active_enemies>1&buff.arcane_harmony.stack>=18&((active_enemies>3&(talent.resonance|talent.high_voltage))|buff.nether_precision.down|buff.nether_precision.stack=1|(buff.nether_precision.stack=2&buff.clearcasting.react=3)))
-  if S.ArcaneBarrage:IsCastable() and ((S.OrbBarrage:IsAvailable() and EnemiesCount8ySplash > 1 and Player:BuffStack(S.ArcaneHarmonyBuff) >= 18 and ((EnemiesCount8ySplash > 3 and (S.Resonance:IsAvailable() or S.HighVoltage:IsAvailable())) or Player:BuffDown(S.NetherPrecisionBuff) or Player:BuffStack(S.NetherPrecisionBuff) == 1 or (Player:BuffStack(S.NetherPrecisionBuff) == 2 and Player:BuffStack(S.ClearcastingBuff) == 3)))) then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 16"; end
+  if S.ArcaneBarrage:IsReady() and (S.OrbBarrage:IsAvailable() and EnemiesCount8ySplash > 1 and Player:BuffStack(S.ArcaneHarmonyBuff) >= 18 and ((EnemiesCount8ySplash > 3 and (S.Resonance:IsAvailable() or S.HighVoltage:IsAvailable())) or Player:BuffDown(S.NetherPrecisionBuff) or Player:BuffStack(S.NetherPrecisionBuff) == 1 or (Player:BuffStack(S.NetherPrecisionBuff) == 2 and Player:BuffStack(S.ClearcastingBuff) == 3))) then
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 18"; end
   end
   -- arcane_missiles,if=buff.clearcasting.react&set_bonus.thewarwithin_season_2_4pc&buff.aether_attunement.react&cooldown.touch_of_the_magi.remains<gcd.max*(3-(1.5*(active_enemies>3&(!talent.time_loop|talent.resonance)))),interrupt_if=tick_time>gcd.remains&(buff.aether_attunement.react=0|(active_enemies>3&(!talent.time_loop|talent.resonance))),interrupt_immediate=1,interrupt_global=1,chain=1
   if S.ArcaneMissiles:IsReady() and (Player:BuffUp(S.ClearcastingBuff) and Player:HasTier("TWW2", 4) and Player:BuffUp(S.AetherAttunementBuff) and S.TouchoftheMagi:CooldownRemains() < Player:GCD() * (3 - (1.5 * num(EnemiesCount8ySplash > 3 and (not S.TimeLoop:IsAvailable() or S.Resonance:IsAvailable()))))) then
     LastSFAM = 2
-    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles sunfury 18"; end
+    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles sunfury 20"; end
   end
-  -- arcane_blast,if=((debuff.magis_spark_arcane_blast.up&((debuff.magis_spark_arcane_blast.remains<(cast_time+gcd.max))|active_enemies=1|talent.leydrinker))|buff.leydrinker.up)&buff.arcane_charge.stack=4&(buff.nether_precision.up|buff.clearcasting.react=0),line_cd=2
-  if S.ArcaneBlast:IsReady() and S.ArcaneBlast:TimeSinceLastCast() >= 2 and (((Target:DebuffUp(S.MagisSparkABDebuff) and ((Target:DebuffRemains(S.MagisSparkABDebuff) < (S.ArcaneBlast:CastTime() + Player:GCD())) or EnemiesCount8ySplash == 1 or S.Leydrinker:IsAvailable())) or Player:BuffUp(S.LeydrinkerBuff)) and Player:ArcaneCharges() == 4 and (Player:BuffUp(S.NetherPrecisionBuff) or Player:BuffDown(S.ClearcastingBuff))) then
-    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast sunfury 20"; end
-  end
-  -- arcane_barrage,if=buff.arcane_charge.stack=4&(cooldown.touch_of_the_magi.ready|cooldown.touch_of_the_magi.remains<((travel_time+0.05)>?gcd.max))
-  if S.ArcaneBarrage:IsCastable() and (Player:ArcaneCharges() == 4 and (S.TouchoftheMagi:CooldownRemains() + 0.05 < Player:GCD())) then
+  -- arcane_barrage,if=buff.arcane_charge.stack=4&((cooldown.touch_of_the_magi.ready)|cooldown.touch_of_the_magi.remains<((travel_time+50)>?gcd.max))&!variable.soul_cd
+  -- Note: travel_time+0.05 was used previously.
+  if S.ArcaneBarrage:IsReady() and (Player:ArcaneCharges() == 4 and (S.TouchoftheMagi:CooldownUp() or S.TouchoftheMagi:CooldownRemains() < mathmin(S.ArcaneBarrage:TravelTime() + 0.05, Player:GCD())) and not VarSoulCD) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 22"; end
   end
-  -- arcane_barrage,if=(talent.high_voltage&active_enemies>1&buff.arcane_charge.stack=4&buff.clearcasting.react&buff.nether_precision.stack=1)
-  if S.ArcaneBarrage:IsCastable() and (S.HighVoltage:IsAvailable() and EnemiesCount8ySplash > 1 and Player:ArcaneCharges() == 4 and Player:BuffUp(S.ClearcastingBuff) and Player:BuffStack(S.NetherPrecisionBuff) == 1) then
+  -- arcane_barrage,if=(cooldown.touch_of_the_magi.ready|(cooldown.touch_of_the_magi.remains<((travel_time+50)>?gcd.max)))&(buff.arcane_surge.down|(buff.arcane_surge.up&buff.arcane_surge.remains<=2.5))&variable.soul_cd
+  if S.ArcaneBarrage:IsReady() and ((S.TouchoftheMagi:CooldownUp() or (S.TouchoftheMagi:CooldownRemains() < mathmin(S.ArcaneBarrage:TravelTime() + 0.05, Player:GCD()))) and (Player:BuffDown(S.ArcaneSurgeBuff) or (Player:BuffUp(S.ArcaneSurgeBuff) and Player:BuffRemains(S.ArcaneSurgeBuff) <= 2.5)) and VarSoulCD) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 24"; end
   end
-  -- arcane_barrage,if=(active_enemies>1&talent.high_voltage&buff.arcane_charge.stack=4&buff.clearcasting.react&buff.aether_attunement.react&buff.glorious_incandescence.down&buff.intuition.down)
-  if S.ArcaneBarrage:IsCastable() and (EnemiesCount8ySplash > 1 and S.HighVoltage:IsAvailable() and Player:ArcaneCharges() == 4 and Player:BuffUp(S.ClearcastingBuff) and Player:BuffUp(S.AetherAttunementBuff) and Player:BuffDown(S.GloriousIncandescenceBuff) and Player:BuffDown(S.IntuitionBuff)) then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 26"; end
+  -- arcane_blast,if=debuff.magis_spark_arcane_blast.up&buff.arcane_charge.stack=4,line_cd=2
+  if S.ArcaneBlast:IsReady() and (Target:DebuffUp(S.MagisSparkABDebuff) and Player:ArcaneCharges() == 4) then
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast sunfury 26"; end
+  end
+  -- arcane_barrage,if=(talent.high_voltage&active_enemies>1&buff.arcane_charge.stack=4&buff.clearcasting.react&buff.nether_precision.stack=1)
+  if S.ArcaneBarrage:IsReady() and (S.HighVoltage:IsAvailable() and EnemiesCount8ySplash > 1 and Player:ArcaneCharges() == 4 and Player:BuffUp(S.ClearcastingBuff) and Player:BuffStack(S.NetherPrecisionBuff) == 1) then
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 28"; end
+  end
+  -- arcane_barrage,if=(talent.high_voltage&active_enemies>1&buff.arcane_charge.stack=4&buff.clearcasting.react&buff.aether_attunement.react&buff.glorious_incandescence.down&buff.intuition.down)
+  if S.ArcaneBarrage:IsReady() and (S.HighVoltage:IsAvailable() and EnemiesCount8ySplash > 1 and Player:ArcaneCharges() == 4 and Player:BuffUp(S.ClearcastingBuff) and Player:BuffUp(S.AetherAttunementBuff) and Player:BuffDown(S.GloriousIncandescenceBuff) and Player:BuffDown(S.IntuitionBuff)) then
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 30"; end
   end
   -- arcane_barrage,if=(active_enemies>2&talent.orb_barrage&talent.high_voltage&debuff.magis_spark_arcane_blast.down&buff.arcane_charge.stack=4&target.health.pct<35&talent.arcane_bombardment&(buff.nether_precision.up|(buff.nether_precision.down&buff.clearcasting.stack=0)))
   if S.ArcaneBarrage:IsCastable() and (EnemiesCount8ySplash > 2 and S.OrbBarrage:IsAvailable() and S.HighVoltage:IsAvailable() and Target:DebuffDown(S.MagisSparkABDebuff) and Player:ArcaneCharges() == 4 and Target:HealthPercentage() < 35 and S.ArcaneBombardment:IsAvailable() and (Player:BuffUp(S.NetherPrecisionBuff) or (Player:BuffDown(S.NetherPrecisionBuff) and Player:BuffDown(S.ClearcastingBuff)))) then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 28"; end
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 32"; end
   end
-  -- arcane_barrage,if=((active_enemies>2|(active_enemies>1&target.health.pct<35&talent.arcane_bombardment))&cooldown.arcane_orb.remains<gcd.max&buff.arcane_charge.stack=4&cooldown.touch_of_the_magi.remains>gcd.max*6&(debuff.magis_spark_arcane_blast.down|!talent.magis_spark)&buff.nether_precision.up&(talent.high_voltage|buff.nether_precision.stack=2|(buff.nether_precision.stack=1&buff.clearcasting.react=0)))
-  if S.ArcaneBarrage:IsCastable() and ((EnemiesCount8ySplash > 2 or (EnemiesCount8ySplash > 1 and Target:HealthPercentage() < 35 and S.ArcaneBombardment:IsAvailable())) and S.ArcaneOrb:CooldownRemains() < Player:GCD() and Player:ArcaneCharges() == 4 and S.TouchoftheMagi:CooldownRemains() > Player:GCD() * 6 and (Target:DebuffDown(S.MagisSparkABDebuff) or not S.MagisSpark:IsAvailable()) and Player:BuffUp(S.NetherPrecisionBuff) and (S.HighVoltage:IsAvailable() or Player:BuffStack(S.NetherPrecisionBuff) == 2 or (Player:BuffStack(S.NetherPrecisionBuff) == 1 and Player:BuffDown(S.ClearcastingBuff)))) then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 30"; end
-  end
-  -- arcane_missiles,if=buff.clearcasting.react&((talent.high_voltage&buff.arcane_charge.stack<4)|buff.nether_precision.down),interrupt_if=tick_time>gcd.remains&(buff.aether_attunement.react=0|(active_enemies>3&(!talent.time_loop|talent.resonance))),interrupt_immediate=1,interrupt_global=1,chain=1
-  if S.ArcaneMissiles:IsReady() and (Player:BuffUp(S.ClearcastingBuff) and ((S.HighVoltage:IsAvailable() and Player:ArcaneCharges() < 4) or Player:BuffDown(S.NetherPrecisionBuff))) then
-    LastSFAM = 3
-    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles sunfury 32"; end
-  end
-  -- arcane_barrage,if=(buff.arcane_charge.stack=4&active_enemies>1&active_enemies<5&buff.burden_of_power.up&((talent.high_voltage&buff.clearcasting.react)|buff.glorious_incandescence.up|buff.intuition.react|(cooldown.arcane_orb.remains<gcd.max|action.arcane_orb.charges>0)))&(!talent.consortiums_bauble|talent.high_voltage)
-  if S.ArcaneBarrage:IsCastable() and ((Player:ArcaneCharges() == 4 and EnemiesCount8ySplash > 1 and EnemiesCount8ySplash < 5 and Player:BuffUp(S.BurdenofPowerBuff) and ((S.HighVoltage:IsAvailable() and Player:BuffUp(S.ClearcastingBuff)) or Player:BuffUp(S.GloriousIncandescenceBuff) or Player:BuffUp(S.IntuitionBuff) or (S.ArcaneOrb:CooldownRemains() < Player:GCD() or S.ArcaneOrb:Charges() > 0))) and (not S.ConsortiumsBauble:IsAvailable() or S.HighVoltage:IsAvailable())) then
+  -- arcane_barrage,if=(active_enemies>2|(active_enemies>1&target.health.pct<35&talent.arcane_bombardment))&cooldown.arcane_orb.remains<gcd.max&buff.arcane_charge.stack=4&cooldown.touch_of_the_magi.remains>gcd.max*6&(debuff.magis_spark_arcane_blast.down|!talent.magis_spark)&buff.nether_precision.up&(talent.high_voltage|((buff.leydrinker.down|(target.health.pct<35&talent.arcane_bombardment&active_enemies>=4&talent.resonance))&buff.nether_precision.stack=2)|(buff.nether_precision.stack=1&buff.clearcasting.react=0))
+  if S.ArcaneBarrage:IsReady() and ((EnemiesCount8ySplash > 2 or (EnemiesCount8ySplash > 1 and Target:HealthPercentage() < 35 and S.ArcaneBombardment:IsAvailable())) and S.ArcaneOrb:CooldownRemains() < Player:GCD() and Player:ArcaneCharges() == 4 and S.TouchoftheMagi:CooldownRemains() > Player:GCD() * 6 and (Target:DebuffDown(S.MagisSparkABDebuff) or not S.MagisSpark:IsAvailable()) and Player:BuffUp(S.NetherPrecisionBuff) and (S.HighVoltage:IsAvailable() or ((Player:BuffDown(S.LeydrinkerBuff) or (Target:HealthPercentage() < 35 and S.ArcaneBombardment:IsAvailable() and EnemiesCount8ySplash >= 4 and S.Resonance:IsAvailable())) and Player:BuffStack(S.NetherPrecisionBuff) == 2) or (Player:BuffStack(S.NetherPrecisionBuff) == 1 and Player:BuffDown(S.ClearcastingBuff)))) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 34"; end
+  end
+  -- arcane_missiles,if=buff.clearcasting.react&((talent.high_voltage&buff.arcane_charge.stack<4)|(buff.nether_precision.down&(buff.clearcasting.react>1|buff.spellfire_spheres.stack=6|buff.burden_of_power.up|buff.glorious_incandescence.up|(buff.intuition.react)))),interrupt_if=tick_time>gcd.remains&(buff.aether_attunement.react=0|(active_enemies>3&(!talent.time_loop|talent.resonance))),interrupt_immediate=1,interrupt_global=1,chain=1
+  if S.ArcaneMissiles:IsReady() and (Player:BuffUp(S.ClearcastingBuff) and ((S.HighVoltage:IsAvailable() and Player:ArcaneCharges() < 4) or (Player:BuffDown(S.NetherPrecisionBuff) and (Player:BuffStack(S.ClearcastingBuff) > 1 or Player:BuffStack(S.SpellfireSpheresBuff) == 6 or Player:BuffUp(S.BurdenofPowerBuff) or Player:BuffUp(S.GloriousIncandescenceBuff) or Player:BuffUp(S.IntuitionBuff))))) then
+    LastSFAM = 2
+    if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles sunfury 36"; end
   end
   -- arcane_orb,if=buff.arcane_charge.stack<3
   if S.ArcaneOrb:IsReady() and (Player:ArcaneCharges() < 3) then
-    if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb sunfury 36"; end
+    if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb sunfury 38"; end
   end
   -- arcane_barrage,if=buff.glorious_incandescence.up|buff.intuition.react
   if S.ArcaneBarrage:IsCastable() and (Player:BuffUp(S.GloriousIncandescenceBuff) or Player:BuffUp(S.IntuitionBuff)) then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 38"; end
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 40"; end
   end
   -- presence_of_mind,if=(buff.arcane_charge.stack=3|buff.arcane_charge.stack=2)&active_enemies>=3
   if S.PresenceofMind:IsCastable() and ((Player:ArcaneCharges() == 3 or Player:ArcaneCharges() == 2) and EnemiesCount8ySplash >= 3) then
-    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceOfMind) then return "presence_of_mind sunfury 40"; end
+    if Cast(S.PresenceofMind, Settings.Arcane.OffGCDasOffGCD.PresenceOfMind) then return "presence_of_mind sunfury 42"; end
   end
   -- arcane_explosion,if=buff.arcane_charge.stack<2&active_enemies>1
   if S.ArcaneExplosion:IsReady() and (Player:ArcaneCharges() < 2 and EnemiesCount8ySplash > 1) then
-    if CastAE(S.ArcaneExplosion) then return "arcane_explosion sunfury 42"; end
+    if CastAE(S.ArcaneExplosion) then return "arcane_explosion sunfury 44"; end
   end
   -- arcane_blast
   if S.ArcaneBlast:IsReady() then
-    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast sunfury 44"; end
+    if Cast(S.ArcaneBlast, nil, nil, not Target:IsSpellInRange(S.ArcaneBlast)) then return "arcane_blast sunfury 46"; end
   end
   -- arcane_barrage
   if S.ArcaneBarrage:IsCastable() then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 46"; end
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 48"; end
   end
 end
 
@@ -469,6 +475,10 @@ local function APL()
 
     -- Set which cast function to use for ArcaneExplosion
     CastAE = (Settings.Arcane.AEMainIcon) and Cast or CastLeft
+
+    -- VarSoulCD from Precombat, since we can't check active_enemies until here.
+    --variable,name=soul_cd,op=set,value=1,if=set_bonus.thewarwithin_season_3_4pc&talent.spellfire_spheres&talent.resonance&!talent.magis_spark&(active_enemies>=3)&variable.soul_burst
+    VarSoulCD = VarSoulBurst and Player:HasTier("TWW3", 4) and Player:HeroTreeID() == 39 and S.Resonance:IsAvailable() and not S.MagisSpark:IsAvailable() and EnemiesCount8ySplash >= 3
   end
 
   if Everyone.TargetIsValid() then
@@ -483,32 +493,32 @@ local function APL()
     end
     -- counterspell
     local ShouldReturn = Everyone.Interrupt(S.Counterspell, Settings.CommonsDS.DisplayStyle.Interrupts); if ShouldReturn then return ShouldReturn; end
-    -- potion,if=(buff.siphon_storm.up|(!talent.evocation&cooldown.arcane_surge.ready))
-    if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.SiphonStormBuff) or (not S.Evocation:IsAvailable() and S.ArcaneSurge:CooldownUp())) then
+    -- potion,if=(buff.siphon_storm.up|(!talent.evocation&cooldown.arcane_surge.ready)|((cooldown.arcane_surge.ready|buff.arcane_surge.up)&variable.soul_cd))|fight_remains<30
+    if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.SiphonStormBuff) or (not S.Evocation:IsAvailable() and S.ArcaneSurge:CooldownUp()) or ((S.ArcaneSurge:CooldownUp() or Player:BuffUp(S.ArcaneSurgeBuff)) and VarSoulCD)) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
         if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 2"; end
       end
     end
     if CDsON() then
-      -- lights_judgment,if=(buff.arcane_surge.down&debuff.touch_of_the_magi.down&active_enemies>=2)
-      if S.LightsJudgment:IsCastable() and (Player:BuffDown(S.ArcaneSurgeBuff) and Target:DebuffDown(S.TouchoftheMagiDebuff) and EnemiesCount8ySplash >= 2) then
+      -- lights_judgment,if=(buff.arcane_surge.down&debuff.touch_of_the_magi.down&buff.arcane_soul.down&buff.siphon_storm.down&active_enemies>=2)
+      if S.LightsJudgment:IsCastable() and (Player:BuffDown(S.ArcaneSurgeBuff) and Target:DebuffDown(S.TouchoftheMagiDebuff) and Player:BuffDown(S.ArcaneSoulBuff) and Player:BuffDown(S.SiphonStormBuff) and EnemiesCount8ySplash >= 2) then
         if Cast(S.LightsJudgment, Settings.CommonsOGCD.OffGCDasOffGCD.Racials, nil, not Target:IsSpellInRange(S.LightsJudgment)) then return "lights_judgment main 4"; end
       end
-      if Player:PrevGCDP(1, S.ArcaneSurge) then
-        -- berserking,if=prev_gcd.1.arcane_surge
+      if (Player:BuffUp(S.SiphonStormBuff) and VarSoulCD) or (Player:PrevGCDP(1, S.ArcaneSurge) and not VarSoulCD) then
+        -- berserking,if=(buff.siphon_storm.up&variable.soul_cd)|(prev_gcd.1.arcane_surge&!variable.soul_cd)
         if S.Berserking:IsCastable() then
           if Cast(S.Berserking, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "berserking main 6"; end
         end
-        -- blood_fury,if=prev_gcd.1.arcane_surge
+        -- blood_fury,if=(buff.siphon_storm.up&variable.soul_cd)|(prev_gcd.1.arcane_surge&!variable.soul_cd)
         if S.BloodFury:IsCastable() then
           if Cast(S.BloodFury, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "blood_fury main 8"; end
         end
-        -- fireblood,if=prev_gcd.1.arcane_surge
+        -- fireblood,if=(buff.siphon_storm.up&variable.soul_cd)|(prev_gcd.1.arcane_surge&!variable.soul_cd)
         if S.Fireblood:IsCastable() then
           if Cast(S.Fireblood, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "fireblood main 10"; end
         end
-        -- ancestral_call,if=prev_gcd.1.arcane_surge
+        -- ancestral_call,if=(buff.siphon_storm.up&variable.soul_cd)|(prev_gcd.1.arcane_surge&!variable.soul_cd)
         if S.AncestralCall:IsCastable() then
           if Cast(S.AncestralCall, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "ancestral_call main 12"; end
         end
@@ -517,20 +527,19 @@ local function APL()
     -- invoke_external_buff,name=power_infusion,if=prev_gcd.1.arcane_surge
     -- invoke_external_buff,name=blessing_of_autumn,if=cooldown.touch_of_the_magi.remains>5
     -- Note: Not handling external buffs.
-    -- use_items,if=(prev_gcd.1.arcane_surge&variable.steroid_trinket_equipped)|(!variable.steroid_trinket_equipped&variable.nonsteroid_trinket_equipped)|(variable.nonsteroid_trinket_equipped&buff.siphon_storm.remains<10&(cooldown.evocation.remains>17|trinket.cooldown.remains>20))|fight_remains<20
+    -- use_items,if=(((!variable.soul_cd&prev_gcd.1.arcane_surge)|(variable.soul_cd&buff.siphon_storm.up&debuff.touch_of_the_magi.up))&(variable.steroid_trinket_equipped|(!variable.steroid_trinket_equipped&!variable.nonsteroid_trinket_equipped)))|(!variable.steroid_trinket_equipped&variable.nonsteroid_trinket_equipped)|(variable.nonsteroid_trinket_equipped&buff.siphon_storm.remains<10&(cooldown.evocation.remains>17|trinket.cooldown.remains>20))|fight_remains<20
     if Settings.Commons.Enabled.Items or Settings.Commons.Enabled.Trinkets then
       local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
-      if ItemToUse and ((Player:PrevGCDP(1, S.ArcaneSurge) and VarSteroidTrinketEquipped) or (not VarSteroidTrinketEquipped and VarNonsteroidTrinketEquipped) or (VarNonsteroidTrinketEquipped and Player:BuffRemains(S.SiphonStormBuff) < 10 and (S.Evocation:CooldownRemains() > 17 or ItemToUse:CooldownRemains() > 20)) or BossFightRemains < 20) then
+      local OtherTrinketCDRemains = 0
+      if ItemToUse and ItemSlot == 13 then OtherTrinketCDRemains = Trinket2:CooldownRemains(); end
+      if ItemToUse and ItemSlot == 14 then OtherTrinketCDRemains = Trinket1:CooldownRemains(); end
+      if ItemToUse and ((((not VarSoulCD and Player:PrevGCDP(1, S.ArcaneSurge)) or (VarSoulCD and Player:BuffUp(S.SiphonStormBuff) and Target:DebuffUp(S.TouchoftheMagiDebuff))) and (VarSteroidTrinketEquipped or (not VarSteroidTrinketEquipped and not VarNonsteroidTrinketEquipped))) or (not VarSteroidTrinketEquipped and VarNonsteroidTrinketEquipped) or (VarNonsteroidTrinketEquipped and Player:BuffRemains(S.SiphonStormBuff) < 10 and (S.Evocation:CooldownRemains() > 17 or OtherTrinketCDRemains > 20)) or BossFightRemains < 20) then
         local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
         if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
         if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
           if Cast(ItemToUse, nil, DisplayStyle, not Target:IsInRange(ItemRange)) then return "Generic use_items for " .. ItemToUse:Name() .. " main 14"; end
         end
       end
-    end
-    -- use_item,name=neural_synapse_enhancer,if=(debuff.touch_of_the_magi.remains>8&buff.arcane_surge.up)|(debuff.touch_of_the_magi.remains>8&variable.neural_on_mini)
-    if Settings.Commons.Enabled.Items and I.NeuralSynapseEnhancer:IsEquippedAndReady() and ((Target:DebuffRemains(S.TouchoftheMagiDebuff) > 8 and Player:BuffUp(S.ArcaneSurgeBuff)) or (Target:DebuffRemains(S.TouchoftheMagiDebuff) > 8 and VarNeuralOnMini)) then
-      if Cast(I.NeuralSynapseEnhancer, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "neural_synapse_enhancer main 16"; end
     end
     -- variable,name=opener,op=set,if=debuff.touch_of_the_magi.up&variable.opener,value=0
     -- Note: Added extra TotM checks so we don't get stuck in the opener if TotM is on CD or not talented.
@@ -541,9 +550,13 @@ local function APL()
     if S.ArcaneBarrage:IsReady() and (FightRemains < 2) then
       if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage main 18"; end
     end
-    -- call_action_list,name=cd_opener
-    if CDsON() then
+    -- call_action_list,name=cd_opener,if=!variable.soul_cd
+    if CDsON() and not VarSoulCD then
       local ShouldReturn = CDOpener(); if ShouldReturn then return ShouldReturn; end
+    end
+    -- call_action_list,name=cd_opener_soul,if=variable.soul_cd
+    if CDsON() and VarSoulCD then
+      local ShouldReturn = CDOpenerSoul(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=sunfury,if=talent.spellfire_spheres
     if S.SpellfireSpheres:IsAvailable() then
