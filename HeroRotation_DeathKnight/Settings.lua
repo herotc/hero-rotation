@@ -36,6 +36,7 @@ HR.GUISettings.APL.DeathKnight = {
       Trinkets = "Suggested",
       -- Class Specific
       AbominationLimb = "Suggested",
+      LegionOfSouls = "Suggested",
       RaiseDead = "Suggested",
     },
   },
