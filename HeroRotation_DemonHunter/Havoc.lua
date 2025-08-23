@@ -1079,7 +1079,7 @@ end
 
 local function AROpener()
   -- Manually added: immolation_aura (in case it wasn't used Precombat or came off CD after start of combat)
-  if ImmoAbility:IsReady() then
+  if ImmoAbility:IsReady() and Player:BuffDown(S.ImmolationAuraBuff) then
     if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura ar_opener 1"; end
   end
   -- potion
@@ -1160,7 +1160,8 @@ local function AROpener()
     if Cast(S.BladeDance, nil, nil, not IsInMeleeRange(8)) then return "blade_dance ar_opener 36"; end
   end
   -- immolation_aura,if=talent.a_fire_inside&talent.burning_wound&buff.metamorphosis.down
-  if ImmoAbility:IsCastable() and (S.AFireInside:IsAvailable() and S.BurningWound:IsAvailable() and Player:BuffDown(S.MetamorphosisBuff)) then
+  -- Note: Added buff.immolation_aura.down check.
+  if ImmoAbility:IsCastable() and Player:BuffDown(S.ImmolationAuraBuff) and (S.AFireInside:IsAvailable() and S.BurningWound:IsAvailable() and Player:BuffDown(S.MetamorphosisBuff)) then
     if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura ar_opener 38"; end
   end
   -- metamorphosis,if=buff.metamorphosis.up&cooldown.blade_dance.remains>gcd.max*2&buff.inner_demon.down&(!talent.restless_hunter|prev_gcd.1.death_sweep)&(cooldown.essence_break.remains|!talent.essence_break|!talent.chaotic_transformation)

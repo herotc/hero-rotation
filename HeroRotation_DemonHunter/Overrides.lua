@@ -17,6 +17,7 @@ local num            = HR.Commons.Everyone.num
 local SpellHavoc     = Spell.DemonHunter.Havoc
 local SpellVengeance = Spell.DemonHunter.Vengeance
 -- Lua
+local mathmax        = math.max
 -- WoW API
 
 --- ============================ CONTENT ============================
@@ -56,6 +57,17 @@ HavocOldBuffUp = HL.AddCoreOverride ("Player.BuffUp",
   end
 , 577)
 
+local HavocOldBuffDown
+HavocOldBuffDown = HL.AddCoreOverride ("Player.BuffDown",
+  function (self, Spell, AnyCaster, BypassRecovery)
+    if Spell == SpellHavoc.ImmolationAuraBuff then
+      return not Player:BuffUp(SpellHavoc.ImmolationAuraBuff)
+    else
+      return HavocOldBuffDown(self, Spell, AnyCaster, BypassRecovery)
+    end
+  end
+, 577)
+
 local HavocOldBuffStack
 HavocOldBuffStack = HL.AddCoreOverride ("Player.BuffStack",
   function (self, Spell, AnyCaster, BypassRecovery)
@@ -63,6 +75,17 @@ HavocOldBuffStack = HL.AddCoreOverride ("Player.BuffStack",
       return num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff1)) + num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff2)) + num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff3)) + num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff4)) + num(Player:BuffUp(SpellHavoc.ImmolationAuraBuff5))
     else
       return HavocOldBuffStack(self, Spell, AnyCaster, BypassRecovery)
+    end
+  end
+, 577)
+
+local HavocOldBuffRemains
+HavocOldBuffRemains = HL.AddCoreOverride ("Player.BuffRemains",
+  function (self, Spell, AnyCaster, BypassRecovery)
+    if Spell == SpellHavoc.ImmolationAuraBuff then
+      return mathmax(HavocOldBuffRemains(self, SpellHavoc.ImmolationAuraBuff1, AnyCaster, BypassRecovery), HavocOldBuffRemains(self, SpellHavoc.ImmolationAuraBuff2, AnyCaster, BypassRecovery), HavocOldBuffRemains(self, SpellHavoc.ImmolationAuraBuff3, AnyCaster, BypassRecovery), HavocOldBuffRemains(self, SpellHavoc.ImmolationAuraBuff4, AnyCaster, BypassRecovery), HavocOldBuffRemains(self, SpellHavoc.ImmolationAuraBuff5, AnyCaster, BypassRecovery))
+    else
+      return HavocOldBuffRemains(self, Spell, AnyCaster, BypassRecovery)
     end
   end
 , 577)
