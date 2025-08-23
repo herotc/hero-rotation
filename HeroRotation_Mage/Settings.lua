@@ -53,6 +53,7 @@ HR.GUISettings.APL.Mage = {
   Arcane = {
     AEMainIcon = false,
     MirrorImagesBeforePull = true,
+    SoulBurst = false,
     PotionType = {
       Selected = "Tempered",
     },
@@ -145,6 +146,7 @@ CreateARPanelOptions(CP_MageOGCD, "APL.Mage.CommonsOGCD")
 -- Arcane
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.AEMainIcon", "Show Arcane Explosion in Main Icon", "Enable this to show Arcane Explosion in the main icon. When not enabled, Arcane Explosion will be shown in the left icon.")
 CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.MirrorImagesBeforePull", "Use Mirror Images Precombat", "Enable this option to show Mirror Images during Precombat.")
+CreatePanelOption("CheckButton", CP_Arcane, "APL.Mage.Arcane.SoulBurst", "Offset Burst with Arcane Soul", "Enable this option to offset your primary burst into the Arcane Soul window while using the Sunfury hero talents.")
 CreateARPanelOptions(CP_Arcane, "APL.Mage.Arcane")
 
 -- Fire
