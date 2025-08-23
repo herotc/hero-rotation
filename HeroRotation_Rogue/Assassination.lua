@@ -1130,7 +1130,7 @@ local function Direct ()
 
   -- # Ambush on Blindside/Subterfuge. Do not use Ambush from stealth during Kingsbane & Deathmark if possible.
   -- actions.direct+=/ambush,if=variable.use_filler&(buff.blindside.up|stealthed.rogue)&(!dot.kingsbane.ticking|debuff.deathmark.down|buff.blindside.up)
-  if (S.Ambush:IsCastable() or S.AmbushOverride:IsReady()) and UseFiller and (Player:BuffUp(S.BlindsideBuff) or Player:StealthUp(true, false))
+  if (S.Ambush:IsCastable() or S.AmbushOverride:IsReady()) and ComboPoints < EffectiveCPSpend and (Player:BuffUp(S.BlindsideBuff) or Player:StealthUp(true, false))
     and (Target:DebuffDown(S.Kingsbane) or Target:DebuffDown(S.Deathmark) or Player:BuffUp(S.BlindsideBuff)) then
     if CastPooling(S.Ambush, nil, not TargetInMeleeRange) then
       return "Cast Ambush"
