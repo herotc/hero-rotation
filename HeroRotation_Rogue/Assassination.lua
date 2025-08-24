@@ -90,6 +90,12 @@ local TrinketSyncSlot = 0
 local TrinketItem1, TrinketItem2
 local EffectiveCPSpend
 
+-- Tier sets
+local TWW3FateboundHasTier2PC = Player:HeroTreeID() == 52 and Player:HasTier('TWW3', 2)
+local TWW3FateboundHasTier4PC = Player:HeroTreeID() == 52 and Player:HasTier('TWW3', 4)
+local TWW3DeathstalkerHasTier2PC = Player:HeroTreeID() == 53 and Player:HasTier('TWW3', 2)
+local TWW3DeathstalkerHasTier4PC = Player:HeroTreeID() == 53 and Player:HasTier('TWW3', 4)
+
 -- Equipment
 local VarTrinketFailures = 0
 local function SetTrinketVariables ()
@@ -750,7 +756,7 @@ local function ShivUsage ()
     if S.LightweightShiv:IsAvailable() and ShivKingsbaneCondition
       and (S.Deathmark:IsReady() and S.Deathmark:CooldownRemains() <= 1)
       and (S.Kingsbane:IsReady() and S.Kingsbane:CooldownRemains() <= 2)
-      and Player:HasTier("TWW3", 2) then
+      and TWW3FateboundHasTier2PC then
       if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
         return "Cast Shiv (FB Edge Case Coins)"
       end
@@ -774,7 +780,7 @@ local function ShivUsage ()
     -- &cooldown.kingsbane.remains>=20)&(!talent.crimson_tempest.enabled|variable.single_target|dot.crimson_tempest.ticking)
     if not S.LightweightShiv:IsAvailable() then
       if ShivKingsbaneCondition
-        and (Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) < (8+3*BoolToInt(Player:HasTier("TWW3", 4)))
+        and (Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) < (8+3*BoolToInt(TWW3DeathstalkerHasTier4PC))
         or not Target:DebuffUp(S.Kingsbane) and S.Kingsbane:CooldownRemains() >= 20)
         and (not S.CrimsonTempest:IsAvailable() or SingleTarget or Target:DebuffUp(S.CrimsonTempest)) then
         if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
@@ -797,7 +803,7 @@ local function ShivUsage ()
     -- &dot.kingsbane.remains>4|cooldown.kingsbane.remains<=1&cooldown.shiv.charges_fractional>=1.7)
     if S.LightweightShiv:IsAvailable() then
       if ShivKingsbaneCondition
-        and (Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) < (8+3*BoolToInt(Player:HasTier("TWW3", 4)))
+        and (Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) < (8+3*BoolToInt(TWW3DeathstalkerHasTier4PC))
         and Target:DebuffRemains(S.Kingsbane) > 4 or S.Kingsbane:CooldownRemains() <= 1 and S.Shiv:ChargesFractional() >= 1.7) then
         if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
           return "Cast Shiv (Double-charge Shiv case for Kingsbane)"
@@ -835,7 +841,7 @@ local function ShivUsage ()
 
     -- # Dump Shiv on fight end
     -- actions.shiv+=/shiv,if=fight_remains<=cooldown.shiv.charges*(8+3*set_bonus.tww3_deathstalker_4pc)
-    if HL.BossFilteredFightRemains("<=", S.Shiv:Charges() * (8+3*BoolToInt(Player:HasTier("TWW3", 4)))) then
+    if HL.BossFilteredFightRemains("<=", S.Shiv:Charges() * (8+3*BoolToInt(TWW3DeathstalkerHasTier4PC))) then
       if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
         return "Cast Shiv (End Fight)"
       end
@@ -913,7 +919,7 @@ local function CDs ()
   -- &(cooldown.deathmark.remains>=50-15*set_bonus.tww3_fatebound_4pc|dot.deathmark.ticking)|fight_remains<=15
   if S.Kingsbane:IsReady() then
     if (Target:DebuffUp(S.ShivDebuff) or S.Shiv:CooldownRemains() < 6) and (Player:BuffUp(S.Envenom) or MeleeEnemies10yCount > 1)
-      and (S.Deathmark:CooldownRemains() >= 50 - 15*BoolToInt(Player:HasTier("TWW3", 4)) or Target:DebuffUp(S.Deathmark)
+      and (S.Deathmark:CooldownRemains() >= 50 - 15*BoolToInt(TWW3FateboundHasTier4PC) or Target:DebuffUp(S.Deathmark)
       or (DeathmarkCondition and S.Deathmark:IsReady())) or HL.BossFilteredFightRemains("<=", 15) then
       if Cast(S.Kingsbane, Settings.Assassination.GCDasOffGCD.Kingsbane) then
         return "Cast Kingsbane"
@@ -966,8 +972,8 @@ local function CDs ()
   -- &set_bonus.tww3_fatebound_4pc|!talent.inevitabile_end&effective_combo_points>=variable.effective_spend_cp)
   if S.ColdBlood:IsReady() and Player:DebuffDown(S.ColdBlood) then
     if (Player:BuffStack(S.FateboundCoinTails) > 0 and Player:BuffStack(S.FateboundCoinHeads) > 0)
-      or Target:DebuffUp(S.ShivDebuff) and (S.Deathmark:CooldownRemains() > 50 and not Player:HasTier("TWW3", 4)
-      or Target:DebuffUp(S.Kingsbane) and Player:HasTier("TWW3", 4) or not S.InevitabileEnd:IsAvailable() and ComboPoints >= EffectiveCPSpend) then
+      or Target:DebuffUp(S.ShivDebuff) and (S.Deathmark:CooldownRemains() > 50 and not TWW3FateboundHasTier4PC
+      or Target:DebuffUp(S.Kingsbane) and TWW3FateboundHasTier4PC or not S.InevitabileEnd:IsAvailable() and ComboPoints >= EffectiveCPSpend) then
       if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then
         return "Cast Cold Blood"
       end
