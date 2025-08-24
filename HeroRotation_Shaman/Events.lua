@@ -30,6 +30,7 @@ Shaman.MoltenWeaponStacks = 0
 Shaman.TempestMaelstrom = 0
 Shaman.SearingTotemActive = false
 Shaman.SearingTotemGUID = 0
+Shaman.TWW3ProcsToAsc = 999
 
 --- ============================ CONTENT ============================
 HL:RegisterForSelfCombatEvent(
@@ -187,4 +188,25 @@ HL:RegisterForCombatEvent(
     end
   end
   , "UNIT_DIED"
+)
+
+--- ===== TWW S3 2pc Proc Tracker =====
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    local SpellID, _, _, _, StackCount = select(12, ...)
+    if Player:HasTier("TWW3", 2) and SpellID == 455130 then
+      Shaman.TWW3ProcsToAsc = 8 - StackCount
+    end
+  end
+  , "SPELL_AURA_APPLIED", "SPELL_AURA_APPLIED_DOSE"
+)
+
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    local SpellID = select(12, ...)
+    if SpellID == 455130 then
+      Shaman.TWW3ProcsToAsc = 0
+    end
+  end
+  , "SPELL_AURA_REMOVED"
 )

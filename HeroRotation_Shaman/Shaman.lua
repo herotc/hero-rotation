@@ -265,9 +265,11 @@ Item.Shaman.Commons = {
 Item.Shaman.Enhancement = MergeTableByKey(Item.Shaman.Commons, {
   -- DF Trinkets
   AlgetharPuzzleBox                     = Item(193701, {13, 14}),
-  BeacontotheBeyond                     = Item(203963, {13, 14}),
+  BeaconToTheBeyond                     = Item(203963, {13, 14}),
   ElementiumPocketAnvil                 = Item(202617, {13, 14}),
   ManicGrieftorch                       = Item(194308, {13, 14}),
+  -- TWW Trinkets
+  UnyieldingNetherprism                 = Item(242396, {13, 14}),
 })
 
 Item.Shaman.Elemental = MergeTableByKey(Item.Shaman.Commons, {
