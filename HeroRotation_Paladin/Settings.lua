@@ -75,6 +75,7 @@ HR.GUISettings.APL.Paladin = {
       Selected = "Tempered",
     },
     GCDasOffGCD = {
+      DivineHammer = false,
       ExecutionSentence = false,
       FinalReckoning = false,
       Seraphim = false,
