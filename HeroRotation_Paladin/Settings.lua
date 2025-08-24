@@ -58,7 +58,6 @@ HR.GUISettings.APL.Paladin = {
     },
     GCDasOffGCD = {
       EyeOfTyr = false,
-      Seraphim = true,
       WordOfGlory = true,
     },
     OffGCDasOffGCD = {
@@ -77,7 +76,6 @@ HR.GUISettings.APL.Paladin = {
     GCDasOffGCD = {
       ExecutionSentence = false,
       FinalReckoning = false,
-      Seraphim = false,
       ShieldOfVengeance = true,
       WakeOfAshes = false,
     },
