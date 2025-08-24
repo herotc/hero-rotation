@@ -746,16 +746,16 @@ local function ShivUsage ()
   -- actions.shiv+=/shiv,if=talent.lightweight_shiv&variable.shiv_kingsbane_condition
     -- &(cooldown.deathmark.ready|cooldown.deathmark.remains<=1)
     -- &(cooldown.kingsbane.ready|cooldown.kingsbane.remains<=2)&set_bonus.tww3_fatebound_2pc
-  if S.LightweightShiv:IsAvailable() and ShivKingsbaneCondition
-    and (S.Deathmark:IsReady() and S.Deathmark:CooldownRemains() <= 1)
-    and (S.Kingsbane:IsReady() and S.Kingsbane:CooldownRemains() <= 2)
-    and Player:HasTier("TWW3", 2) then
-    if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
-      return "Cast Shiv (FB Edge Case Coins)"
-    end
-  end
-
   if S.Shiv:IsReady() then
+    if S.LightweightShiv:IsAvailable() and ShivKingsbaneCondition
+      and (S.Deathmark:IsReady() and S.Deathmark:CooldownRemains() <= 1)
+      and (S.Kingsbane:IsReady() and S.Kingsbane:CooldownRemains() <= 2)
+      and Player:HasTier("TWW3", 2) then
+      if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
+        return "Cast Shiv (FB Edge Case Coins)"
+      end
+    end
+
     -- # Shiv for aoe with Arterial Precision
     -- actions.shiv+=/shiv,if=talent.arterial_precision&!debuff.shiv.up&dot.garrote.ticking
     -- &dot.rupture.ticking&spell_targets.fan_of_knives>=4&dot.crimson_tempest.ticking
