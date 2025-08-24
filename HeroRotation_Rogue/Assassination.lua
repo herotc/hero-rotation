@@ -1088,7 +1088,7 @@ local function Direct ()
   -- actions.direct+=/variable,name=use_caustic_filler,value=talent.caustic_spatter&dot.rupture.ticking
   -- &(!debuff.caustic_spatter.up|debuff.caustic_spatter.remains<=2)&combo_points.deficit>=1&!variable.single_target
   local UseCausticFiller = S.CausticSpatter:IsAvailable() and Target:DebuffUp(S.Rupture)
-    and (not Target:DebuffUp(S.CausticSpatterDebuff) or Target:DebuffRemains(S.CausticSpatterDebuff) <= 2)
+    and (Target:DebuffDown(S.CausticSpatterDebuff) or Target:DebuffRemains(S.CausticSpatterDebuff) <= 2)
     and ComboPointsDeficit >= 1 and not SingleTarget
 
   -- actions.direct+=/mutilate,if=variable.use_caustic_filler
@@ -1126,7 +1126,7 @@ local function Direct ()
   -- # Various Checks to see if we need to use a generator
   -- actions.direct+=/variable,name=use_filler,value=combo_points<=variable.effective_spend_cp&!variable.cd_soon
   -- |variable.not_pooling|!variable.single_target
-  local UseFiller = ComboPoints < EffectiveCPSpend and not CDSoon or NotPooling or not SingleTarget
+  local UseFiller = ComboPoints <= EffectiveCPSpend and not CDSoon or NotPooling or not SingleTarget
 
   -- # Ambush on Blindside/Subterfuge. Do not use Ambush from stealth during Kingsbane & Deathmark if possible.
   -- actions.direct+=/ambush,if=variable.use_filler&(buff.blindside.up|stealthed.rogue)&(!dot.kingsbane.ticking|debuff.deathmark.down|buff.blindside.up)
@@ -1187,7 +1187,7 @@ local function Direct ()
     end
   end
 
-  -- # Fallback Mutilate if all else failsz
+  -- # Fallback Mutilate if all else fails
   -- actions.direct+=/mutilate,if=variable.use_filler
   if S.Mutilate:IsCastable() and UseFiller then
     if CastPooling(S.Mutilate, nil,not TargetInMeleeRange) then
@@ -1286,15 +1286,15 @@ local function APL ()
 
     -- # Pooling Setup, check for cooldowns
     -- actions+=/variable,name=in_cooldowns,value=dot.kingsbane.ticking|debuff.shiv.up
-    InCooldowns = Target:DebuffUp(S.Kingsbane) or Target:DebuffUp(S.Shiv)
+    InCooldowns = Target:DebuffUp(S.Kingsbane) or Target:DebuffUp(S.ShivDebuff)
 
     -- # Check upper bounds of energy to begin spending
     -- actions+=/variable,name=upper_limit_energy,value=energy.pct>=(80-10*talent.vicious_venoms.rank-30*talent.amplifying_poison)
     UpperLimitEnergy = Player:EnergyPercentage() >= (80 - 10 * S.ViciousVenoms:TalentRank() - 30 * num(S.AmplifyingPoison:IsAvailable()))
 
     -- # Checking for cooldowns soon
-    -- actions+=/variable,name=cd_soon,value=cooldown.kingsbane.remains<3&!cooldown.kingsbane.ready
-    CDSoon = S.Kingsbane:CooldownRemains() < 3 and not S.Kingsbane:IsReady()
+    -- actions+=/variable,name=cd_soon,value=talent.kingsbane&cooldown.kingsbane.remains<3&!cooldown.kingsbane.ready
+    CDSoon = S.Kingsbane:IsAvailable() and S.Kingsbane:CooldownRemains() < 3 and not S.Kingsbane:IsReady()
 
     -- # Pooling Condition all together
     -- actions+=/variable,name=not_pooling,value=variable.in_cooldowns|buff.darkest_night.up|variable.upper_limit_energy|fight_remains<=20
