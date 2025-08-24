@@ -563,7 +563,7 @@ local function Vanish ()
   end
 
   -- # Don't Vanish if deathstalker's mark isn't up and we're at a finish condition
-  if S.DeathStalkersMark:IsAvailable() and Target:BuffDown(S.DeathStalkersMarkDebuff) and ComboPoints >= EffectiveCPSpend then
+  if S.DeathStalkersMark:IsAvailable() and Target:DebuffDown(S.DeathStalkersMarkDebuff) and ComboPoints >= EffectiveCPSpend then
     return
   end
 
@@ -826,7 +826,7 @@ local function ShivUsage ()
     if not S.Deathmark:AnyDebuffUp() and not S.Kingsbane:IsAvailable() and ShivCondition and (Target:DebuffUp(S.CrimsonTempest) or S.AmplifyingPoison:IsAvailable())
       and (((num(S.LightweightShiv:IsAvailable()) + 1) - S.Shiv:ChargesFractional()) * 30 < S.Deathmark:CooldownRemains()) then
       if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
-        return "Cast Shiv"
+        return "Cast Shiv (Fallback)"
       end
     end
 
@@ -835,7 +835,7 @@ local function ShivUsage ()
     if not S.Kingsbane:IsAvailable() and not S.ArterialPrecision:IsAvailable() and ShivCondition
       and (not S.CrimsonTempest:IsAvailable() or SingleTarget or Target:DebuffUp(S.CrimsonTempest)) then
       if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
-        return "Cast Shiv"
+        return "Cast Shiv (No KB)"
       end
     end
 
@@ -919,8 +919,8 @@ local function CDs ()
   -- &(cooldown.deathmark.remains>=50-15*set_bonus.tww3_fatebound_4pc|dot.deathmark.ticking)|fight_remains<=15
   if S.Kingsbane:IsReady() then
     if (Target:DebuffUp(S.ShivDebuff) or S.Shiv:CooldownRemains() < 6) and (Player:BuffUp(S.Envenom) or MeleeEnemies10yCount > 1)
-      and (S.Deathmark:CooldownRemains() >= 50 - 15*BoolToInt(TWW3FateboundHasTier4PC) or Target:DebuffUp(S.Deathmark)
-      or (DeathmarkCondition and S.Deathmark:IsReady())) or HL.BossFilteredFightRemains("<=", 15) then
+      and (S.Deathmark:CooldownRemains() >= 50 - 15*BoolToInt(TWW3FateboundHasTier4PC) or Target:DebuffUp(S.Deathmark))
+      or HL.BossFilteredFightRemains("<=", 15) then
       if Cast(S.Kingsbane, Settings.Assassination.GCDasOffGCD.Kingsbane) then
         return "Cast Kingsbane"
       end
@@ -970,7 +970,7 @@ local function CDs ()
   -- actions.cds+=/cold_blood,use_off_gcd=1,if=(buff.fatebound_coin_tails.stack>0&buff.fatebound_coin_heads.stack>0)
   -- |debuff.shiv.up&(cooldown.deathmark.remains>50&!set_bonus.tww3_fatebound_4pc|dot.kingsbane.ticking
   -- &set_bonus.tww3_fatebound_4pc|!talent.inevitabile_end&effective_combo_points>=variable.effective_spend_cp)
-  if S.ColdBlood:IsReady() and Player:DebuffDown(S.ColdBlood) then
+  if S.ColdBlood:IsReady() and Player:BuffDown(S.ColdBlood) then
     if (Player:BuffStack(S.FateboundCoinTails) > 0 and Player:BuffStack(S.FateboundCoinHeads) > 0)
       or Target:DebuffUp(S.ShivDebuff) and (S.Deathmark:CooldownRemains() > 50 and not TWW3FateboundHasTier4PC
       or Target:DebuffUp(S.Kingsbane) and TWW3FateboundHasTier4PC or not S.InevitabileEnd:IsAvailable() and ComboPoints >= EffectiveCPSpend) then
