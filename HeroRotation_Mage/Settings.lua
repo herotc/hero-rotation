@@ -113,6 +113,7 @@ HR.GUISettings.APL.Mage = {
       Flurry = false,
       Freeze = false,
       FrozenOrb = true,
+      IceFloes = false,
       IcyVeins = true,
       RayOfFrost = false,
       WaterJet = false,

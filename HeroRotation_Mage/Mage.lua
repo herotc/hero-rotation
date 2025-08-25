@@ -228,6 +228,7 @@ Spell.Mage.Frost = MergeTableByKey(Spell.Mage.Commons, {
   Freeze                                = Spell(33395), --splash, 8
   -- Buffs
   BrainFreezeBuff                       = Spell(190446),
+  ColdFrontReadyBuff                    = Spell(382114),
   DeathsChillBuff                       = Spell(454371),
   ExtendedBankrollBuff                  = Spell(1216914), -- TWW S2 Tier 4pc
   FingersofFrostBuff                    = Spell(44544),
@@ -255,30 +256,32 @@ Item.Mage.Commons = {
   ArazsRitualForge                      = Item(242402, {13, 14}),
   BurstofKnowledge                      = Item(231424, {13, 14}),
   ChaoticNethergate                     = Item(246825, {13, 14}),
+  FlarendosPilotLight                   = Item(230191, {13, 14}),
+  FunhouseLens                          = Item(234217, {13, 14}),
   HighSpeakersAccretion                 = Item(219303, {13, 14}),
   HouseOfCards                          = Item(230027, {13, 14}),
   ImperfectAscendancySerum              = Item(225654, {13, 14}),
   IncorporealEssencegorger              = Item(246945, {13, 14}),
-  LilyoftheEternalWeave                 = Item(242494, {13, 14}),
+  LilyOfTheEternalWeave                 = Item(242494, {13, 14}),
+  MereldarsToll                         = Item(219313, {13, 14}),
   PerfidiousProjector                   = Item(242403, {13, 14}),
   QuickwickCandlestick                  = Item(225649, {13, 14}),
   SignetOfThePriory                     = Item(219308, {13, 14}),
   SpymastersWeb                         = Item(220202, {13, 14}),
   TreacherousTransmitter                = Item(221023, {13, 14}),
-  FunhouseLens                          = Item(234217, {13, 14}),
-  FlarendosPilotLight                   = Item(230191, {13, 14}),
   -- TWW S2 Prior Expansion Items
   Blastmaster3000                       = Item(234717, {13, 14}),
   GarbagemancersLastResort              = Item(235984, {13, 14}),
   GeargrindersSpareKeys                 = Item(230197, {13, 14}),
   GooBlinGrenade                        = Item(200142, {13, 14}),
   IngeniousManaBattery                  = Item(169344, {13, 14}),
-  NeuralSynapseEnhancer                 = Item(168973, {16}),
   NoggenfoggerUltimateDeluxe            = Item(232486, {13, 14}),
   RatfangToxin                          = Item(235359, {13, 14}),
   RingingRitualMud                      = Item(232543, {13, 14}),
   SoullettingRuby                       = Item(178809, {13, 14}),
   SunbloodAmethyst                      = Item(178826, {13, 14}),
+  -- Non-Trinket Items
+  NeuralSynapseEnhancer                 = Item(168973, {16}),
 }
 
 Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
@@ -286,7 +289,6 @@ Item.Mage.Arcane = MergeTableByKey(Item.Mage.Commons, {
   AberrantSpellforge                    = Item(212451, {13, 14}),
   FearbreakersEcho                      = Item(224449, {13, 14}),
   MadQueensMandate                      = Item(212454, {13, 14}),
-  MereldarsToll                         = Item(219313, {13, 14}),
 })
 
 Item.Mage.Fire = MergeTableByKey(Item.Mage.Commons, {

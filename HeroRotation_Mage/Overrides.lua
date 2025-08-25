@@ -277,7 +277,7 @@ HL.AddCoreOverride("Player.BuffStackP",
       local Icicles = BaseCheck
       if self:IsCasting(SpellFrost.GlacialSpike) then return 0 end
       if (not SpellFrost.GlacialSpike:IsAvailable()) and SpellFrost.IceLance:TimeSinceLastCast() < 2 * Player:SpellHaste() then Icicles = 0 end
-      return mathmin(Icicles + (self:IsCasting(SpellFrost.Frostbolt) and 1 or 0), 5)
+      return mathmin(Icicles + ((self:IsCasting(SpellFrost.Frostbolt) or self:IsCasting(SpellFrost.FrostfireBolt)) and 1 or 0), 5)
     elseif Spell == SpellFrost.GlacialSpikeBuff then
       return self:IsCasting(SpellFrost.GlacialSpike) and 0 or BaseCheck
     elseif Spell == SpellFrost.WintersReachBuff then
