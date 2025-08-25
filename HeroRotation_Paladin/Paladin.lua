@@ -50,7 +50,6 @@ Spell.Paladin.Commons = {
   HolyAvenger                           = Spell(105809),
   LayonHands                            = Spell(633),
   OfDuskandDawn                         = Spell(409441),
-  Seraphim                              = Spell(152262),
   VengefulWrath                         = Spell(406835),
   ZealotsParagon                        = Spell(391142),
   -- Auras
@@ -65,7 +64,6 @@ Spell.Paladin.Commons = {
   ConsecrationBuff                      = Spell(188370),
   DivinePurposeBuff                     = Spell(223819),
   HolyAvengerBuff                       = Spell(105809),
-  SeraphimBuff                          = Spell(152262),
   ShieldoftheRighteousBuff              = Spell(132403),
   -- Debuffs
   ConsecrationDebuff                    = Spell(204242),
