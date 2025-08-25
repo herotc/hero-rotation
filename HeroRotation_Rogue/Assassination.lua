@@ -762,8 +762,8 @@ local function ShivUsage ()
     -- &(cooldown.kingsbane.ready|cooldown.kingsbane.remains<=2)&set_bonus.tww3_fatebound_2pc
   if S.Shiv:IsReady() then
     if S.LightweightShiv:IsAvailable() and ShivKingsbaneCondition
-      and (S.Deathmark:IsReady() and S.Deathmark:CooldownRemains() <= 1)
-      and (S.Kingsbane:IsReady() and S.Kingsbane:CooldownRemains() <= 2)
+      and (S.Deathmark:IsReady() and S.Deathmark:CooldownRemains() <= 2)
+      and (S.Kingsbane:IsReady() and S.Kingsbane:CooldownRemains() <= 3)
       and TWW3FateboundHasTier2PC then
       if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
         return "Cast Shiv (FB Edge Case Coins)"
