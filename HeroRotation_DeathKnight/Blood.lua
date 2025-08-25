@@ -297,8 +297,8 @@ local function SanDRW()
   if HSAction:IsReady() and (Player:BuffRemains(S.EssenceoftheBloodQueenBuff) < 1.5 and Player:BuffUp(S.EssenceoftheBloodQueenBuff)) then
     if Cast(HSAction, nil, nil, not TargetInMeleeRange) then return "heart_strike san_drw 2"; end
   end
-  -- bonestorm,if=buff.bone_shield.stack>=5&buff.death_and_decay.remains
-  if S.Bonestorm:IsReady() and (VarBoneShieldStacks >= 5 and Player:BuffUp(S.DeathAndDecayBuff)) then
+  -- bonestorm,if=buff.bone_shield.stack>=5
+  if S.Bonestorm:IsReady() and (VarBoneShieldStacks >= 5) then
     if Cast(S.Bonestorm, Settings.Blood.GCDasOffGCD.Bonestorm, nil, not Target:IsInMeleeRange(8)) then return "bonestorm san_drw 4"; end
   end
   -- death_strike,if=runic_power.deficit<36
@@ -348,8 +348,8 @@ local function Sanlayn()
   if HSAction:IsReady() and (Player:BuffRemains(S.EssenceoftheBloodQueenBuff) < 1.5 and Player:BuffUp(S.EssenceoftheBloodQueenBuff) and Player:BuffUp(S.VampiricStrikeBuff)) then
     if Cast(HSAction, nil, nil, not TargetInMeleeRange) then return "heart_strike sanlayn 8"; end
   end
-  -- bonestorm,if=buff.bone_shield.stack>=5&buff.death_and_decay.remains
-  if S.Bonestorm:IsReady() and (VarBoneShieldStacks >= 5 and Player:BuffUp(S.DeathAndDecayBuff)) then
+  -- bonestorm,if=buff.bone_shield.stack>=5&(buff.death_and_decay.remains|active_enemies<=3)
+  if S.Bonestorm:IsReady() and (VarBoneShieldStacks >= 5 and (Player:BuffUp(S.DeathAndDecayBuff) or EnemiesMeleeCount <= 3)) then
     if Cast(S.Bonestorm, Settings.Blood.GCDasOffGCD.Bonestorm, nil, not Target:IsInMeleeRange(8)) then return "bonestorm sanlayn 10"; end
   end
   -- death_strike,if=runic_power.deficit<20
@@ -380,8 +380,8 @@ local function Sanlayn()
   if S.Marrowrend:IsReady() and (VarBoneShieldStacks < 6 and not Player:BonestormTicking()) then
     if Cast(S.Marrowrend, nil, nil, not TargetInMeleeRange) then return "marrowrend sanlayn 24"; end
   end
-  -- tombstone,if=buff.bone_shield.stack>=6&buff.death_and_decay.remains&cooldown.dancing_rune_weapon.remains>=25
-  if S.Tombstone:IsReady() and (VarBoneShieldStacks >= 6 and Player:BuffUp(S.DeathAndDecayBuff) and S.DancingRuneWeapon:CooldownRemains() >= 25) then
+  -- tombstone,if=buff.bone_shield.stack>=6&(buff.death_and_decay.remains|active_enemies<=3)&cooldown.dancing_rune_weapon.remains>=25
+  if S.Tombstone:IsReady() and (VarBoneShieldStacks >= 6 and (Player:BuffUp(S.DeathAndDecayBuff) or EnemiesMeleeCount <= 3) and S.DancingRuneWeapon:CooldownRemains() >= 25) then
     if Cast(S.Tombstone, Settings.Blood.GCDasOffGCD.Tombstone) then return "tombstone sanlayn 26"; end
   end
   -- any_dnd,if=(active_enemies<=3&buff.crimson_scourge.remains)|(active_enemies>3&!buff.death_and_decay.remains)
