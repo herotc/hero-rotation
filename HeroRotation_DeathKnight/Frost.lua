@@ -259,7 +259,7 @@ local function Cooldowns()
   end
   -- breath_of_sindragosa,use_off_gcd=1,if=!buff.breath_of_sindragosa.up&(buff.pillar_of_frost.up|fight_remains<20)
   if S.BreathofSindragosa:IsReady() and (Player:BuffDown(S.BreathofSindragosa) and (Player:BuffUp(S.PillarofFrostBuff) or BossFightRemains < 20)) then
-    if Cast(S.BreathofSindragosa, Settings.Frost.GCDasOffGCD.BreathOfSindragosa, nil, not TargetInMeleeRange) then return "breath_of_sindragosa cooldowns 14"; end
+    if Cast(S.BreathofSindragosa, Settings.Frost.GCDasOffGCD.BreathOfSindragosa, nil, not Target:IsInRange(12)) then return "breath_of_sindragosa cooldowns 14"; end
   end
   -- reapers_mark,target_if=first:debuff.reapers_mark_debuff.down,if=buff.pillar_of_frost.up|cooldown.pillar_of_frost.remains>5|fight_remains<20
   if S.ReapersMark:IsReady() and (Player:BuffUp(S.PillarofFrostBuff) or S.PillarofFrost:CooldownRemains() > 5 or BossFightRemains < 20) then
@@ -283,7 +283,7 @@ local function Cooldowns()
   end
   -- soul_reaper,if=talent.reaper_of_souls&buff.reaper_of_souls.up&buff.killing_machine.react<2
   if S.SoulReaper:IsReady() and (S.ReaperofSouls:IsAvailable() and Player:BuffUp(S.ReaperofSoulsBuff) and Player:BuffStack(S.KillingMachineBuff) < 2) then
-    if Cast(S.SoulReaper, nil, nil, not TargetInMeleeRange) then return "soul_reaper cooldowns 26"; end
+    if Cast(S.SoulReaper, nil, nil, not Target:IsInRange(5)) then return "soul_reaper cooldowns 26"; end
   end
   -- empower_rune_weapon,use_off_gcd=1,if=(rune<2|!buff.killing_machine.react)&runic_power<35+(talent.icy_onslaught*buff.icy_onslaught.stack*5)&gcd.remains<0.5
   -- Note: Removed gcd.remains check.
