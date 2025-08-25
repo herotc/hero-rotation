@@ -129,6 +129,10 @@ SetTrinketVariables()
 HL:RegisterForEvent(function()
   VarTrinketFailures = 0
   SetTrinketVariables()
+  TWW3FateboundHasTier2PC = Player:HeroTreeID() == 52 and Player:HasTier('TWW3', 2)
+  TWW3FateboundHasTier4PC = Player:HeroTreeID() == 52 and Player:HasTier('TWW3', 4)
+  TWW3DeathstalkerHasTier2PC = Player:HeroTreeID() == 53 and Player:HasTier('TWW3', 2)
+  TWW3DeathstalkerHasTier4PC = Player:HeroTreeID() == 53 and Player:HasTier('TWW3', 4)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -137,6 +141,10 @@ HL:RegisterForEvent(function()
   else
     S.ColdBlood = Spell(382245)
   end
+  TWW3FateboundHasTier2PC = Player:HeroTreeID() == 52 and Player:HasTier('TWW3', 2)
+  TWW3FateboundHasTier4PC = Player:HeroTreeID() == 52 and Player:HasTier('TWW3', 4)
+  TWW3DeathstalkerHasTier2PC = Player:HeroTreeID() == 53 and Player:HasTier('TWW3', 2)
+  TWW3DeathstalkerHasTier4PC = Player:HeroTreeID() == 53 and Player:HasTier('TWW3', 4)
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB", "PLAYER_LOGIN", "PLAYER_TALENT_UPDATE", "PLAYER_SPECIALIZATION_CHANGED")
 
 -- Interrupts
