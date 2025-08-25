@@ -99,9 +99,6 @@ HL.AddCoreOverride("Player.JudgmentPower",
     if Player:BuffUp(SpellRet.AvengingWrathBuff) then
       JP = JP + 1
     end
-    if Player:BuffUp(SpellRet.BastionofLightBuff) then
-      JP = JP + 2
-    end
     return JP
   end
 , 70)
