@@ -411,19 +411,32 @@ function HR.CmdHandler(Message)
     HR.Print("HeroDBC Version: |cff8888ff" .. tostring(DBCVer) .. "|r")
   elseif Argument1 == "help" then
     HR.Print("|cffffff00--[Toggles]--|r")
-    HR.Print("  On/Off: |cff8888ff/hr toggle|r")
-    HR.Print("  CDs: |cff8888ff/hr cds|r")
-    HR.Print("  AoE: |cff8888ff/hr aoe|r")
-    HR.Print("  Debug: |cff8888ff/hr debug|r")
-    HR.Print("  Flash: |cff8888ff/hr flash|r")
-    HR.Print("Version: |cff8888ff/hr version|r")
+    HR.Print("On/Off: |cff8888ff/hr toggle|r")
+    HR.Print("   CDs: |cff8888ff/hr cds|r")
+    HR.Print("   AoE: |cff8888ff/hr aoe|r")
+    HR.Print(" Debug: |cff8888ff/hr debug|r")
+    HR.Print(" Flash: |cff8888ff/hr flash|r")
     HR.Print("|cffffff00--[User Interface]--|r")
     HR.Print("  UI Lock: |cff8888ff/hr lock|r")
-    HR.Print("  UI Unlock: |cff8888ff/hr unlock|r")
-    HR.Print("  UI Scale: |cff8888ff/hr scale|r |cff88ff88[Type]|r |cffff8888[Size]|r")
-    HR.Print("    [Type]: |cff88ff88ui|r, |cff88ff88buttons|r, |cff88ff88all|r")
-    HR.Print("    [Size]: |cffff8888number > 0 and <= 10|r")
-    HR.Print("  Button Anchor Reset : |cff8888ff/hr resetbuttons|r")
+    HR.Print("UI Unlock: |cff8888ff/hr unlock|r")
+    HR.Print(" UI Scale: |cff8888ff/hr scale|r |cff88ff88[Type]|r |cffff8888[Size]|r")
+    HR.Print("   [Type]: |cff88ff88ui|r, |cff88ff88buttons|r, |cff88ff88all|r")
+    HR.Print("   [Size]: |cffff8888number > 0 and <= 10|r")
+    HR.Print("Button Anchor Reset: |cff8888ff/hr resetbuttons|r")
+    HR.Print("|cffffff00--[Other]--|r")
+    HR.Print(" Config: |cff8888ff/hr config|r")
+    HR.Print("Version: |cff8888ff/hr version|r")
+  elseif Argument1 == "config" then
+    for _, cat in pairs(SettingsPanel:GetAllCategories()) do
+      if cat.name == "HeroRotation" then
+        for _, sub in pairs(cat:GetSubcategories()) do
+          if sub.name == "General" then
+            Settings.OpenToCategory(sub.ID, true)
+            return
+          end
+        end
+      end
+    end
   else
     HR.Print("Invalid arguments.")
     HR.Print("Type |cff8888ff/hr help|r for more infos.")
