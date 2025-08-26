@@ -91,10 +91,8 @@ local TrinketItem1, TrinketItem2
 local EffectiveCPSpend
 
 -- Tier sets
-local TWW3FateboundHasTier2PC = Player:HeroTreeID() == 52 and Player:HasTier('TWW3', 2)
-local TWW3FateboundHasTier4PC = Player:HeroTreeID() == 52 and Player:HasTier('TWW3', 4)
-local TWW3DeathstalkerHasTier2PC = Player:HeroTreeID() == 53 and Player:HasTier('TWW3', 2)
-local TWW3DeathstalkerHasTier4PC = Player:HeroTreeID() == 53 and Player:HasTier('TWW3', 4)
+local TWW3FateboundHasTier2PC, TWW3FateboundHasTier4PC
+local TWW3DeathstalkerHasTier2PC, TWW3DeathstalkerHasTier4PC
 
 -- Equipment
 local VarTrinketFailures = 0
@@ -129,10 +127,6 @@ SetTrinketVariables()
 HL:RegisterForEvent(function()
   VarTrinketFailures = 0
   SetTrinketVariables()
-  TWW3FateboundHasTier2PC = Player:HeroTreeID() == 52 and Player:HasTier('TWW3', 2)
-  TWW3FateboundHasTier4PC = Player:HeroTreeID() == 52 and Player:HasTier('TWW3', 4)
-  TWW3DeathstalkerHasTier2PC = Player:HeroTreeID() == 53 and Player:HasTier('TWW3', 2)
-  TWW3DeathstalkerHasTier4PC = Player:HeroTreeID() == 53 and Player:HasTier('TWW3', 4)
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -1214,6 +1208,11 @@ end
 
 --- ======= MAIN =======
 local function APL ()
+  TWW3FateboundHasTier2PC = Player:HeroTreeID() == 52 and Player:HasTier('TWW3', 2)
+  TWW3FateboundHasTier4PC = Player:HeroTreeID() == 52 and Player:HasTier('TWW3', 4)
+  TWW3DeathstalkerHasTier2PC = Player:HeroTreeID() == 53 and Player:HasTier('TWW3', 2)
+  TWW3DeathstalkerHasTier4PC = Player:HeroTreeID() == 53 and Player:HasTier('TWW3', 4)
+
   -- Enemies Update
   MeleeRange = 5
   AoERange = 10
