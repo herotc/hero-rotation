@@ -103,6 +103,38 @@ local Interrupts = {
   end }
 }
 
+-- hero trees
+local Trickster, Fatebound
+local TWW3TricksterHasTier2PC, TWW3TricksterHasTier4PC
+local TWW3FateboundHasTier2PC, TWW3FateboundHasTier4PC
+
+-- register events
+HL:RegisterForEvent(function()
+  SetTrinketVariables()
+end, "PLAYER_EQUIPMENT_CHANGED")
+
+local DoubleJeopardyBuffUp = false
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    local SpellID = select(12, ...)
+    if Fatebound and SpellID == Rogue:StealthSpell():ID() or SpellID == S.VanishBuff:ID() then
+      DoubleJeopardyBuffUp = true
+    end
+  end
+, "SPELL_AURA_APPLIED"
+)
+
+HL:RegisterForSelfCombatEvent(
+  function (...)
+    local SpellID = select(12, ...)
+    if Fatebound and DoubleJeopardyBuffUp and (SpellID == S.Dispatch:ID() or SpellID == S.BetweentheEyes:ID() or SpellID == S.KillingSpree:ID()
+      or SpellID == S.GhostlyStrike:ID()) then
+      DoubleJeopardyBuffUp = false
+    end
+  end
+, "SPELL_CAST_SUCCESS"
+)
+
 -- Stable Energy Prediction
 local PrevEnergyTimeToMaxPredicted, PrevEnergyPredicted = 0, 0
 local function EnergyTimeToMaxStable (MaxOffset)
@@ -234,33 +266,28 @@ local function RtB_Reroll(ForceLoadedDice)
         -- +(buff.true_bearing.remains>39)+(buff.grand_melee.remains>39)+(buff.buried_treasure.remains>39)+(buff.skull_and_crossbones.remains>39)
       -- Added to RtB Cache, See RtB_Buffs
 
-      -- # With TWW2 (old tier), roll if you will lose 0 or 1 buffs. This includes rolling immediately after KIR.
-      -- If you KIR'd a natural 5 roll, then wait until they approach pandemic range.
-      -- actions.roll_the_bones+=/roll_the_bones,if=set_bonus.tww2_4pc&rtb_buffs.will_lose<=1&(variable.buffs_above_pandemic<5|rtb_buffs.max_remains<42)
-      Cache.APLVar.RtB_Reroll = Player:HasTier("TWW2", 4) and Cache.APLVar.RtB_Buffs.Will_Lose.Total <= 1 and (Cache.APLVar.RtB_Buffs.BuffsAbovePandemic < 5
-        or Cache.APLVar.RtB_Buffs.MaxRemains <= 42)
+      --# With TWW2, Sleight of Hand, or Supercharger: roll if you will lose 0 or 1 buffs.
+      -- This includes rolling immediately after KIR. With TWW2, don't roll immediately after a natural 5 buff KIR.
+      -- actions.roll_the_bones+=/roll_the_bones,if=(set_bonus.tww2_4pc|talent.sleight_of_hand|talent.supercharger)
+        -- &rtb_buffs.will_lose<=1&(variable.buffs_above_pandemic<5|rtb_buffs.max_remains<42|!set_bonus.tww2_4pc)
+      Cache.APLVar.RtB_Reroll = (Player:HasTier("TWW2", 4) or S.SleightOfHand:IsAvailable() or S.Supercharger:IsAvailable())
+        and Cache.APLVar.RtB_Buffs.Will_Lose.Total <= 1 and (Cache.APLVar.RtB_Buffs.BuffsAbovePandemic < 5
+        or Cache.APLVar.RtB_Buffs.MaxRemains <= 42 or not Player:HasTier("TWW2", 4))
 
-      -- # With TWW2 (old tier), roll over any 2 buffs. HO builds also roll if you will lose 3-4 buffs,
-      -- while KIR builds wait until they approach ~10s remaining.
-      -- actions.roll_the_bones+=/roll_the_bones,if=set_bonus.tww2_4pc&(rtb_buffs<=2|(rtb_buffs.max_remains<11|!talent.keep_it_rolling)
-        -- &rtb_buffs.will_lose<5&talent.supercharger&rtb_buffs.normal>0)
+      -- # With TWW2, or Supercharger with either Loaded Dice or Sleight of Hand without KIR: roll over any 2 buffs.
+      -- actions.roll_the_bones+=/roll_the_bones,if=(set_bonus.tww2_4pc|talent.supercharger
+        -- &(buff.loaded_dice.up|talent.sleight_of_hand&!talent.keep_it_rolling))&rtb_buffs<=2
       if not Cache.APLVar.RtB_Reroll then
-        Cache.APLVar.RtB_Reroll = Player:HasTier("TWW2", 4) and (Cache.APLVar.RtB_Buffs.Total <= 2
-          or (Cache.APLVar.RtB_Buffs.MaxRemains < 11 or not S.KeepItRolling:IsAvailable())
-            and Cache.APLVar.RtB_Buffs.Will_Lose.Total < 5 and S.Supercharger:IsAvailable() and Cache.APLVar.RtB_Buffs.Normal > 0)
+        Cache.APLVar.RtB_Reroll = (Player:HasTier("TWW2", 4) or S.Supercharger:IsAvailable()
+        and (Player:BuffUp(S.LoadedDice) or S.SleightOfHand:IsAvailable() and not S.KeepItRolling:IsAvailable()))
+        and Cache.APLVar.RtB_Buffs.Total <= 2
       end
 
-      -- # Without TWW2, roll if you will lose 0 buffs, or 1 buff with Loaded Dice active. This includes rolling immediately after KIR.
-      -- actions.roll_the_bones+=/roll_the_bones,if=!set_bonus.tww2_4pc&rtb_buffs.will_lose<=buff.loaded_dice.up
+      -- # With TWW2, roll over 3-4 buffs, but KIR builds only if all buffs are under ~10 seconds remaining.
+      -- actions.roll_the_bones+=/roll_the_bones,if=set_bonus.tww2_4pc&rtb_buffs.will_lose<5&(rtb_buffs.max_remains<11|!talent.keep_it_rolling)
       if not Cache.APLVar.RtB_Reroll then
-        Cache.APLVar.RtB_Reroll = not Player:HasTier("TWW2", 4) and Cache.APLVar.RtB_Buffs.Will_Lose.Total <= num(Player:BuffUp(S.LoadedDice) or ForceLoadedDice)
-      end
-
-      -- # Without TWW2, roll over exactly 2 buffs with Loaded Dice and Supercharger.
-      -- actions.roll_the_bones+=/roll_the_bones,if=!set_bonus.tww2_4pc&talent.supercharger&buff.loaded_dice.up&rtb_buffs<=2
-      if not Cache.APLVar.RtB_Reroll then
-        Cache.APLVar.RtB_Reroll = not Player:HasTier("TWW2", 4) and S.Supercharger:IsAvailable()
-          and (Player:BuffUp(S.LoadedDiceBuff) or ForceLoadedDice) and Cache.APLVar.RtB_Buffs.Total <= 2
+        Cache.APLVar.RtB_Reroll = Player:HasTier("TWW2", 4) and Cache.APLVar.RtB_Buffs.Will_Lose.Total < 5
+        and (Cache.APLVar.RtB_Buffs.MaxRemains < 11 or not S.KeepItRolling:IsAvailable())
       end
 
       -- # Without TWW2, HO builds without Supercharger can roll over 2 buffs with Loaded Dice active
@@ -280,10 +307,10 @@ end
 
 -- # Use finishers if at -1 from max combo points, or -2 in Stealth with Crackshot
 local function Finish_Condition ()
-  -- actions+=/variable,name=finish_condition,value=combo_points>=cp_max_spend-1-(stealthed.all&talent.crackshot|
-  -- (talent.hand_of_fate|talent.flawless_form)&talent.hidden_opportunity&(buff.audacity.up|buff.opportunity.up))
+  -- actions+=/variable,name=finish_condition,value=combo_points>=cp_max_spend-1-(stealthed.all&talent.crackshot
+  -- |(hero_tree.fatebound|hero_tree.trickster)&talent.hidden_opportunity&(buff.audacity.up|buff.opportunity.up))
   return ComboPoints >= Rogue.CPMaxSpend() - 1 - num((Player:StealthUp(true, true) and S.Crackshot:IsAvailable()
-    or (S.HandOfFate:IsAvailable() or S.FlawlessForm:IsAvailable()) and S.HiddenOpportunity:IsAvailable()
+    or (Fatebound or Trickster) and S.HiddenOpportunity:IsAvailable()
     and (Player:BuffUp(S.AudacityBuff) or Player:BuffUp(S.Opportunity))))
 end
 
@@ -403,8 +430,14 @@ local function Finish(ReturnSpellOnly)
     if ReturnSpellOnly then
       return S.KillingSpree
     else
-      if Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle, not Target:IsInRange(8), nil) then
-        return "Cast Killing Spree"
+      if Settings.Outlaw.KillingSpreeDisplayStyle ~= "Main Icon" then
+        if Cast(S.KillingSpree, nil, Settings.Outlaw.KillingSpreeDisplayStyle, not Target:IsInRange(8), nil) then
+          return "Cast Killing Spree"
+        end
+      else
+        if CastPooling(S.KillingSpree, nil, not Target:IsInRange(8)) then
+          return "Cast Killing Spree"
+        end
       end
     end
   end
@@ -422,10 +455,10 @@ local function Finish(ReturnSpellOnly)
 
   -- # Outside of stealth, use Between the Eyes to maintain the buff, or with Ruthless Precision active,
   -- or to proc Greenskins Wickers if not active. Trickster builds can also send BtE on cooldown.
-  -- actions.finish=between_the_eyes,if=(buff.ruthless_precision.up|buff.between_the_eyes.remains<4|!talent.mean_streak)
+  -- actions.finish+=/between_the_eyes,if=(buff.ruthless_precision.up|buff.between_the_eyes.remains<4|!hero_tree.fatebound)
   -- &(!buff.greenskins_wickers.up|!talent.greenskins_wickers)
   if S.BetweentheEyes:IsCastable() and (Player:BuffUp(S.RuthlessPrecision) or Player:BuffRemains(S.BetweentheEyes) < 4 or
-    not S.MeanStreak:IsAvailable()) and (Player:BuffDown(S.GreenskinsWickersBuff) or not S.GreenskinsWickers:IsAvailable()) then
+    not Fatebound) and (Player:BuffDown(S.GreenskinsWickersBuff) or not S.GreenskinsWickers:IsAvailable()) then
     if ReturnSpellOnly then
       return S.BetweentheEyes
     else
@@ -477,7 +510,6 @@ local function SpellQueueMacro (BaseSpell, ReturnSpellOnly)
     if MacroAbility and ReturnSpellOnly then
       return MacroAbility
     end
-
     if BaseSpell:ID() == S.Vanish:ID() and (not Settings.Outlaw.SpellQueueMacro.Vanish or not MacroAbility) then
       if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then
         return "Cast Vanish"
@@ -506,12 +538,12 @@ local function SpellQueueMacro (BaseSpell, ReturnSpellOnly)
 
     -- If we don't need to reroll then we can check finishers
     if not MacroAbility then
-      -- Fetch Finisher if not in stealth (AR->Dispatch/Coup) or Stealth Ability if we are (AR->BtE)
+      -- Fetch Finisher if not in stealth (AR->Dispatch/Coup/KS) or Stealth Ability if we are (AR->BtE)
       -- Outside of stealth could be AR -> Vanish -> BtE so check for this first then fallback into normal finisher.
       if not Player:StealthUp(true, true) then
-        -- AR->Coup Highest prio, outside of stealth especially if double coup
-        if S.CoupDeGrace:IsCastable() then
-          MacroAbility = S.CoupDeGrace
+        -- AR->Coup/KS
+        if S.CoupDeGrace:IsCastable() or S.KillingSpree:IsCastable() then
+          MacroAbility = Finish(true)
         else
           local MacroAbilities = StealthCDs(true)
 
@@ -552,12 +584,10 @@ end
 function StealthCDs (ReturnSpellOnly)
   -- # Flex Vanish usage for standard builds.
 
-  -- # Fatebound or builds without Killing Spree attempt to hold Vanish for when BtE is on cooldown and Ruthless Precision is active.
-  -- actions.vanish=vanish,if=(!talent.unseen_blade|!talent.killing_spree)
-  -- &!cooldown.between_the_eyes.ready&buff.ruthless_precision.remains>4
+  -- # TWW3 Fatebound always attempts to align Vanish with Ghostly Strike.
+  -- actions.vanish=vanish,if=set_bonus.tww3_fatebound_2pc&cooldown.ghostly_strike.ready&talent.ghostly_strike
   if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
-    if (not S.UnseenBlade:IsAvailable() or not S.KillingSpree:IsAvailable()) and not S.BetweentheEyes:IsReady()
-      and Player:BuffRemains(S.RuthlessPrecision) > 4 then
+    if TWW3FateboundHasTier2PC and S.GhostlyStrike:IsReady() and S.GhostlyStrike:IsAvailable() then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
         if ReturnSpellOnly then
@@ -568,10 +598,15 @@ function StealthCDs (ReturnSpellOnly)
     end
   end
 
-  -- # Fatebound or builds without Killing Spree should also Vanish if Supercharger becomes active.
-  -- actions.vanish+=/vanish,if=(!talent.unseen_blade|!talent.killing_spree)&buff.supercharge_1.up
+  -- # Fatebound without TWW3, or builds without Killing Spree attempt to hold Vanish for when BtE is on cooldown
+  -- and Ruthless Precision is active.
+  -- actions.vanish+=/vanish,if=(hero_tree.fatebound|!talent.killing_spree)
+  -- &(!cooldown.between_the_eyes.ready&buff.ruthless_precision.remains>4|buff.supercharge_1.up)
+  -- &(!set_bonus.tww3_fatebound_2pc|!talent.ghostly_strike)
   if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
-    if (not S.UnseenBlade:IsAvailable() or not S.KillingSpree:IsAvailable()) and ChargedComboPoints > 0 then
+    if (Fatebound or not S.KillingSpree:IsAvailable())
+      and (not S.BetweentheEyes:IsReady() and Player:BuffRemains(S.RuthlessPrecision) > 4 or ChargedComboPoints > 0)
+      and (not TWW3FateboundHasTier2PC or not S.GhostlyStrike:IsAvailable()) then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
         if ReturnSpellOnly then
@@ -584,11 +619,11 @@ function StealthCDs (ReturnSpellOnly)
 
   -- # Trickster builds with Killing Spree should Vanish if Killing Spree is not up soon. With TWW3 Trickster,
   -- attempt to align Vanish with a recently used Coup de Grace.
-  -- actions.vanish+=/vanish,if=talent.unseen_blade&talent.killing_spree&cooldown.killing_spree.remains>30
+  -- actions.vanish+=/vanish,if=hero_tree.trickster&talent.killing_spree&cooldown.killing_spree.remains>30
   -- &(time-action.coup_de_grace.last_used<=10|!set_bonus.tww3_trickster_4pc)
   if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
-    if S.UnseenBlade:IsAvailable() and S.KillingSpree:IsAvailable() and S.KillingSpree:CooldownRemains() > 30
-    and (S.CoupDeGrace:TimeSinceLastCast() <= 10 or not Player:HasTier("TWW3", 4)) then
+    if Trickster and S.KillingSpree:IsAvailable() and S.KillingSpree:CooldownRemains() > 30
+      and (S.CoupDeGrace:TimeSinceLastCast() <= 10 or not TWW3TricksterHasTier4PC) then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
         if ReturnSpellOnly then
@@ -599,10 +634,12 @@ function StealthCDs (ReturnSpellOnly)
     end
   end
 
-  -- # Vanish if it is about to cap charges or sim duration is ending soon.
-  -- actions.vanish+=/vanish,if=cooldown.vanish.full_recharge_time<15|fight_remains<charges*8
+  -- # Vanish if about to cap charges or sim duration is ending soon. TWW3 Fatebound will sit on max charges for an upcoming Ghostly Strike.
+  -- actions.vanish+=/vanish,if=cooldown.vanish.full_recharge_time<15
+  -- &(!set_bonus.tww3_fatebound_2pc|!talent.ghostly_strike)|fight_remains<charges*8
   if S.Vanish:IsCastable() and Vanish_DPS_Condition() then
-    if S.Vanish:FullRechargeTime() < 15 or HL.BossFilteredFightRemains("<", 8) then
+    if S.Vanish:FullRechargeTime() < 15 and (not TWW3FateboundHasTier2PC or not S.GhostlyStrike:IsAvailable())
+      or HL.BossFilteredFightRemains("<", S.Vanish:Charges() * 8) then
       ShouldReturn = SpellQueueMacro(S.Vanish, ReturnSpellOnly)
       if ShouldReturn then
         if ReturnSpellOnly then
@@ -612,6 +649,7 @@ function StealthCDs (ReturnSpellOnly)
       end
     end
   end
+
 end
 
 local function Items()
@@ -684,11 +722,15 @@ end
 
 local function CDs ()
   -- # Maintain Adrenaline Rush. With Improved AR, recast at low CPs even if already active.
+  -- With TWW3 Fatebound, attempt to send AR alongside Vanish if there is a Vanish charge available.
   -- actions.cds=adrenaline_rush,if=!buff.adrenaline_rush.up&(!variable.finish_condition|!talent.improved_adrenaline_rush)
-  -- |buff.adrenaline_rush.up&talent.improved_adrenaline_rush&combo_points<=2
+  -- |buff.adrenaline_rush.up&talent.improved_adrenaline_rush&combo_points<=2&(cooldown.vanish.charges=0
+  -- |buff.double_jeopardy.up|!set_bonus.tww3_fatebound_2pc)|fight_remains<2
   if CDsON() and S.AdrenalineRush:IsCastable() then
     if Player:BuffDown(S.AdrenalineRush) and (not Finish_Condition() or not S.ImprovedAdrenalineRush:IsAvailable())
-    or Player:BuffUp(S.AdrenalineRush) and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2 then
+    or Player:BuffUp(S.AdrenalineRush) and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2
+    and (S.Vanish:Charges() == 0 or DoubleJeopardyBuffUp or not TWW3FateboundHasTier2PC)
+    or HL.BossFilteredFightRemains("<", 2) then
       if S.ImprovedAdrenalineRush:IsAvailable() then
         ShouldReturn = SpellQueueMacro(S.AdrenalineRush)
         if ShouldReturn then
@@ -702,20 +744,17 @@ local function CDs ()
     end
   end
 
-  -- # High priority Ghostly Strike as it is off-gcd.
-  -- actions.cds+=/ghostly_strike
+  -- # High priority Ghostly Strike as it is off-gcd. Trickster builds with 1 point in Fan the Hammer prefer not to use it at max CPs.
+  -- actions.cds+=/ghostly_strike,if=hero_tree.fatebound&(buff.double_jeopardy.up|fight_remains<2|cooldown.vanish.charges=0
+  -- |!set_bonus.tww3_fatebound_2pc)|hero_tree.trickster&(combo_points<cp_max_spend|talent.fan_the_hammer.rank>1)
   if S.GhostlyStrike:IsCastable() then
-    if Cast(S.GhostlyStrike, Settings.Outlaw.OffGCDasOffGCD.GhostlyStrike, nil, not Target:IsSpellInRange(S.GhostlyStrike)) then
-      return "Cast Ghostly Strike"
+    if Fatebound and (DoubleJeopardyBuffUp or HL.BossFilteredFightRemains("<", 2) or S.Vanish:Charges() == 0
+      or not TWW3FateboundHasTier2PC) or Trickster and (ComboPoints < Rogue.CPMaxSpend() or S.FanTheHammer:TalentRank() > 1) then
+      if Cast(S.GhostlyStrike, Settings.Outlaw.OffGCDasOffGCD.GhostlyStrike, nil, not Target:IsSpellInRange(S.GhostlyStrike)) then
+        return "Cast Ghostly Strike"
+      end
     end
   end
-
-  -- double coup
-  --[[if S.CoupDeGrace:IsCastable() and S.CoupDeGrace:TimeSinceLastCast() < 1 and Player:BuffUp(S.AdrenalineRush) then
-    if CastPooling(S.CoupDeGrace, nil, not Target:IsSpellInRange(S.CoupDeGrace)) then
-      return "Double Coup De Grace CDs"
-    end
-  end]]
 
   -- # Sprint to further benefit from Scroll of Momentum trinket
   -- actions.cds+=/sprint,if=(trinket.1.is.scroll_of_momentum|trinket.2.is.scroll_of_momentum)&buff.full_momentum.up
@@ -785,11 +824,14 @@ local function CDs ()
     end
   end
 
-  -- # If not at risk of losing Adrenaline Rush, call flexible Vanish rules to be used at finisher CPs.
+  -- # # If not at risk of losing Adrenaline Rush, call flexible Vanish rules to be used at finisher CPs, or Fatebound TWW3 can Vanish at low CPs if AR is ready.
   -- actions.cds+=/call_action_list,name=vanish,if=!stealthed.all&talent.crackshot&talent.underhanded_upper_hand
-  -- &talent.subterfuge&buff.adrenaline_rush.up&variable.finish_condition
+  -- &talent.subterfuge&(buff.adrenaline_rush.up&variable.finish_condition&(!cooldown.adrenaline_rush.ready
+  -- |!set_bonus.tww3_fatebound_2pc)|set_bonus.tww3_fatebound_2pc&cooldown.adrenaline_rush.ready&combo_points<=2)
   if not Player:StealthUp(true, true) and S.Crackshot:IsAvailable() and S.UnderhandedUpperhand:IsAvailable()
-    and S.Subterfuge:IsAvailable() and Player:BuffUp(S.AdrenalineRush) and Finish_Condition() then
+    and S.Subterfuge:IsAvailable() and (Player:BuffUp(S.AdrenalineRush) and Finish_Condition()
+    and (not S.AdrenalineRush:IsReady() or not TWW3FateboundHasTier2PC) or TWW3FateboundHasTier2PC and S.AdrenalineRush:IsReady()
+    and ComboPoints <= 2) then
     ShouldReturn = StealthCDs()
     if ShouldReturn then
       return ShouldReturn
@@ -903,11 +945,23 @@ local function Build ()
 
   -- # Without Hidden Opportunity, prioritize building CPs with Blade Flurry at 4+ targets.
   -- Trickster should prefer to use this at low CPs unless AR isn't active.
-  -- actions.build+=/blade_flurry,if=talent.deft_maneuvers&spell_targets>=4&(combo_points<=2|!buff.adrenaline_rush.up|!talent.unseen_blade)
+  -- actions.build+=/blade_flurry,if=talent.deft_maneuvers&spell_targets>=4&(combo_points<=2|!buff.adrenaline_rush.up|!hero_tree.trickster)
   if S.BladeFlurry:IsCastable() then
-    if S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 4 and (ComboPoints <= 2 or Player:BuffDown(S.AdrenalineRush) or not S.UnseenBlade:IsAvailable()) then
+    if S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 4 and (ComboPoints <= 2 or Player:BuffDown(S.AdrenalineRush) or not OutlawTrickster) then
       if Cast(S.BladeFlurry, Settings.Outlaw.GCDasOffGCD.BladeFlurry) then
         return "Cast Blade Flurry (Fatebound or 1FTH)"
+      end
+    end
+  end
+
+  -- # At sustain 3 targets (2 target for Fatebound 1FTH), Blade Flurry can be used to build CPs if we are missing CPs equal to the amount it will give.
+  -- actions.build+=/blade_flurry,if=talent.deft_maneuvers&combo_points.deficit=spell_targets+buff.broadside.up
+  -- &spell_targets>=3-hero_tree.fatebound&talent.fan_the_hammer.rank=1
+  if S.BladeFlurry:IsCastable() then
+    if S.DeftManeuvers:IsAvailable() and ComboPointsDeficit == EnemiesBFCount + num(Player:BuffUp(S.Broadside))
+      and EnemiesBFCount >= 3 - num(Fatebound) and S.FanTheHammer:TalentRank() == 1 then
+      if Cast(S.BladeFlurry, Settings.Outlaw.GCDasOffGCD.BladeFlurry) then
+        return "Cast Blade Flurry (Sustained Cleave)"
       end
     end
   end
@@ -959,6 +1013,15 @@ end
 
 --- ======= MAIN =======
 local function APL ()
+  -- Hero Trees
+  Trickster = Player:HeroTreeID() == 51
+  Fatebound = Player:HeroTreeID() == 52
+
+  -- tier sets
+  TWW3TricksterHasTier2PC = Player:HeroTreeID() == 51 and Player:HasTier('TWW3', 2)
+  TWW3TricksterHasTier4PC = Player:HeroTreeID() == 51 and Player:HasTier('TWW3', 4)
+  TWW3FateboundHasTier2PC = Player:HeroTreeID() == 52 and Player:HasTier('TWW3', 2)
+  TWW3FateboundHasTier4PC = Player:HeroTreeID() == 52 and Player:HasTier('TWW3', 4)
 
   -- Local Update
   RtB_Buffs()
@@ -1034,8 +1097,8 @@ local function APL ()
       end
 
       -- # Prepull Adrenaline Rush if using Trickster+KIR+Loaded Dice. Fatebound would rather AR on pull for Coin damage.
-      -- actions.precombat+=/adrenaline_rush,precombat_seconds=1,if=!talent.edge_case&talent.keep_it_rolling&talent.loaded_dice
-      if S.AdrenalineRush:IsCastable() and not S.EdgeCase:IsAvailable() and S.KeepItRolling:IsAvailable()
+      -- actions.precombat+=/adrenaline_rush,precombat_seconds=1,if=!hero_tree.fatebound&talent.keep_it_rolling&talent.loaded_dice
+      if S.AdrenalineRush:IsCastable() --[[and not S.EdgeCase:IsAvailable()]] and S.KeepItRolling:IsAvailable()
         and S.LoadedDice:IsAvailable()
         and (not S.ImprovedAdrenalineRush:IsAvailable() or not Finish_Condition()) then
         if Cast(S.AdrenalineRush, Settings.Outlaw.OffGCDasOffGCD.AdrenalineRush) then
@@ -1044,9 +1107,9 @@ local function APL ()
       end
 
       --# Prepull Roll the Bones if using Trickster or not using Loaded Dice.
-      -- actions.precombat+=/roll_the_bones,precombat_seconds=1,if=!talent.edge_case|!talent.loaded_dice
+      -- actions.precombat+=/roll_the_bones,precombat_seconds=1,if=!hero_tree.fatebound|!talent.loaded_dice
       if S.RolltheBones:IsCastable() then
-        if (not S.EdgeCase:IsAvailable() or not S.LoadedDice:IsAvailable())
+        if (--[[not S.EdgeCase:IsAvailable() or]] not S.LoadedDice:IsAvailable())
           and (not S.Supercharger:IsAvailable() or ChargedComboPoints < 2) then
           if Cast(S.RolltheBones, Settings.Outlaw.GCDasOffGCD.RollTheBones) then
             return "Cast Roll the Bones (Opener)"
@@ -1059,7 +1122,7 @@ local function APL ()
         if ShouldReturn then
           return "Stealth (Opener): " .. ShouldReturn
         end
-        if S.KeepItRolling:IsAvailable() and S.GhostlyStrike:IsReady() and S.EchoingReprimand:IsAvailable() then
+        if S.KeepItRolling:IsAvailable() and S.GhostlyStrike:IsReady() then
           if Cast(S.GhostlyStrike, nil, nil, not Target:IsSpellInRange(S.GhostlyStrike)) then
             return "Cast Ghostly Strike KiR (Opener)"
           end
