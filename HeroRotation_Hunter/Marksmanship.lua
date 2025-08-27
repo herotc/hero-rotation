@@ -273,7 +273,7 @@ local function DRST()
   end
   -- black_arrow,if=talent.headshot&buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)|!talent.headshot
   if S.BlackArrow:IsReady() and (S.Headshot:IsAvailable() and Player:BuffUp(S.PreciseShotsBuff) and VarSpotterOrMovingDown or not S.Headshot:IsAvailable()) then
-    if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "bl;ack_arrow dr_st 10"; end
+    if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "black_arrow dr_st 10"; end
   end
   -- aimed_shot,if=buff.trueshot.up&buff.precise_shots.down|buff.lock_and_load.up&buff.moving_target.up
   if S.AimedShot:IsReady() and (Player:BuffUp(S.TrueshotBuff) and Player:BuffDown(S.PreciseShotsBuff) or Player:BuffUp(S.LockandLoadBuff) and Player:BuffUp(S.MovingTargetBuff)) then
