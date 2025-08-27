@@ -563,11 +563,11 @@ local function FSOpener()
     if Cast(S.FelRush, nil, Settings.CommonsDS.DisplayStyle.FelRush) then return "fel_rush fs_opener 10"; end
   end
   -- immolation_aura,if=variable.fs_tier34_2piece&buff.demonsurge_hardcast.up&(buff.demonsurge_consuming_fire.up|charges=2)
-  if ImmoAbility:IsCastable() and (Player:HasTier("TWW3", 2) and Player:Demonsurge("Hardcast") and (Player:Demonsurge("ConsumingFire") or S.ImmolationAura:Charges() == 2)) then
+  if ImmoAbility:IsCastable() and (Player:HasTier("TWW3", 2) and Player:Demonsurge("Hardcast") and (Player:Demonsurge("ConsumingFire") or ImmoAbility:Charges() == 2)) then
     if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura fs_opener 12"; end
   end
   -- annihilation,if=variable.fs_tier34_2piece&debuff.essence_break.down&cooldown.metamorphosis.remains&buff.demonsurge_annihilation.up&cooldown.eye_beam.up
-  if S.Annihilation:IsReady() and (Player:HasTier("TWW3", 2) and Target:DebuffDown(S.EssenceBreakDebuff) and S.Metamorphosis:CooldownDown() and Player:Demonsurge("Annihilation") and S.EyeBeam:CooldownUp()) then
+  if S.Annihilation:IsReady() and (Player:HasTier("TWW3", 2) and Target:DebuffDown(S.EssenceBreakDebuff) and S.Metamorphosis:CooldownDown() and Player:Demonsurge("Annihilation") and BeamAbility:CooldownUp()) then
     if Cast(S.Annihilation, nil, nil, not IsInMeleeRange(5)) then return "annihilation fs_opener 14"; end
   end
   -- felblade,if=talent.inertia&buff.inertia_trigger.up&active_enemies=1&buff.metamorphosis.up&cooldown.metamorphosis.up&cooldown.essence_break.up&buff.inner_demon.down&buff.demonsurge_annihilation.down
@@ -607,7 +607,8 @@ local function FSOpener()
     if Cast(S.Annihilation, nil, nil, not IsInMeleeRange(5)) then return "annihilation fs_opener 32"; end
   end
   -- immolation_aura,if=talent.a_fire_inside&talent.burning_wound&buff.metamorphosis.down
-  if ImmoAbility:IsCastable() and (S.AFireInside:IsAvailable() and S.BurningWound:IsAvailable() and Player:BuffDown(S.MetamorphosisBuff)) then
+  -- Note: Added buff.immolation_aura.down check to avoid double suggestions during opener.
+  if ImmoAbility:IsCastable() and Player:BuffDown(S.ImmolationAuraBuff) and (S.AFireInside:IsAvailable() and S.BurningWound:IsAvailable() and Player:BuffDown(S.MetamorphosisBuff)) then
     if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura fs_opener 34"; end
   end
   -- felblade,if=fury<40&debuff.essence_break.down&buff.inertia_trigger.down&cooldown.metamorphosis.up
@@ -1160,7 +1161,7 @@ local function AROpener()
     if Cast(S.BladeDance, nil, nil, not IsInMeleeRange(8)) then return "blade_dance ar_opener 36"; end
   end
   -- immolation_aura,if=talent.a_fire_inside&talent.burning_wound&buff.metamorphosis.down
-  -- Note: Added buff.immolation_aura.down check.
+  -- Note: Added buff.immolation_aura.down check to avoid double suggestions during opener.
   if ImmoAbility:IsCastable() and Player:BuffDown(S.ImmolationAuraBuff) and (S.AFireInside:IsAvailable() and S.BurningWound:IsAvailable() and Player:BuffDown(S.MetamorphosisBuff)) then
     if Cast(ImmoAbility, Settings.Havoc.GCDasOffGCD.ImmolationAura, nil, not IsInMeleeRange(8)) then return "immolation_aura ar_opener 38"; end
   end

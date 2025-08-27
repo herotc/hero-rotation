@@ -92,10 +92,14 @@ HavocOldBuffRemains = HL.AddCoreOverride ("Player.BuffRemains",
 
 HL.AddCoreOverride ("Player.Demonsurge",
   function(self, Buff)
-    if DH.Demonsurge[Buff] ~= nil then
-      return DH.Demonsurge[Buff]
+    if Buff == "Hardcast" then
+      return SpellHavoc.AbyssalGaze:IsLearned()
     else
-      return false
+      if DH.Demonsurge[Buff] ~= nil then
+        return DH.Demonsurge[Buff]
+      else
+        return false
+      end
     end
   end
 , 577)
