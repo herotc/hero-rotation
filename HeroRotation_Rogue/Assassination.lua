@@ -1010,8 +1010,7 @@ local function Core_Dot()
   -- &refreshable&!buff.cold_blood.up&target.time_to_die-remains>(4+(talent.dashing_scoundrel*5)+(variable.regen_saturated*6))
   -- &(!buff.darkest_night.up|talent.caustic_spatter&!debuff.caustic_spatter.up)
   if S.Rupture:IsReady() and ComboPoints >= EffectiveCPSpend and Player:BuffDown(S.ColdBlood) and
-    (Player:BuffDown(S.DarkestNightBuff) or S.CausticSpatter:IsAvailable()
-    and not Target:DebuffUp(S.CausticSpatterDebuff)) then
+    (Player:BuffDown(S.DarkestNightBuff) or S.CausticSpatter:IsAvailable() and not Target:DebuffUp(S.CausticSpatterDebuff)) then
     if Evaluate_Rupture_Target(Target) and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
       if CastPooling(S.Rupture, nil, nil, not TargetInMeleeRange) then
         return "Cast Rupture"
@@ -1092,6 +1091,11 @@ end
 local function Direct ()
   -- # Direct Damage Abilities
 
+  -- # Various Checks to see if we need to use a generator
+  -- actions.direct+=/variable,name=use_filler,value=combo_points<=variable.effective_spend_cp&!variable.cd_soon
+  -- |variable.not_pooling|!variable.single_target
+  local UseFiller = ComboPoints <= EffectiveCPSpend and not CDSoon or NotPooling or not SingleTarget
+
   -- # Maintain Caustic Spatter
   -- actions.direct+=/variable,name=use_caustic_filler,value=talent.caustic_spatter&dot.rupture.ticking
   -- &(!debuff.caustic_spatter.up|debuff.caustic_spatter.remains<=2)&combo_points.deficit>=1&!variable.single_target
@@ -1117,7 +1121,7 @@ local function Direct ()
   -- actions.direct=envenom,if=!buff.darkest_night.up&combo_points>=variable.effective_spend_cp
   -- &(variable.not_pooling|debuff.amplifying_poison.stack>=20|!variable.single_target)
   if S.Envenom:IsCastable() and Player:BuffDown(S.DarkestNightBuff) and ComboPoints >= EffectiveCPSpend
-    and (NotPooling or Target:DebuffStack(S.AmplifyingPoisonDebuff) >= 20 or not SingleTarget) then
+    and (UseFiller or Target:DebuffStack(S.AmplifyingPoisonDebuff) >= 20 or not SingleTarget) then
     if CastPooling(S.Envenom, nil, not TargetInMeleeRange) then
       return "Cast Envenom 1"
     end
@@ -1130,11 +1134,6 @@ local function Direct ()
       return "Cast Envenom 2"
     end
   end
-
-  -- # Various Checks to see if we need to use a generator
-  -- actions.direct+=/variable,name=use_filler,value=combo_points<=variable.effective_spend_cp&!variable.cd_soon
-  -- |variable.not_pooling|!variable.single_target
-  local UseFiller = ComboPoints <= EffectiveCPSpend and not CDSoon or NotPooling or not SingleTarget
 
   -- # Ambush on Blindside/Subterfuge. Do not use Ambush from stealth during Kingsbane & Deathmark if possible.
   -- actions.direct+=/ambush,if=variable.use_filler&(buff.blindside.up|stealthed.rogue)&(!dot.kingsbane.ticking|debuff.deathmark.down|buff.blindside.up)

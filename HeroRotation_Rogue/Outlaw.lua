@@ -272,7 +272,7 @@ local function RtB_Reroll(ForceLoadedDice)
         -- &rtb_buffs.will_lose<=1&(variable.buffs_above_pandemic<5|rtb_buffs.max_remains<42|!set_bonus.tww2_4pc)
       Cache.APLVar.RtB_Reroll = (Player:HasTier("TWW2", 4) or S.SleightOfHand:IsAvailable() or S.Supercharger:IsAvailable())
         and Cache.APLVar.RtB_Buffs.Will_Lose.Total <= 1 and (Cache.APLVar.RtB_Buffs.BuffsAbovePandemic < 5
-        or Cache.APLVar.RtB_Buffs.MaxRemains <= 42 or not Player:HasTier("TWW2", 4))
+        or Cache.APLVar.RtB_Buffs.MaxRemains < 42 or not Player:HasTier("TWW2", 4))
 
       -- # With TWW2, or Supercharger with either Loaded Dice or Sleight of Hand without KIR: roll over any 2 buffs.
       -- actions.roll_the_bones+=/roll_the_bones,if=(set_bonus.tww2_4pc|talent.supercharger
@@ -496,6 +496,7 @@ local function Finish(ReturnSpellOnly)
 end
 
 local StealthCDs
+local Build
 
 -- # Spell Queue Macros
 -- This returns a table with the base spell and the result of the Stealth or Finish action lists as if the applicable buff / Combo points was present
@@ -505,10 +506,50 @@ local function SpellQueueMacro (BaseSpell, ReturnSpellOnly)
   -- Handle StealthMacro GUI options
   -- If false, just suggest them as off-GCD and bail out of the macro functionality
   if BaseSpell:ID() == S.Vanish:ID() or BaseSpell:ID() == S.Shadowmeld:ID() then
+
+    -- Fatebound can Vanish -> AR -> BtE for double jeopardy
+    local MacroAbilities
+    local ForceDoubleJeopardyBuffUp = true
+    if CDsON() and S.AdrenalineRush:IsCastable() then
+      if Player:BuffDown(S.AdrenalineRush) and (not Finish_Condition() or not S.ImprovedAdrenalineRush:IsAvailable())
+        or Player:BuffUp(S.AdrenalineRush) and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2
+        and (S.Vanish:Charges() == 0 or ForceDoubleJeopardyBuffUp or not TWW3FateboundHasTier2PC)
+        or HL.BossFilteredFightRemains("<", 2) then
+        if S.ImprovedAdrenalineRush:IsAvailable() then
+          MacroAbility = Finish(true)
+          if MacroAbility then
+            -- BtE might be on cooldown but won't be after vanish so just show BtE instead
+            if MacroAbility == S.Dispatch then
+              MacroAbility = S.BetweentheEyes
+            end
+            MacroAbilities = { S.AdrenalineRush, MacroAbility }
+
+            -- Make sure Adrenaline Rush returned a combo which may not happen if targeting something out of range
+            if MacroAbilities and MacroAbilities[2] and MacroAbilities[2] ~= "Cast Adrenaline Rush"
+              and Settings.Outlaw.SpellQueueMacro.Vanish then
+              local VanishMacroTable = { BaseSpell, unpack(MacroAbilities) }
+              ShouldReturn = CastQueue(unpack(VanishMacroTable))
+              if ShouldReturn then
+                return "| " .. VanishMacroTable[2]:Name() .. " | " .. VanishMacroTable[3]:Name()
+              end
+            end
+          end
+        end
+      end
+    end
+    ForceDoubleJeopardyBuffUp = false
+
     -- Fetch stealth spell
-    MacroAbility = Stealth(true)
-    if MacroAbility and ReturnSpellOnly then
-      return MacroAbility
+    if Finish_Condition() then
+      MacroAbility = Stealth(true)
+      if MacroAbility and ReturnSpellOnly then
+        return MacroAbility
+      end
+    else
+      MacroAbility = Build(true)
+      if MacroAbility and ReturnSpellOnly then
+        return MacroAbility
+      end
     end
     if BaseSpell:ID() == S.Vanish:ID() and (not Settings.Outlaw.SpellQueueMacro.Vanish or not MacroAbility) then
       if Cast(S.Vanish, Settings.CommonsOGCD.OffGCDasOffGCD.Vanish) then
@@ -720,7 +761,7 @@ local function Items()
   end
 end
 
-local function CDs ()
+local function CDs (ReturnSpellOnly)
   -- # Maintain Adrenaline Rush. With Improved AR, recast at low CPs even if already active.
   -- With TWW3 Fatebound, attempt to send AR alongside Vanish if there is a Vanish charge available.
   -- actions.cds=adrenaline_rush,if=!buff.adrenaline_rush.up&(!variable.finish_condition|!talent.improved_adrenaline_rush)
@@ -734,6 +775,9 @@ local function CDs ()
       if S.ImprovedAdrenalineRush:IsAvailable() then
         ShouldReturn = SpellQueueMacro(S.AdrenalineRush)
         if ShouldReturn then
+          if ReturnSpellOnly then
+            return {S.AdrenalineRush, ShouldReturn}
+          end
           return "AR Finisher Macro 1 " .. ShouldReturn
         end
       else
@@ -806,7 +850,7 @@ local function CDs ()
   -- actions.cds+=/vanish,if=talent.underhanded_upper_hand&talent.subterfuge&buff.adrenaline_rush.up&!stealthed.all
   -- &buff.adrenaline_rush.remains<2&cooldown.adrenaline_rush.remains>30
   if S.UnderhandedUpperhand:IsAvailable() and S.Subterfuge:IsAvailable() and Player:BuffUp(S.AdrenalineRush)
-    and not Player:StealthUp(true, true) and Player:BuffRemains(S.AdrenalineRush) < 2 and S.AdrenalineRush:CooldownRemains() > 30 then
+    and not Player:StealthUp(true, true) and Player:BuffRemains(S.AdrenalineRush) < 3 and S.AdrenalineRush:CooldownRemains() > 30 then
     ShouldReturn = StealthCDs()
     if ShouldReturn then
       return ShouldReturn
@@ -913,12 +957,16 @@ local function CDs ()
   end
 end
 
-local function Build ()
+function Build (ReturnSpellOnly)
   -- # High priority Ambush with Hidden Opportunity.
   -- actions.build+=/ambush,if=talent.hidden_opportunity&buff.audacity.up
   if S.Ambush:IsCastable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.AudacityBuff) then
-    if CastPooling(S.SSAudacity, nil, not Target:IsSpellInRange(S.Ambush)) then
-      return "Cast Ambush (SS High-Prio Buffed)"
+    if ReturnSpellOnly then
+      return S.SSAudacity
+    else
+      if CastPooling(S.SSAudacity, nil, not Target:IsSpellInRange(S.Ambush)) then
+        return "Cast Ambush (SS High-Prio Buffed)"
+      end
     end
   end
 
@@ -929,8 +977,12 @@ local function Build ()
   if S.SinisterStrike:IsCastable() then
     if Rogue.DisorientingStrikesCount() > 0 and not Player:StealthUp(true, true)
       and not S.HiddenOpportunity:IsAvailable() and Player:BuffStack(S.EscalatingBlade) < 4 and not S.CoupDeGrace:IsCastable() then
-      if CastPooling(S.SinisterStrike, nil, not Target:IsSpellInRange(S.SinisterStrike)) then
-        return "Cast Sinister Strike... Spend Disorienting Strikes"
+      if ReturnSpellOnly then
+        return S.SinisterStrike
+      else
+        if CastPooling(S.SinisterStrike, nil, not Target:IsSpellInRange(S.SinisterStrike)) then
+          return "Cast Sinister Strike... Spend Disorienting Strikes"
+        end
       end
     end
   end
@@ -938,8 +990,12 @@ local function Build ()
   -- # With Audacity + Hidden Opportunity + Fan the Hammer, consume Opportunity to proc Audacity any time Ambush is not available
   -- actions.build+=/pistol_shot,if=talent.fan_the_hammer&talent.audacity&talent.hidden_opportunity&buff.opportunity.up&!buff.audacity.up
   if S.FanTheHammer:IsAvailable() and S.Audacity:IsAvailable() and S.HiddenOpportunity:IsAvailable() and Player:BuffUp(S.Opportunity) and Player:BuffDown(S.AudacityBuff) then
-    if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then
-      return "Cast Pistol Shot (Audacity)"
+    if ReturnSpellOnly then
+      return S.PistolShot
+    else
+      if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then
+        return "Cast Pistol Shot (Audacity)"
+      end
     end
   end
 
@@ -948,8 +1004,12 @@ local function Build ()
   -- actions.build+=/blade_flurry,if=talent.deft_maneuvers&spell_targets>=4&(combo_points<=2|!buff.adrenaline_rush.up|!hero_tree.trickster)
   if S.BladeFlurry:IsCastable() then
     if S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 4 and (ComboPoints <= 2 or Player:BuffDown(S.AdrenalineRush) or not OutlawTrickster) then
-      if Cast(S.BladeFlurry, Settings.Outlaw.GCDasOffGCD.BladeFlurry) then
-        return "Cast Blade Flurry (Fatebound or 1FTH)"
+      if ReturnSpellOnly then
+        return S.BladeFlurry
+      else
+        if Cast(S.BladeFlurry, Settings.Outlaw.GCDasOffGCD.BladeFlurry) then
+          return "Cast Blade Flurry (Fatebound or 1FTH)"
+        end
       end
     end
   end
@@ -960,8 +1020,12 @@ local function Build ()
   if S.BladeFlurry:IsCastable() then
     if S.DeftManeuvers:IsAvailable() and ComboPointsDeficit == EnemiesBFCount + num(Player:BuffUp(S.Broadside))
       and EnemiesBFCount >= 3 - num(Fatebound) and S.FanTheHammer:TalentRank() == 1 then
-      if Cast(S.BladeFlurry, Settings.Outlaw.GCDasOffGCD.BladeFlurry) then
-        return "Cast Blade Flurry (Sustained Cleave)"
+      if ReturnSpellOnly then
+        return S.BladeFlurry
+      else
+        if Cast(S.BladeFlurry, Settings.Outlaw.GCDasOffGCD.BladeFlurry) then
+          return "Cast Blade Flurry (Sustained Cleave)"
+        end
       end
     end
   end
@@ -970,9 +1034,13 @@ local function Build ()
   -- actions.build+=/pistol_shot,if=talent.fan_the_hammer&buff.opportunity.up&(buff.opportunity.stack>=buff.opportunity.max_stack|buff.opportunity.remains<2)
     if S.FanTheHammer:IsAvailable() and S.FanTheHammer:TalentRank() == 2 and Player:BuffUp(S.Opportunity)
       and (Player:BuffStack(S.Opportunity) >= 6 or Player:BuffRemains(S.Opportunity) < 2) then
-    if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then
-      return "Cast Pistol Shot (FtH Dump)"
-    end
+      if ReturnSpellOnly then
+        return S.PistolShot
+      else
+        if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then
+          return "Cast Pistol Shot (FtH Dump)"
+        end
+      end
   end
 
   -- # With Fan the Hammer, consume Opportunity if it will not overcap CPs, or with 1 CP at minimum
@@ -980,8 +1048,12 @@ local function Build ()
   -- *(talent.fan_the_hammer.rank+1))|combo_points<=talent.ruthlessness)
   if S.FanTheHammer:IsAvailable() and Player:BuffUp(S.Opportunity) and (ComboPointsDeficit >= (1 + (num(S.QuickDraw:IsAvailable()) + num(Player:BuffUp(S.Broadside)))
     * (S.FanTheHammer:TalentRank() + 1)) or ComboPoints <= num(S.Ruthlessness:IsAvailable())) then
-    if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then
-      return "Cast Pistol Shot (Low CP Opportunity)"
+    if ReturnSpellOnly then
+      return S.PistolShot
+    else
+      if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then
+        return "Cast Pistol Shot (Low CP Opportunity)"
+      end
     end
   end
 
@@ -990,23 +1062,35 @@ local function Build ()
   -- |talent.quick_draw.enabled|talent.audacity.enabled&!buff.audacity.up)
   if not S.FanTheHammer:IsAvailable() and Player:BuffUp(S.Opportunity) and (EnergyTimeToMax > 1.5 or ComboPointsDeficit <= 1 + num(Player:BuffUp(S.Broadside))
     or S.QuickDraw:IsAvailable() or S.Audacity:IsAvailable() and Player:BuffDown(S.AudacityBuff)) then
-    if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then
-      return "Cast Pistol Shot (No Fan the Hammer)"
+    if ReturnSpellOnly then
+      return S.PistolShot
+    else
+      if CastPooling(S.PistolShot, nil, not Target:IsSpellInRange(S.PistolShot)) then
+        return "Cast Pistol Shot (No Fan the Hammer)"
+      end
     end
   end
 
   -- # Use Coup de Grace at low CP if Sinister Strike would otherwise be used.
   -- actions.build+=/coup_de_grace,if=!stealthed.all
   if S.CoupDeGrace:IsCastable() and not Player:StealthUp(true, true) then
-    if CastPooling(S.CoupDeGrace, nil, not Target:IsSpellInRange(S.CoupDeGrace)) then
-      return "Low CP Coup De Grace"
+    if ReturnSpellOnly then
+      return S.CoupDeGrace
+    else
+      if CastPooling(S.CoupDeGrace, nil, not Target:IsSpellInRange(S.CoupDeGrace)) then
+        return "Low CP Coup De Grace"
+      end
     end
   end
 
   -- actions.build+=/sinister_strike
   if S.SinisterStrike:IsCastable() then
-    if CastPooling(S.SinisterStrike, nil, not Target:IsSpellInRange(S.SinisterStrike)) then
-      return "Cast Sinister Strike"
+    if ReturnSpellOnly then
+      return S.SinisterStrike
+    else
+      if CastPooling(S.SinisterStrike, nil, not Target:IsSpellInRange(S.SinisterStrike)) then
+        return "Cast Sinister Strike"
+      end
     end
   end
 end
