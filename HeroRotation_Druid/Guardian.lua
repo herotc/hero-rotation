@@ -406,11 +406,6 @@ local function APL()
         if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 12"; end
       end
     end
-    -- prowl
-    -- Note: Manually added Cat Form check.
-    if S.Prowl:IsCastable() and (Player:BuffUp(S.CatForm)) then
-      if Cast(S.Prowl) then return "prowl main 14"; end
-    end
     -- run_action_list,name=bear
     local ShouldReturn = Bear(); if ShouldReturn then return ShouldReturn; end
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool Resources"; end
