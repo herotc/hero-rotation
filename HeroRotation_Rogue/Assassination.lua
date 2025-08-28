@@ -1195,6 +1195,12 @@ local function Direct ()
     end
   end
 
+  if S.Ambush:IsReady() and UseFiller then
+    if CastPooling(S.Ambush, nil,not TargetInMeleeRange) then
+      return "Cast Ambush (Filler)"
+    end
+  end
+
   -- # Fallback Mutilate if all else fails
   -- actions.direct+=/mutilate,if=variable.use_filler
   if S.Mutilate:IsCastable() and UseFiller then
