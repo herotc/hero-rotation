@@ -54,6 +54,8 @@ Spell.Evoker.Commons = {
   ScarletAdaptationBuff                 = Spell(372470),
   SourceofMagicBuff                     = Spell(369459),
   TipTheScalesBuff                      = Spell(370553),
+  -- TWW S3 Tier Buffs
+  InnerFlameBuff                        = Spell(1236776), -- Flameshaper 2pc
   -- DF Trinket Effects
   SpoilsofNeltharusCrit                 = Spell(381954),
   SpoilsofNeltharusHaste                = Spell(381955),

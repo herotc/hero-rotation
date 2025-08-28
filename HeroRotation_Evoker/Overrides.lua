@@ -93,6 +93,12 @@ HL.AddCoreOverride ("Player.MaxEssenceBurst",
   end
 , 1467)
 
+HL.AddCoreOverride ("Player.EssenceBurstAtMaxStacks",
+  function()
+    return Player:EssenceBurst() == Player:MaxEssenceBurst()
+  end
+, 1467)
+
 -- Preservation, ID: 1468
 
 -- Augmentation, ID: 1473

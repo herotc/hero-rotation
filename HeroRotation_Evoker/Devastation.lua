@@ -65,6 +65,7 @@ local PlayerHaste = Player:SpellHaste()
 local VarR1CastTime = PlayerHaste
 local VarDRPrepTime = 6
 local VarDRPrepTimeAoe = 4
+local VarAcceptableEngulfLoss = 3
 local VarCanUseEmpower = true
 local VarHasExternalPI = false
 local VarCanExtendDR = false
@@ -265,6 +266,14 @@ local function EvaluateTargetIfEngulfST(TargetUnit)
   return (TargetUnit:DebuffRemains(S.FireBreathDebuff) >= S.Engulf:TravelTime() + 2 * num(S.Engulf:InFlight())) and (not S.Enkindle:IsAvailable() or TargetUnit:DebuffUp(S.EnkindleDebuff)) and (not S.RubyEmbers:IsAvailable() or Target:DebuffUp(S.LivingFlameDebuff)) and (not S.ShatteringStar:IsAvailable() and not S.Iridescence:IsAvailable() or TargetUnit:DebuffUp(S.ShatteringStarDebuff) and (not S.Iridescence:IsAvailable() or S.Engulf:FullRechargeTime() <= S.FireBreath:CooldownRemains() + 4 or VarDragonrageUp) or Player:BuffUp(S.IridescenceRedBuff) and (TargetUnit:DebuffUp(S.ShatteringStarDebuff) or not S.ShatteringStar:IsAvailable() or S.Engulf:FullRechargeTime() <= S.ShatteringStar:CooldownRemains()) or S.ScorchingEmbers:IsAvailable() and Evoker.LastFBFullDuration <= 10 and TargetUnit:DebuffRemains(S.FireBreathDebuff) <= 5) and (VarNextDragonrage >= S.Engulf:Cooldown() * 1.2 or not S.Dragonrage:IsAvailable() or S.Engulf:FullRechargeTime() <= VarNextDragonrage) and (S.TipTheScales:CooldownRemains() >= 4 or S.FireBreath:CooldownRemains() >= 8 or not S.ScorchingEmbers:IsAvailable() or not S.TipTheScales:IsAvailable()) and (not S.Iridescence:IsAvailable() or Player:BuffUp(S.IridescenceRedBuff) and (TargetUnit:DebuffRemains(S.ShatteringStarDebuff) >= S.Engulf:TravelTime() or S.ShatteringStar:CooldownRemains() + Player:GCD() > Player:BuffRemains(S.IridescenceRedBuff) or Player:Essence() < 3 and Player:BuffStack(S.IridescenceRedBuff) == 1 or S.Engulf:FullRechargeTime() < S.FireBreath:CooldownRemains() and (TargetUnit:DebuffRemains(S.ShatteringStarDebuff) >= S.Engulf:TravelTime()) or not S.ShatteringStar:IsAvailable())) or BossFightRemains <= 10
 end
 
+--- ===== CastCycle Functions =====
+local function EvaluateCycleEngulf(TargetUnit)
+  -- target_if=(dot.fire_breath_damage.remains>travel_time)&(dot.enkindle.remains>travel_time|!talent.enkindle)&(!talent.scorching_embers|dot.fire_breath_damage.duration<=6|fight_remains<=30)&(cooldown.dragonrage.remains>=cooldown.engulf.duration+full_recharge_time|!talent.dragonrage|buff.tip_the_scales.up&cooldown.fire_breath.up|buff.dragonrage.up|full_recharge_time<=cooldown.fire_breath.duration_expected)
+  local EngulfTravel = S.Engulf:TravelTime()
+  local EngulfCD = S.Engulf:Cooldown() or 27 * Player:SpellHaste()
+  return (TargetUnit:DebuffRemains(S.FireBreathDebuff) > EngulfTravel) and (TargetUnit:DebuffRemains(S.EnkindleDebuff) > EngulfTravel or not S.Enkindle:IsAvailable()) and (not S.ScorchingEmbers:IsAvailable() or TargetUnit:DebuffRemains(S.FireBreathDebuff) <= 6 or BossFightRemains <= 30) and (S.Dragonrage:CooldownRemains() >= EngulfCD + S.Engulf:FullRechargeTime() or not S.Dragonrage:IsAvailable() or Player:BuffUp(S.TipTheScalesBuff) and S.FireBreath:CooldownUp() or VarDragonrageUp or S.Engulf:FullRechargeTime() <= S.FireBreath:CooldownRemains())
+end
+
 --- ===== Rotation Functions =====
 local function Precombat()
   -- snapshot_stats
@@ -298,6 +307,7 @@ local function Precombat()
   -- variable,name=has_external_pi,value=cooldown.invoke_power_infusion_0.duration>0
   -- Note: Not handling external PI.
   -- variable,name=can_use_empower,value=1,default=1,if=!talent.animosity|!talent.dragonrage
+  -- variable,name=acceptable_engulf_loss,default=3,op=reset
   -- Note: Another tw variables that are never changed. Moved to variable declarations.
   -- verdant_embrace,if=talent.scarlet_adaptation
   if Settings.Devastation.UseGreen and S.VerdantEmbrace:IsCastable() and (S.ScarletAdaptation:IsAvailable()) then
@@ -397,43 +407,37 @@ local function Green()
 end
 
 local function Aoe()
-  -- shattering_star,target_if=max:target.health.pct,if=(cooldown.dragonrage.up&talent.arcane_vigor|talent.eternitys_span&active_enemies<=3)&!talent.engulf
-  if S.ShatteringStar:IsCastable() and ((S.Dragonrage:CooldownUp() and S.ArcaneVigor:IsAvailable() or S.EternitysSpan:IsAvailable() and EnemiesCount8ySplash <= 3) and not S.Engulf:IsAvailable()) then
-    if Everyone.CastTargetIf(S.ShatteringStar, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star aoe 2"; end
-  end
   -- hover,use_off_gcd=1,if=raid_event.movement.in<6&!buff.hover.up&gcd.remains>=0.5&(buff.mass_disintegrate_stacks.up&talent.mass_disintegrate|active_enemies<=4)
   -- Note: Not handling movement ability.
-  -- firestorm,if=buff.snapfire.up&!talent.feed_the_flames
-  if S.Firestorm:IsCastable() and (Player:BuffUp(S.SnapfireBuff) and not S.FeedtheFlames:IsAvailable()) then
-    if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm aoe 4"; end
+  -- firestorm,if=buff.snapfire.up
+  if S.Firestorm:IsCastable() and (Player:BuffUp(S.SnapfireBuff)) then
+    if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm aoe 2"; end
+  end
+  -- shattering_star,target_if=max:target.health.pct,if=(!buff.essence_burst.at_max_stacks&talent.arcane_vigor|talent.eternitys_span&active_enemies<=4)
+  if S.ShatteringStar:IsCastable() and (Player:EssenceBurst() < Player:MaxEssenceBurst() and S.ArcaneVigor:IsAvailable() or S.EternitysSpan:IsAvailable() and EnemiesCount8ySplash <= 4) then
+    if Everyone.CastTargetIf(S.ShatteringStar, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star aoe 4"; end
   end
   -- deep_breath,if=talent.maneuverability&talent.melt_armor&!cooldown.fire_breath.up&!cooldown.eternity_surge.up|talent.feed_the_flames&talent.engulf&talent.imminent_destruction
   if CDsON() and DeepBreathAbility:IsCastable() and (S.Maneuverability:IsAvailable() and S.MeltArmor:IsAvailable() and S.FireBreath:CooldownDown() and S.EternitySurge:CooldownDown() or S.FeedtheFlames:IsAvailable() and S.Engulf:IsAvailable() and S.ImminentDestruction:IsAvailable()) then
     if Cast(DeepBreathAbility, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath aoe 6"; end
   end
-  -- firestorm,if=talent.feed_the_flames&(!talent.engulf|cooldown.engulf.remains>4|cooldown.engulf.charges=0|(variable.next_dragonrage<=cooldown*1.2|!talent.dragonrage))
-  if S.Firestorm:IsCastable() and (S.FeedtheFlames:IsAvailable() and (not S.Engulf:IsAvailable() or S.Engulf:CooldownRemains() > 4 or S.Engulf:Charges() == 0 or (VarNextDragonrage <= 20 * 1.2 or not S.Dragonrage:IsAvailable()))) then
-    if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm aoe 8"; end
+  -- tip_the_scales,use_off_gcd=1,if=(!talent.dragonrage|buff.dragonrage.up)&cooldown.fire_breath.remains<cooldown.eternity_surge.remains
+  if CDsON() and S.TipTheScales:IsCastable() and ((not S.Dragonrage:IsAvailable() or VarDragonrageUp) and S.FireBreath:CooldownRemains() < S.EternitySurge:CooldownRemains()) then
+    if Cast(S.TipTheScales, Settings.CommonsOGCD.GCDasOffGCD.TipTheScales) then return "tip_the_scales aoe 8"; end
   end
-  -- call_action_list,name=fb,if=talent.dragonrage&cooldown.dragonrage.up&(talent.iridescence|talent.scorching_embers)&!talent.engulf
-  if S.Dragonrage:IsAvailable() and S.Dragonrage:CooldownUp() and (S.Iridescence:IsAvailable() or S.ScorchingEmbers:IsAvailable()) and not S.Engulf:IsAvailable() then
-    local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
+  -- fire_breath,target_if=max:target.health.pct,empower_to=4,if=talent.scorching_embers&variable.can_use_empower&target.time_to_die>=duration
+  -- Note: fire_breath hits all targets, so ignoring target_if.
+  -- Note: empower_to=4 requires Font of Magic.
+  if S.FireBreath:IsReady() and S.FontofMagic:IsAvailable() and (S.ScorchingEmbers:IsAvailable() and VarCanUseEmpower and Target:TimeToDie() >= 2 + 4 * num(S.BlastFurnace:IsAvailable())) then
+    if CastAnnotated(S.FireBreath, false, "4", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 4 aoe 10"; end
   end
-  -- tip_the_scales,if=(!talent.dragonrage|buff.dragonrage.up)&(cooldown.fire_breath.remains<=cooldown.eternity_surge.remains|(cooldown.eternity_surge.remains<=cooldown.fire_breath.remains&talent.font_of_magic)&!talent.engulf)
-  if CDsON() and S.TipTheScales:IsCastable() and ((not S.Dragonrage:IsAvailable() or VarDragonrageUp) and (S.FireBreath:CooldownRemains() <= S.EternitySurge:CooldownRemains() or (S.EternitySurge:CooldownRemains() <= S.FireBreath:CooldownRemains() and S.FontofMagic:IsAvailable()) and not S.Engulf:IsAvailable())) then
-    if Cast(S.TipTheScales, Settings.CommonsOGCD.GCDasOffGCD.TipTheScales) then return "tip_the_scales aoe 10"; end
+  -- fire_breath,target_if=max:target.health.pct,empower_to=2,if=variable.can_use_empower&target.time_to_die>=duration
+  if S.FireBreath:IsReady() and (VarCanUseEmpower and Target:TimeToDie() >= 14 + 4 * num(S.BlastFurnace:IsAvailable())) then
+    if CastAnnotated(S.FireBreath, false, "2", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 2 aoe 12"; end
   end
-  -- shattering_star,target_if=max:target.health.pct,if=(cooldown.dragonrage.up&talent.arcane_vigor|talent.eternitys_span&active_enemies<=3)&talent.engulf
-  if S.ShatteringStar:IsCastable() and ((S.Dragonrage:CooldownUp() and S.ArcaneVigor:IsAvailable() or S.EternitysSpan:IsAvailable() and EnemiesCount8ySplash <= 3) and S.Engulf:IsAvailable()) then
-    if Everyone.CastTargetIf(S.ShatteringStar, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star aoe 12"; end
-  end
-  -- dragonrage,target_if=max:target.time_to_die,if=target.time_to_die>=32|active_enemies>=3&target.time_to_die>=15|fight_remains<30
-  if CDsON() and S.Dragonrage:IsCastable() and (Target:TimeToDie() >= 32 or EnemiesCount8ySplash >= 3 and Target:TimeToDie() >= 15 or BossFightRemains < 30) then
+  -- dragonrage,target_if=max:target.time_to_die,if=target.time_to_die>=15|!raid_event.adds.exists
+  if S.Dragonrage:IsReady() then
     if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage) then return "dragonrage aoe 14"; end
-  end
-  -- call_action_list,name=fb,if=(!talent.dragonrage|buff.dragonrage.up|cooldown.dragonrage.remains>variable.dr_prep_time_aoe|!talent.animosity|talent.flame_siphon)&(target.time_to_die>=8|talent.mass_disintegrate)
-  if (not S.Dragonrage:IsAvailable() or VarDragonrageUp or S.Dragonrage:CooldownRemains() > VarDRPrepTimeAoe or not S.Animosity:IsAvailable() or S.FlameSiphon:IsAvailable()) and (Target:TimeToDie() >= 8 or S.MassDisintegrate:IsAvailable()) then
-    local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
   end
   -- call_action_list,name=es,if=(!talent.dragonrage|buff.dragonrage.up|cooldown.dragonrage.remains>variable.dr_prep_time_aoe|!talent.animosity)&(!buff.jackpot.up|!set_bonus.tww2_4pc|talent.mass_disintegrate)
   if (not S.Dragonrage:IsAvailable() or VarDragonrageUp or S.Dragonrage:CooldownRemains() > VarDRPrepTimeAoe or not S.Animosity:IsAvailable()) and (Player:BuffDown(S.JackpotBuff) or not Player:HasTier("TWW2", 4) or S.MassDisintegrate:IsAvailable()) then
@@ -443,111 +447,100 @@ local function Aoe()
   if CDsON() and DeepBreathAbility:IsCastable() and (not VarDragonrageUp and Player:EssenceDeficit() > 3) then
     if Cast(DeepBreathAbility, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath aoe 16"; end
   end
-  -- shattering_star,target_if=max:target.health.pct,if=(buff.essence_burst.stack<buff.essence_burst.max_stack&talent.arcane_vigor|talent.eternitys_span&active_enemies<=3|set_bonus.tww2_4pc&buff.jackpot.stack<2)&(!talent.engulf|cooldown.engulf.remains<4|cooldown.engulf.charges>0)
-  if S.ShatteringStar:IsCastable() and ((LessThanMaxEssenceBurst() and S.ArcaneVigor:IsAvailable() or S.EternitysSpan:IsAvailable() and EnemiesCount8ySplash <= 3 or Player:HasTier("TWW2", 4) and Player:BuffStack(S.JackpotBuff) < 2) and (not S.Engulf:IsAvailable() or S.Engulf:CooldownRemains() < 4 or S.Engulf:Charges() > 0)) then
-    if Everyone.CastTargetIf(S.ShatteringStar, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star aoe 18"; end
-  end
-  -- engulf,target_if=max:(((dot.fire_breath_damage.remains-dbc.effect.1140380.base_value*action.engulf_damage.in_flight_to_target-action.engulf_damage.travel_time)>0)*3+dot.living_flame_damage.ticking+dot.enkindle.ticking),if=(dot.fire_breath_damage.remains>=action.engulf_damage.travel_time+dbc.effect.1140380.base_value*action.engulf_damage.in_flight_to_target)&(variable.next_dragonrage>=cooldown*1.2|!talent.dragonrage)
-  if S.Engulf:IsReady() and (VarNextDragonrage >= S.Engulf:Cooldown() * 1.2 or not S.Dragonrage:IsAvailable()) then
-    if Everyone.CastTargetIf(S.Engulf, Enemies8ySplash, "max", EvaluateTargetIfFilterEngulfAoe, EvaluateTargetIfEngulfAoe, not Target:IsInRange(25)) then return "engulf aoe 20"; end
+  -- engulf,target_if=(dot.fire_breath_damage.remains>travel_time)&(dot.enkindle.remains>travel_time|!talent.enkindle)&(!talent.scorching_embers|dot.fire_breath_damage.duration<=6|fight_remains<=30)&(cooldown.dragonrage.remains>=cooldown.engulf.duration+full_recharge_time|!talent.dragonrage|buff.tip_the_scales.up&cooldown.fire_breath.up|buff.dragonrage.up|full_recharge_time<=cooldown.fire_breath.duration_expected)
+  if S.Engulf:IsReady() then
+    if Everyone.CastCycle(S.Engulf, Enemies8ySplash, EvaluateCycleEngulf, not Target:IsInRange(25)) then return "engulf aoe 18"; end
   end
   -- pyre,target_if=max:target.health.pct,if=buff.charged_blast.stack>=12&(cooldown.dragonrage.remains>gcd.max*4|!talent.dragonrage)
   if S.Pyre:IsReady() and (Player:BuffStack(S.ChargedBlastBuff) >= 12 and (S.Dragonrage:CooldownRemains() > Player:GCD() * 4 or not S.Dragonrage:IsAvailable())) then
-    if Everyone.CastTargetIf(S.Pyre, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Pyre) then return "pyre aoe 22"; end
+    if Everyone.CastTargetIf(S.Pyre, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Pyre) then return "pyre aoe 20"; end
   end
   -- disintegrate,target_if=min:debuff.bombardments.remains,if=buff.mass_disintegrate_stacks.up&talent.mass_disintegrate&(!variable.pool_for_id|buff.mass_disintegrate_stacks.remains<=buff.mass_disintegrate_stacks.stack*(duration+0.1))
   if S.Disintegrate:IsReady() and (S.MassDisintegrate:IsAvailable() and Player:BuffUp(S.MassDisintegrateBuff) and (not VarPoolForID or Player:BuffRemains(S.MassDisintegrateBuff) <= Player:BuffStack(S.MassDisintegrateBuff) * (S.Disintegrate:BaseDuration() + 0.1))) then
-    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "min", EvaluateTargetIfFilterBombardments, EvaluateTargetIfDisintegrate, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate aoe 24"; end
+    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "min", EvaluateTargetIfFilterBombardments, EvaluateTargetIfDisintegrate, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate aoe 22"; end
   end
   -- deep_breath,if=talent.imminent_destruction&!buff.essence_burst.up
   if CDsON() and DeepBreathAbility:IsCastable() and (S.ImminentDestruction:IsAvailable() and Player:BuffDown(S.EssenceBurstBuff)) then
-    if Cast(DeepBreathAbility, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath aoe 26"; end
+    if Cast(DeepBreathAbility, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath aoe 24"; end
   end
-  -- pyre,target_if=max:target.health.pct,if=(active_enemies>=4-(buff.imminent_destruction.up)|talent.volatility|talent.scorching_embers&active_dot.fire_breath_damage>=active_enemies*0.75)&(cooldown.dragonrage.remains>gcd.max*4|!talent.dragonrage|!talent.charged_blast)&!variable.pool_for_id&(!buff.mass_disintegrate_stacks.up|buff.essence_burst.stack=2|buff.essence_burst.stack=1&essence>=(3-buff.imminent_destruction.up)|essence>=(5-buff.imminent_destruction.up*2))
-  if S.Pyre:IsReady() and ((EnemiesCount8ySplash >= 4 - num(Player:BuffUp(S.ImminentDestructionBuff)) or S.Volatility:IsAvailable() or S.ScorchingEmbers:IsAvailable() and S.FireBreathDebuff:AuraActiveCount() >= EnemiesCount8ySplash * 0.75) and (S.Dragonrage:CooldownRemains() > Player:GCD() * 4 or not S.Dragonrage:IsAvailable() or not S.ChargedBlast:IsAvailable()) and not VarPoolForID and (Player:BuffDown(S.MassDisintegrateBuff) or Player:EssenceBurst() == 2 or Player:EssenceBurst() == 1 and Player:Essence() >= (3 - num(Player:BuffUp(S.ImminentDestructionBuff))) or Player:Essence() >= (5 - num(Player:BuffUp(S.ImminentDestructionBuff)) * 2))) then
-    if Everyone.CastTargetIf(S.Pyre, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Pyre) then return "pyre aoe 28"; end
+  -- pyre,target_if=max:target.health.pct,if=(active_enemies>=4-(buff.imminent_destruction.up)|talent.snapfire|talent.volatility|talent.scorching_embers&active_dot.fire_breath_damage>=active_enemies*0.75)&(cooldown.dragonrage.remains>gcd.max*4|!talent.dragonrage|!talent.charged_blast)&!variable.pool_for_id&(!buff.mass_disintegrate_stacks.up|buff.essence_burst.stack=2|buff.essence_burst.stack=1&essence>=(3-buff.imminent_destruction.up)|essence>=(5-buff.imminent_destruction.up*2))
+  if S.Pyre:IsReady() and ((EnemiesCount8ySplash >= 4 - num(Player:BuffUp(S.ImminentDestructionBuff)) or S.Snapfire:IsAvailable() or S.Volatility:IsAvailable() or S.ScorchingEmbers:IsAvailable() and S.FireBreathDebuff:AuraActiveCount() >= EnemiesCount8ySplash * 0.75) and (S.Dragonrage:CooldownRemains() > Player:GCD() * 4 or not S.Dragonrage:IsAvailable() or not S.ChargedBlast:IsAvailable()) and not VarPoolForID and (Player:BuffDown(S.MassDisintegrateBuff) or Player:EssenceBurst() == 2 or Player:EssenceBurst() == 1 and Player:Essence() >= (3 - num(Player:BuffUp(S.ImminentDestructionBuff))) or Player:Essence() >= (5 - num(Player:BuffUp(S.ImminentDestructionBuff)) * 2))) then
+    if Everyone.CastTargetIf(S.Pyre, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Pyre) then return "pyre aoe 26"; end
   end
-  -- living_flame,target_if=max:target.health.pct,if=(!talent.burnout|buff.burnout.up|cooldown.fire_breath.remains<=gcd.max*5|buff.scarlet_adaptation.up|buff.ancient_flame.up)&buff.leaping_flames.up&(!buff.essence_burst.up&essence.deficit>1|cooldown.fire_breath.remains<=gcd.max*3&buff.essence_burst.stack<buff.essence_burst.max_stack)
-  if S.LivingFlame:IsReady() and ((not S.Burnout:IsAvailable() or Player:BuffUp(S.BurnoutBuff) or S.FireBreath:CooldownRemains() <= Player:GCD() * 5 or Player:BuffUp(S.ScarletAdaptationBuff) or Player:BuffUp(S.AncientFlameBuff)) and Player:BuffUp(S.LeapingFlamesBuff) and (Player:BuffDown(S.EssenceBurstBuff) and Player:EssenceDeficit() > 1 or S.FireBreath:CooldownRemains() <= Player:GCD() * 3 and Player:EssenceBurst() < Player:MaxEssenceBurst())) then
-    if Everyone.CastTargetIf(S.LivingFlame, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.LivingFlame) then return "living_flame aoe 30"; end
+  -- living_flame,target_if=max:target.health.pct,if=(!talent.burnout|buff.burnout.up|cooldown.fire_breath.remains<=gcd.max*5|buff.inner_flame.up|buff.scarlet_adaptation.up|buff.ancient_flame.up)&buff.leaping_flames.up&(!buff.essence_burst.up&essence.deficit>1|cooldown.fire_breath.remains<=gcd.max*3&buff.essence_burst.stack<buff.essence_burst.max_stack)
+  if S.LivingFlame:IsReady() and ((not S.Burnout:IsAvailable() or Player:BuffUp(S.BurnoutBuff) or S.FireBreath:CooldownRemains() <= Player:GCD() * 5 or Player:BuffUp(S.AncientFlameBuff) or Player:BuffUp(S.ScarletAdaptationBuff) or Player:BuffUp(S.AncientFlameBuff)) and Player:BuffUp(S.LeapingFlamesBuff) and (Player:BuffDown(S.EssenceBurstBuff) and Player:EssenceDeficit() > 1 or S.FireBreath:CooldownRemains() <= Player:GCD() * 3 and Player:EssenceBurst() < Player:MaxEssenceBurst())) then
+    if Everyone.CastTargetIf(S.LivingFlame, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.LivingFlame) then return "living_flame aoe 28"; end
   end
   -- disintegrate,target_if=max:target.health.pct,chain=1,early_chain_if=evoker.use_early_chaining&ticks>=2&(raid_event.movement.in>2|buff.hover.up),interrupt_if=evoker.use_clipping&buff.dragonrage.up&ticks>=2&(raid_event.movement.in>2|buff.hover.up),if=(raid_event.movement.in>2|buff.hover.up)&!variable.pool_for_id&(active_enemies<=4|buff.mass_disintegrate_stacks.up)
   if S.Disintegrate:IsReady() and (not VarPoolForID and (EnemiesCount8ySplash <= 4 or Player:BuffUp(S.MassDisintegrateBuff))) then
-    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate aoe 32"; end
+    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate aoe 30"; end
   end
   -- living_flame,target_if=max:target.health.pct,if=talent.snapfire&buff.burnout.up
   if S.LivingFlame:IsReady() and (S.Snapfire:IsAvailable() and Player:BuffUp(S.BurnoutBuff)) then
-    if Everyone.CastTargetIf(S.LivingFlame, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.LivingFlame) then return "living_flame aoe 34"; end
+    if Everyone.CastTargetIf(S.LivingFlame, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.LivingFlame) then return "living_flame aoe 32"; end
   end
   -- firestorm
   if S.Firestorm:IsCastable() then
-    if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm aoe 36"; end
+    if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm aoe 34"; end
   end
   -- living_flame,if=talent.snapfire&!talent.engulfing_blaze
   if S.LivingFlame:IsReady() and (S.Snapfire:IsAvailable() and not S.EngulfingBlaze:IsAvailable()) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame aoe 38"; end
+    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame aoe 36"; end
   end
   -- azure_strike,target_if=max:target.health.pct
   -- Note: Since this is a filler, going to use both Cast and CastTargetIf.
   if S.AzureStrike:IsCastable() then
-    if Everyone.CastTargetIf(S.AzureStrike, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike cti aoe 40"; end
+    if Everyone.CastTargetIf(S.AzureStrike, Enemies8ySplash, "max", EvaluateTargetIfFilterHPPct, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike cti aoe 38"; end
   end
   if S.AzureStrike:IsCastable() then
-    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike aoe 42"; end
+    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike aoe 40"; end
   end
 end
 
 local function ST()
-  -- dragonrage
-  if CDsON() and S.Dragonrage:IsCastable() then
-    if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage) then return "dragonrage st 2"; end
+  -- deep_breath,if=talent.maneuverability&set_bonus.tww3_4pc,cancel_if=gcd.remains=0&ticks>=8&active_enemies=1
+  if DeepBreathAbility:IsCastable() and (S.Maneuverability:IsAvailable() and Player:HasTier("TWW3", 4)) then
+    if Cast(DeepBreathAbility, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath st 2"; end
+  end
+  -- dragonrage,if=target.time_to_die>=30&raid_event.adds.in>=60|!raid_event.adds.exists
+  if S.Dragonrage:IsReady() and (Target:TimeToDie() >= 30) then
+    if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage) then return "dragonrage st 4"; end
+  end
+  -- eternity_surge,empower_to=1,if=set_bonus.tww3_4pc&buff.dragonrage.up&cooldown.engulf.full_recharge_time<gcd.max*3&cooldown.fire_breath.remains<gcd.max*3
+  if S.EternitySurge:IsCastable() and (Player:HasTier("TWW3", 4) and VarDragonrageUp and S.Engulf:FullRechargeTime() < Player:GCD() * 3 and S.FireBreath:CooldownRemains() < Player:GCD() * 3) then
+    if CastAnnotated(S.EternitySurge, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "eternity_surge empower 1 st 6"; end
+  end
+  -- living_flame,if=set_bonus.tww3_4pc&cooldown.engulf.remains<=execute_time*2&buff.essence_burst.stack<(2-talent.arcane_vigor.enabled)&buff.dragonrage.up&cooldown.fire_breath.remains<=execute_time*2
+  if S.LivingFlame:IsCastable() and (Player:HasTier("TWW3", 4) and S.Engulf:CooldownRemains() <= S.LivingFlame:ExecuteTime() * 2 and Player:EssenceBurst() < (2 - num(S.ArcaneVigor:IsAvailable())) and VarDragonrageUp and S.FireBreath:CooldownRemains() <= S.LivingFlame:ExecuteTime() * 2) then
+    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame st 8"; end
   end
   -- hover,use_off_gcd=1,if=raid_event.movement.in<6&!buff.hover.up&gcd.remains>=0.5|talent.slipstream&gcd.remains>=0.5
-  -- Note: Not handling movement ability.
-  -- tip_the_scales,use_off_gcd=1,if=buff.dragonrage.up&cooldown.fire_breath.remains<=cooldown.eternity_surge.remains
-  if CDsON() and S.TipTheScales:IsCastable() and (VarDragonrageUp and S.FireBreath:CooldownRemains() <= S.EternitySurge:CooldownRemains()) then
-    if Cast(S.TipTheScales, Settings.CommonsOGCD.GCDasOffGCD.TipTheScales) then return "tip_the_scales st 4"; end
+  -- Note: Not handling hover.
+  -- tip_the_scales,use_off_gcd=1,if=buff.dragonrage.up&cooldown.fire_breath.remains<cooldown.eternity_surge.remains
+  if CDsON() and S.TipTheScales:IsCastable() and (VarDragonrageUp and S.FireBreath:CooldownRemains() < S.EternitySurge:CooldownRemains()) then
+    if Cast(S.TipTheScales, Settings.CommonsOGCD.GCDasOffGCD.TipTheScales) then return "tip_the_scales st 10"; end
   end
-  -- shattering_star,if=(buff.essence_burst.stack<buff.essence_burst.max_stack|!talent.arcane_vigor)
-  if S.ShatteringStar:IsCastable() and (LessThanMaxEssenceBurst() or not S.ArcaneVigor:IsAvailable()) then
-    if Cast(S.ShatteringStar, nil, nil, not Target:IsSpellInRange(S.ShatteringStar)) then return "shattering_star st 6"; end
+  -- shattering_star,if=(!buff.essence_burst.at_max_stacks|!talent.arcane_vigor|talent.engulf)&(set_bonus.tww2_2pc|!talent.scorching_embers|!talent.engulf|dot.fire_breath_damage.ticking&dot.fire_breath_damage.duration<=6|(action.engulf.usable_in<?cooldown.fire_breath.remains_expected+4)>=15)
+  if S.ShatteringStar:IsCastable() and ((not Player:EssenceBurstAtMaxStacks() or not S.ArcaneVigor:IsAvailable() or S.Engulf:IsAvailable()) and (Player:HasTier("TWW2", 2) or not S.ScorchingEmbers:IsAvailable() or not S.Engulf:IsAvailable() or Target:DebuffRemains(S.FireBreathDebuff) <= 6 or mathmax(S.Engulf:CooldownRemains(), S.FireBreath:CooldownRemains() + 4) >= 15)) then
+    if Cast(S.ShatteringStar, nil, nil, not Target:IsInRange(25)) then return "shattering_star st 12"; end
   end
-  -- Note: All fire_breath lines require VarCanUseEmpower to be true.
-  if VarCanUseEmpower then
-    -- Note: fire_breath will hit most/all targets, so ignoring target_if.
-    -- fire_breath,target_if=max:target.health.pct,empower_to=4,if=(talent.scorching_embers&talent.engulf&action.engulf.usable_in<=duration+0.5)&variable.can_use_empower&cooldown.engulf.full_recharge_time<=cooldown.fire_breath.duration_expected+4
-    local MaxEmpower = S.FontofMagic:IsAvailable() and 4 or 3
-    if S.FireBreath:IsCastable() and ((S.ScorchingEmbers:IsAvailable() and S.Engulf:IsAvailable() and S.Engulf:CooldownRemains() <= Player:EmpowerCastTime(MaxEmpower) + 0.5) and S.Engulf:FullRechargeTime() <= 34) then
-      if CastAnnotated(S.FireBreath, false, MaxEmpower, not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower " .. MaxEmpower .. " st 8"; end
-    end
-    -- fire_breath,target_if=max:target.health.pct,empower_to=1,if=talent.engulf&talent.fulminous_roar&variable.can_use_empower
-    if S.FireBreath:IsCastable() and (S.Engulf:IsAvailable() and S.FulminousRoar:IsAvailable()) then
-      if CastAnnotated(S.FireBreath, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 1 st 10"; end
-    end
-    -- fire_breath,target_if=max:target.health.pct,empower_to=2,if=variable.can_use_empower&!buff.dragonrage.up
-    if S.FireBreath:IsCastable() and (not VarDragonrageUp) then
-      if CastAnnotated(S.FireBreath, false, "2", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 2 st 12"; end
-    end
-    -- fire_breath,target_if=max:target.health.pct,empower_to=1,if=variable.can_use_empower
-    if S.FireBreath:IsCastable() then
-      if CastAnnotated(S.FireBreath, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 1 st 14"; end
-    end
+  -- fire_breath,target_if=max:target.health.pct,empower_to=4,if=(talent.scorching_embers&talent.engulf&action.engulf.usable_in<=duration+0.5)&variable.can_use_empower&(cooldown.shattering_star.remains<=duration+0.5+6-gcd.max|!talent.shattering_star|cooldown.engulf.full_recharge_time<=cooldown.fire_breath.duration_expected+4)
+  if S.FireBreath:IsCastable() and ((S.ScorchingEmbers:IsAvailable() and S.Engulf:IsAvailable() and S.Engulf:CooldownRemains() <= 2 + 4 * num(S.BlastFurnace:IsAvailable()) + 0.5) and VarCanUseEmpower and (S.ShatteringStar:CooldownRemains() <= 2 + 4 * num(S.BlastFurnace:IsAvailable()) + 0.5 + 6 - Player:GCD() or not S.ShatteringStar:IsAvailable() or S.Engulf:FullRechargeTime() <= 34)) then
+    if CastAnnotated(S.FireBreath, false, "4", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 4 st 14"; end
   end
-  -- engulf,if=(dot.fire_breath_damage.remains>travel_time)&(dot.living_flame_damage.remains>travel_time|!talent.ruby_embers)&(dot.enkindle.remains>travel_time|!talent.enkindle)&(!talent.iridescence|buff.iridescence_red.up)&(!talent.scorching_embers|dot.fire_breath_damage.duration<=6|fight_remains<=30)&(debuff.shattering_star_debuff.remains>travel_time|full_recharge_time<action.shattering_star.usable_in|talent.scorching_embers)
-  if S.Engulf:IsReady() and ((Target:DebuffRemains(S.FireBreathDebuff) > S.Engulf:TravelTime()) and (Target:DebuffRemains(S.LivingFlameDebuff) > S.Engulf:TravelTime() or not S.RubyEmbers:IsAvailable()) and (Target:DebuffRemains(S.EnkindleDebuff) > S.Engulf:TravelTime() or not S.Enkindle:IsAvailable()) and (not S.Iridescence:IsAvailable() or Player:BuffUp(S.IridescenceRedBuff)) and (not S.ScorchingEmbers:IsAvailable() or Target:DebuffRemains(S.FireBreathDebuff) <= 6 or BossFightRemains <= 30) and (Target:DebuffRemains(S.ShatteringStarDebuff) > S.Engulf:TravelTime() or S.Engulf:FullRechargeTime() < S.ShatteringStar:CooldownRemains() or S.ScorchingEmbers:IsAvailable())) then
-    if Cast(S.Engulf, nil, nil, not Target:IsInRange(25)) then return "engulf st 16"; end
+  -- fire_breath,target_if=max:target.health.pct,empower_to=2,if=variable.can_use_empower&!buff.dragonrage.up&talent.mass_disintegrate
+  if S.FireBreath:IsCastable() and (VarCanUseEmpower and not VarDragonrageUp and S.MassDisintegrate:IsAvailable()) then
+    if CastAnnotated(S.FireBreath, false, "2", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 2 st 16"; end
   end
-  -- Note: All eternity_surge lines require VarCanUseEmpower to be true.
-  if VarCanUseEmpower then
-    -- Note: eternity_surge will hit multiple targets. Ignoring target_if, for now.
-    -- eternity_surge,target_if=max:target.health.pct,empower_to=2,if=(!talent.power_swell|buff.power_swell.remains<=duration|!talent.mass_disintegrate)&active_enemies=2&!talent.eternitys_span&variable.can_use_empower
-    if S.EternitySurge:IsCastable() and ((not S.PowerSwell:IsAvailable() or Player:BuffRemains(S.PowerSwellBuff) <= Player:EmpowerCastTime(2) or not S.MassDisintegrate:IsAvailable()) and EnemiesCount8ySplash == 2 and not S.EternitysSpan:IsAvailable()) then
-      if CastAnnotated(S.EternitySurge, false, "2", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "eternity_surge empower 2 st 18"; end
-    end
-    -- eternity_surge,target_if=max:target.health.pct,empower_to=1,if=(!talent.power_swell|buff.power_swell.remains<=duration|!talent.mass_disintegrate)&variable.can_use_empower
-    if S.EternitySurge:IsCastable() and ((not S.PowerSwell:IsAvailable() or Player:BuffRemains(S.PowerSwellBuff) <= Player:EmpowerCastTime(1) or not S.MassDisintegrate:IsAvailable())) then
-      if CastAnnotated(S.EternitySurge, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "eternity_surge empower 1 st 20"; end
-    end
+  -- fire_breath,target_if=max:target.health.pct,empower_to=1,if=variable.can_use_empower
+  if S.FireBreath:IsCastable() and (VarCanUseEmpower) then
+    if CastAnnotated(S.FireBreath, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 1 st 18"; end
+  end
+  -- engulf,if=(dot.fire_breath_damage.remains>travel_time)&(dot.living_flame_damage.remains>travel_time|!talent.ruby_embers)&(dot.enkindle.remains>travel_time|!talent.enkindle)&(!talent.iridescence|buff.iridescence_red.up)&(!talent.scorching_embers|dot.fire_breath_damage.duration<=6|fight_remains<=30)&(debuff.shattering_star_debuff.remains>travel_time|full_recharge_time<action.shattering_star.usable_in|talent.scorching_embers)&(cooldown.dragonrage.remains>=cooldown.engulf.duration+full_recharge_time|raid_event.adds.in<=60&raid_event.adds.in>duration+full_recharge_time|!talent.dragonrage|buff.tip_the_scales.up&cooldown.fire_breath.up|buff.dragonrage.up|full_recharge_time<=cooldown.fire_breath.duration_expected)
+  local EngulfTravel = S.Engulf:TravelTime()
+  local EngulfCD = S.Engulf:Cooldown() or 27 * Player:SpellHaste()
+  if S.Engulf:IsReady() and ((Target:DebuffRemains(S.FireBreathDebuff) > EngulfTravel) and (Target:DebuffRemains(S.LivingFlameDebuff) > EngulfTravel or not S.RubyEmbers:IsAvailable()) and (Target:DebuffRemains(S.EnkindleDebuff) > EngulfTravel or not S.Enkindle:IsAvailable()) and (not S.Iridescence:IsAvailable() or Player:BuffUp(S.IridescenceRedBuff)) and (not S.ScorchingEmbers:IsAvailable() or Target:DebuffRemains(S.FireBreathDebuff) <= 6 or BossFightRemains <= 30) and (Target:DebuffRemains(S.ShatteringStarDebuff) > EngulfTravel or S.Engulf:FullRechargeTime() < S.ShatteringStar:CooldownRemains() or S.ScorchingEmbers:IsAvailable()) and (S.Dragonrage:CooldownRemains() >= EngulfCD + S.Engulf:FullRechargeTime() or not S.Dragonrage:IsAvailable() or Player:BuffUp(S.TipTheScalesBuff) and S.FireBreath:CooldownUp() or VarDragonrageUp or S.Engulf:FullRechargeTime() <= 30)) then
+    if Cast(S.Engulf, nil, nil, not Target:IsInRange(25)) then return "engulf st 20"; end
   end
   -- living_flame,if=buff.dragonrage.up&buff.dragonrage.remains<(buff.essence_burst.max_stack-buff.essence_burst.stack)*gcd.max&buff.burnout.up
   if S.LivingFlame:IsCastable() and (VarDragonrageUp and VarDragonrageRemains < (Player:MaxEssenceBurst() - Player:EssenceBurst()) * Player:GCD() and Player:BuffUp(S.BurnoutBuff)) then
@@ -561,41 +554,54 @@ local function ST()
   if S.Firestorm:IsCastable() and (Player:BuffUp(S.SnapfireBuff) or EnemiesCount8ySplash >= 2) then
     if Cast(S.Firestorm, nil, nil, not Target:IsInRange(25)) then return "firestorm st 26"; end
   end
-  -- deep_breath,if=talent.imminent_destruction|talent.melt_armor|talent.maneuverability
-  if CDsON() and DeepBreathAbility:IsCastable() and (S.ImminentDestruction:IsAvailable() or S.MeltArmor:IsAvailable() or S.Maneuverability:IsAvailable()) then
-    if Cast(DeepBreathAbility, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath st 28"; end
+  -- Note: All eternity_surge lines require VarCanUseEmpower to be true.
+  if VarCanUseEmpower then
+    -- Note: eternity_surge will hit multiple targets. Ignoring target_if, for now.
+    -- eternity_surge,target_if=max:target.health.pct,empower_to=2,if=(!talent.power_swell|buff.power_swell.remains<=duration|!talent.mass_disintegrate)&active_enemies=2&!talent.eternitys_span&variable.can_use_empower
+    if S.EternitySurge:IsCastable() and ((not S.PowerSwell:IsAvailable() or Player:BuffRemains(S.PowerSwellBuff) <= Player:EmpowerCastTime(2) or not S.MassDisintegrate:IsAvailable()) and EnemiesCount8ySplash == 2 and not S.EternitysSpan:IsAvailable()) then
+      if CastAnnotated(S.EternitySurge, false, "2", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "eternity_surge empower 2 st 28"; end
+    end
+    -- eternity_surge,target_if=max:target.health.pct,empower_to=1,if=(!talent.power_swell|buff.power_swell.remains<=duration|!talent.mass_disintegrate)&variable.can_use_empower
+    if S.EternitySurge:IsCastable() and ((not S.PowerSwell:IsAvailable() or Player:BuffRemains(S.PowerSwellBuff) <= Player:EmpowerCastTime(1) or not S.MassDisintegrate:IsAvailable())) then
+      if CastAnnotated(S.EternitySurge, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "eternity_surge empower 1 st 30"; end
+    end
+  end
+  -- deep_breath,if=(talent.imminent_destruction|talent.melt_armor|talent.maneuverability)&!set_bonus.tww3_4pc,interrupt_immediate=1,interrupt_if=gcd.remains=0&ticks>=8,cancel_if=gcd.remains=0&ticks>=8
+  if S.DeepBreath:IsReady() and ((S.ImminentDestruction:IsAvailable() or S.MeltArmor:IsAvailable() or S.Maneuverability:IsAvailable()) and not Player:HasTier("TWW3", 4)) then
+    if Cast(S.DeepBreath, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath st 32"; end
+  end
+  -- living_flame,if=buff.leaping_flames.up&buff.essence_burst.stack=0&buff.inner_flame.up&(buff.inner_flame.remains>execute_time|!buff.dragonrage.up&buff.burnout.up)&set_bonus.tww3_4pc
+  if S.LivingFlame:IsReady() and (Player:BuffUp(S.LeapingFlamesBuff) and Player:EssenceBurst() == 0 and Player:BuffUp(S.InnerFlameBuff) and (Player:BuffRemains(S.InnerFlameBuff) > S.LivingFlame:ExecuteTime() or not VarDragonrageUp and Player:BuffUp(S.BurnoutBuff)) and Player:HasTier("TWW3", 4)) then
+    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame st 34"; end
   end
   -- disintegrate,target_if=min:debuff.bombardments.remains,early_chain_if=ticks_remain<=1&buff.mass_disintegrate_stacks.up,if=(raid_event.movement.in>2|buff.hover.up)&buff.mass_disintegrate_stacks.up&talent.mass_disintegrate&!variable.pool_for_id
   if S.Disintegrate:IsReady() and (Player:BuffUp(S.MassDisintegrateBuff) and S.MassDisintegrate:IsAvailable() and not VarPoolForID) then
-    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "min", EvaluateTargetIfFilterBombardments, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate st 30"; end
+    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "min", EvaluateTargetIfFilterBombardments, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate st 36"; end
   end
   -- pyre,if=talent.snapfire&active_enemies>=2&talent.volatility.rank>=2&(!talent.azure_celerity|talent.feed_the_flames)
   if S.Pyre:IsReady() and (S.Snapfire:IsAvailable() and EnemiesCount8ySplash >= 2 and S.Volatility:TalentRank() >= 2 and (not S.AzureCelerity:IsAvailable() or S.FeedtheFlames:IsAvailable())) then
-    if Cast(S.Pyre, nil, nil, not Target:IsInRange(25)) then return "pyre st 32"; end
+    if Cast(S.Pyre, nil, nil, not Target:IsInRange(25)) then return "pyre st 38"; end
   end
-  -- disintegrate,target_if=min:debuff.bombardments.remains,chain=1,if=(raid_event.movement.in>2|buff.hover.up)&!variable.pool_for_id
+  -- disintegrate,target_if=min:debuff.bombardments.remains,chain=1,interrupt_if=buff.inner_flame.up,if=(raid_event.movement.in>2|buff.hover.up)&!variable.pool_for_id
   if S.Disintegrate:IsReady() and (not VarPoolForID) then
-    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "min", EvaluateTargetIfFilterBombardments, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate st 34"; end
+    if Everyone.CastTargetIf(S.Disintegrate, Enemies8ySplash, "min", EvaluateTargetIfFilterBombardments, nil, not Target:IsInRange(25), nil, Settings.CommonsDS.DisplayStyle.Disintegrate) then return "disintegrate st 40"; end
   end
   -- call_action_list,name=green,if=talent.ancient_flame&!buff.ancient_flame.up&!buff.shattering_star_debuff.up&talent.scarlet_adaptation&!buff.dragonrage.up&!buff.burnout.up&talent.engulfing_blaze
   if Settings.Devastation.UseGreen and (S.AncientFlame:IsAvailable() and Player:BuffDown(S.AncientFlameBuff) and Target:DebuffDown(S.ShatteringStarDebuff) and S.ScarletAdaptation:IsAvailable() and not VarDragonrageUp and Player:BuffDown(S.BurnoutBuff) and S.EngulfingBlaze:IsAvailable()) then
     local ShouldReturn = Green(); if ShouldReturn then return ShouldReturn; end
   end
-  -- living_flame,if=buff.burnout.up|buff.leaping_flames.up|buff.ancient_flame.up
-  if S.LivingFlame:IsReady() and (Player:BuffUp(S.BurnoutBuff) or Player:BuffUp(S.LeapingFlamesBuff) or Player:BuffUp(S.AncientFlameBuff)) then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame st 36"; end
-  end
+  -- living_flame,if=buff.burnout.up|(buff.leaping_flames.up|buff.ancient_flame.up)&raid_event.movement.in>execute_time
   -- azure_strike,if=active_enemies>=2&!talent.snapfire
   if S.AzureStrike:IsCastable() and (EnemiesCount8ySplash >= 2 and not S.Snapfire:IsAvailable()) then
-    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike st 38"; end
+    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike st 42"; end
   end
-  -- living_flame
+  -- living_flame,if=raid_event.movement.in>execute_time
   if S.LivingFlame:IsReady() then
-    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame st 40"; end
+    if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame st 44"; end
   end
   -- azure_strike
   if S.AzureStrike:IsCastable() then
-    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike st 42"; end
+    if Cast(S.AzureStrike, nil, nil, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike st 46"; end
   end
 end
 
@@ -609,12 +615,12 @@ local function Trinkets()
     if I.NeuralSynapseEnhancer:IsEquippedAndReady() and (VarDragonrageUp or not S.Dragonrage:IsAvailable() or S.Dragonrage:CooldownRemains() >= 5) then
       if Cast(I.NeuralSynapseEnhancer, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "neural_synapse_enhancer main 4"; end
     end
-    -- use_item,slot=trinket1,if=buff.dragonrage.up&((variable.trinket_2_buffs&!cooldown.fire_breath.up&!cooldown.shattering_star.up&trinket.2.cooldown.remains)|buff.tip_the_scales.up&(!cooldown.shattering_star.up|talent.engulf)&variable.trinket_priority=1|(!cooldown.fire_breath.up&!cooldown.shattering_star.up)|active_enemies>=3)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1|variable.trinket_2_exclude)&!variable.trinket_1_manual|trinket.1.proc.any_dps.duration>=fight_remains|trinket.1.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=1)&!variable.trinket_1_manual
-    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (VarDragonrageUp and ((VarTrinket2Buffs and S.FireBreath:CooldownDown() and S.ShatteringStar:CooldownDown() and Trinket2:CooldownDown()) or Player:BuffUp(S.TipTheScalesBuff) and (S.ShatteringStar:CooldownDown() or S.Engulf:IsAvailable()) and VarTrinketPriority == 1 or (S.FireBreath:CooldownDown() and S.ShatteringStar:CooldownDown()) or EnemiesCount8ySplash >= 3) and (not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1 or VarTrinket2Ex) and not VarTrinket1Manual or VarTrinket1CD <= 60 and (VarNextDragonrage > 20 or not S.Dragonrage:IsAvailable()) and (not VarDragonrageUp or VarTrinketPriority == 1) and not VarTrinket1Manual) then
+    -- use_item,slot=trinket1,if=buff.dragonrage.up&((variable.trinket_2_buffs&!cooldown.fire_breath.up&!cooldown.shattering_star.up&trinket.2.cooldown.remains)|buff.tip_the_scales.up&(!cooldown.shattering_star.up)&variable.trinket_priority=1|(!cooldown.fire_breath.up&!cooldown.shattering_star.up)|active_enemies>=3)&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1|variable.trinket_2_exclude)&!variable.trinket_1_manual|trinket.1.proc.any_dps.duration>=fight_remains|trinket.1.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=1)&!variable.trinket_1_manual
+    if Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1) and (VarDragonrageUp and ((VarTrinket2Buffs and S.FireBreath:CooldownDown() and S.ShatteringStar:CooldownDown() and Trinket2:CooldownDown()) or Player:BuffUp(S.TipTheScalesBuff) and (S.ShatteringStar:CooldownDown()) and VarTrinketPriority == 1 or (S.FireBreath:CooldownDown() and S.ShatteringStar:CooldownDown()) or EnemiesCount8ySplash >= 3) and (not Trinket2:HasCooldown() or Trinket2:CooldownDown() or VarTrinketPriority == 1 or VarTrinket2Ex) and not VarTrinket1Manual or VarTrinket1CD <= 60 and (VarNextDragonrage > 20 or not S.Dragonrage:IsAvailable()) and (not VarDragonrageUp or VarTrinketPriority == 1) and not VarTrinket1Manual) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_item for " .. Trinket1:Name() .. " trinkets 6"; end
     end
-    -- use_item,slot=trinket2,if=buff.dragonrage.up&((variable.trinket_1_buffs&!cooldown.fire_breath.up&!cooldown.shattering_star.up&trinket.1.cooldown.remains)|buff.tip_the_scales.up&(!cooldown.shattering_star.up|talent.engulf)&variable.trinket_priority=2|(!cooldown.fire_breath.up&!cooldown.shattering_star.up)|active_enemies>=3)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2|variable.trinket_1_exclude)&!variable.trinket_2_manual|trinket.2.proc.any_dps.duration>=fight_remains|trinket.2.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=2)&!variable.trinket_2_manual
-    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (VarDragonrageUp and ((VarTrinket1Buffs and S.FireBreath:CooldownDown() and S.ShatteringStar:CooldownDown() and Trinket1:CooldownDown()) or Player:BuffUp(S.TipTheScalesBuff) and (S.ShatteringStar:CooldownDown() or S.Engulf:IsAvailable()) and VarTrinketPriority == 2 or (S.FireBreath:CooldownDown() and S.ShatteringStar:CooldownDown()) or EnemiesCount8ySplash >= 3) and (not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2 or VarTrinket1Ex) and not VarTrinket2Manual or VarTrinket2CD <= 60 and (VarNextDragonrage > 20 or not S.Dragonrage:IsAvailable()) and (not VarDragonrageUp or VarTrinketPriority == 2) and not VarTrinket2Manual) then
+    -- use_item,slot=trinket2,if=buff.dragonrage.up&((variable.trinket_1_buffs&!cooldown.fire_breath.up&!cooldown.shattering_star.up&trinket.1.cooldown.remains)|buff.tip_the_scales.up&(!cooldown.shattering_star.up)&variable.trinket_priority=2|(!cooldown.fire_breath.up&!cooldown.shattering_star.up)|active_enemies>=3)&(!trinket.1.has_cooldown|trinket.1.cooldown.remains|variable.trinket_priority=2|variable.trinket_1_exclude)&!variable.trinket_2_manual|trinket.2.proc.any_dps.duration>=fight_remains|trinket.2.cooldown.duration<=60&(variable.next_dragonrage>20|!talent.dragonrage)&(!buff.dragonrage.up|variable.trinket_priority=2)&!variable.trinket_2_manual
+    if Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2) and (VarDragonrageUp and ((VarTrinket1Buffs and S.FireBreath:CooldownDown() and S.ShatteringStar:CooldownDown() and Trinket1:CooldownDown()) or Player:BuffUp(S.TipTheScalesBuff) and (S.ShatteringStar:CooldownDown()) and VarTrinketPriority == 2 or (S.FireBreath:CooldownDown() and S.ShatteringStar:CooldownDown()) or EnemiesCount8ySplash >= 3) and (not Trinket1:HasCooldown() or Trinket1:CooldownDown() or VarTrinketPriority == 2 or VarTrinket1Ex) and not VarTrinket2Manual or VarTrinket2CD <= 60 and (VarNextDragonrage > 20 or not S.Dragonrage:IsAvailable()) and (not VarDragonrageUp or VarTrinketPriority == 2) and not VarTrinket2Manual) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_item for " .. Trinket2:Name() .. " trinkets 8"; end
     end
   end
@@ -702,7 +708,7 @@ local function APL()
       VarPoolForID = S.DeepBreath:CooldownRemains() < 7 and Player:EssenceDeficit() >= 1 and Player:BuffDown(S.EssenceBurstBuff)
     end
     -- variable,name=can_extend_dr,if=talent.animosity,op=set,value=buff.dragonrage.up&(buff.dragonrage.duration+dbc.effect.1160688.base_value%1000-buff.dragonrage.elapsed-buff.dragonrage.remains)>0
-    -- Note: As of 11.1.5.61122, dbc.effect.1160688.base_value is 20000, found via the command: simc spell_query=effect.id=1160688
+    -- Note: As of 11.2.0.62801, dbc.effect.1160688.base_value is 20000, found via the command: simc spell_query=effect.id=1160688
     VarCanExtendDR = VarDragonrageUp and (18 + 20 - S.Dragonrage:TimeSinceLastCast() - VarDragonrageRemains) > 0
     -- variable,name=can_use_empower,op=set,value=cooldown.dragonrage.remains>=gcd.max*variable.dr_prep_time,if=talent.animosity&talent.dragonrage
     VarCanUseEmpower = (S.Animosity:IsAvailable() and S.Dragonrage:IsAvailable()) and (S.Dragonrage:CooldownRemains() >= Player:GCD() * VarDRPrepTime) or false
@@ -731,7 +737,7 @@ end
 local function Init()
   S.FireBreathDebuff:RegisterAuraTracking()
 
-  HR.Print("Devastation Evoker rotation has been updated for patch 11.1.5.")
+  HR.Print("Devastation Evoker rotation has been updated for patch 11.2.0.")
 end
 
 HR.SetAPL(1467, APL, Init);
