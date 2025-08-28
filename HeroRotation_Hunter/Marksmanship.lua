@@ -666,13 +666,13 @@ local function APL()
     if EnemiesCount10ySplash > 1 and (Player:HeroTreeID() == 42 or Player:Level() < 71) then
       local ShouldReturn = SentCleave(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=drst,if=active_enemies=1&hero_tree.dark_ranger
-    if EnemiesCount10ySplash == 1 and Player:HeroTreeID() == 44 then
+    -- call_action_list,name=drst,if=hero_tree.dark_ranger
+    if Player:HeroTreeID() == 44 then
       local ShouldReturn = DRST(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=sentst,if=active_enemies=1&!talent.black_arrow
+    -- call_action_list,name=sentst,if=!talent.black_arrow
     -- Note: Added level check to force this function for below level 70.
-    if EnemiesCount10ySplash == 1 and (Player:HeroTreeID() == 42 or Player:Level() < 71) then
+    if Player:HeroTreeID() == 42 or Player:Level() < 71 then
       local ShouldReturn = SentST(); if ShouldReturn then return ShouldReturn; end
     end
     -- Pool Focus if nothing else to do
