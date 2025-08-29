@@ -223,7 +223,7 @@ do
   local LastEnergizeTime, LastCastTime = 0, 0
   local ShurikenTornadoBuff = Spell(277925)
   function Rogue.TimeToNextTornado()
-    if not Player:BuffUp(ShurikenTornadoBuff, nil, true) then
+    if Player:BuffDown(ShurikenTornadoBuff, nil, true) then
       return 0
     end
     local TimeToNextTick = Player:BuffRemains(ShurikenTornadoBuff, nil, true) % 1

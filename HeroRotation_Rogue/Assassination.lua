@@ -697,7 +697,7 @@ local function UsableItems ()
   -- actions.items+=/use_item,name=junkmaestros_mega_magnet,if=cooldown.deathmark.remains>=30&!dot.deathmark.ticking
   -- &!debuff.shiv.up&(!talent.deathstalkers_mark|buff.lingering_darkness.up&buff.junkmaestros_mega_magnet.stack>5)|fight_remains<=10
   if I.JunkmaestrosMegaMagnet:IsEquippedAndReady() and Player:BuffUp(S.JunkmaestrosBuff) then
-    if S.Deathmark:CooldownRemains() >= 30 and not Target:DebuffUp(S.Deathmark) and Player:BuffDown(S.ShivDebuff)
+    if S.Deathmark:CooldownRemains() >= 30 and Target:DebuffDown(S.Deathmark) and Player:BuffDown(S.ShivDebuff)
       and (not S.DeathStalkersMark:IsAvailable()
       or Player:BuffUp(S.LingeringDarknessBuff) and Player:BuffStack(S.JunkmaestrosBuff) > 5) or HL.BossFilteredFightRemains("<=", 10) then
       if Cast(I.JunkmaestrosMegaMagnet, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
@@ -756,8 +756,8 @@ local function ShivUsage ()
     -- &(cooldown.kingsbane.ready|cooldown.kingsbane.remains<=2)&set_bonus.tww3_fatebound_2pc
   if S.Shiv:IsReady() then
     if S.LightweightShiv:IsAvailable() and ShivKingsbaneCondition
-      and (S.Deathmark:IsReady() and S.Deathmark:CooldownRemains() <= 2)
-      and (S.Kingsbane:IsReady() and S.Kingsbane:CooldownRemains() <= 3)
+      and (S.Deathmark:IsReady() or S.Deathmark:CooldownRemains() <= 2)
+      and (S.Kingsbane:IsReady() or S.Kingsbane:CooldownRemains() <= 3)
       and TWW3FateboundHasTier2PC then
       if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
         return "Cast Shiv (FB Edge Case Coins)"
@@ -783,7 +783,7 @@ local function ShivUsage ()
     if not S.LightweightShiv:IsAvailable() then
       if ShivKingsbaneCondition
         and (Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) < (8+3*BoolToInt(TWW3DeathstalkerHasTier4PC))
-        or not Target:DebuffUp(S.Kingsbane) and S.Kingsbane:CooldownRemains() >= 20)
+        or Target:DebuffDown(S.Kingsbane) and S.Kingsbane:CooldownRemains() >= 20)
         and (not S.CrimsonTempest:IsAvailable() or SingleTarget or Target:DebuffUp(S.CrimsonTempest)) then
         if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
           return "Cast Shiv (Kingsbane)"
@@ -1010,7 +1010,7 @@ local function Core_Dot()
   -- &refreshable&!buff.cold_blood.up&target.time_to_die-remains>(4+(talent.dashing_scoundrel*5)+(variable.regen_saturated*6))
   -- &(!buff.darkest_night.up|talent.caustic_spatter&!debuff.caustic_spatter.up)
   if S.Rupture:IsReady() and ComboPoints >= EffectiveCPSpend and Player:BuffDown(S.ColdBlood) and
-    (Player:BuffDown(S.DarkestNightBuff) or S.CausticSpatter:IsAvailable() and not Target:DebuffUp(S.CausticSpatterDebuff)) then
+    (Player:BuffDown(S.DarkestNightBuff) or S.CausticSpatter:IsAvailable() and Target:DebuffDown(S.CausticSpatterDebuff)) then
     if Evaluate_Rupture_Target(Target) and Rogue.CanDoTUnit(Target, RuptureDMGThreshold) then
       if CastPooling(S.Rupture, nil, nil, not TargetInMeleeRange) then
         return "Cast Rupture"
@@ -1038,7 +1038,7 @@ local function AoE_Dot ()
   -- actions.aoe_dot+=/crimson_tempest,target_if=min:remains,if=spell_targets>=2&variable.dot_finisher_condition
   -- &refreshable&target.time_to_die-remains>6&!buff.darkest_night.up
   if HR.AoEON() and S.CrimsonTempest:IsReady() and MeleeEnemies10yCount >= 2 and DotFinisherCondition
-    and not Player:BuffUp(S.DarkestNightBuff) then
+    and Player:BuffDown(S.DarkestNightBuff) then
     for _, CycleUnit in pairs(MeleeEnemies10y) do
       if IsDebuffRefreshable(CycleUnit, S.CrimsonTempest, CrimsonTempestThreshold)
         and CycleUnit:FilteredTimeToDie(">", 6) and not ValueIsInArray(CrimsonTempestIgnoreNPCs, CycleUnit:NPCID()) then
@@ -1063,7 +1063,7 @@ local function AoE_Dot ()
   -- &target.time_to_die>(7+(talent.dashing_scoundrel*5)+(variable.regen_saturated*6))&!buff.darkest_night.up
   if S.Rupture:IsReady() and HR.AoEON() then
     if DotFinisherCondition and (Target:DebuffDown(S.Kingsbane) or Player:BuffUp(S.ColdBlood))
-      and (not EnergyRegenSaturated or not ScentSaturated) and not Player:BuffUp(S.DarkestNightBuff) then
+      and (not EnergyRegenSaturated or not ScentSaturated) and Player:BuffDown(S.DarkestNightBuff) then
       local function EvaluateRuptureTarget(TargetUnit)
         return IsDebuffRefreshable(TargetUnit, S.Rupture, RuptureThreshold)
       end
@@ -1279,7 +1279,7 @@ local function APL ()
     -- actions.precombat+=/food
     -- actions.precombat+=/snapshot_stats
     -- actions.precombat+=/stealth
-    if not Player:BuffUp(Rogue.VanishBuffSpell()) then
+    if Player:BuffDown(Rogue.VanishBuffSpell()) then
       ShouldReturn = Rogue.Stealth(Rogue.StealthSpell())
       if ShouldReturn then
         return ShouldReturn

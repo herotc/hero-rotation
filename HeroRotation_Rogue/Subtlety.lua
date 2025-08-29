@@ -517,7 +517,7 @@ end
 local function StealthMacro (StealthSpell)
   -- Fetch the predicted ability to use after the stealth spell
   local MacroAbility
-  if not Player:BuffUp(S.DarkestNightBuff) and EffectiveComboPoints >= 6 or Player:BuffUp(S.DarkestNightBuff) and ComboPoints == Rogue.CPMaxSpend() then
+  if Player:BuffDown(S.DarkestNightBuff) and EffectiveComboPoints >= 6 or Player:BuffUp(S.DarkestNightBuff) and ComboPoints == Rogue.CPMaxSpend() then
     MacroAbility = Finish(true, StealthSpell, true)
   end
 
@@ -926,7 +926,7 @@ local function APL ()
   if not Player:AffectingCombat() then
     -- Stealth
     -- Note: Since 7.2.5, Blizzard disallowed Stealth cast under ShD (workaround to prevent the Extended Stealth bug)
-    if not Player:BuffUp(S.ShadowDanceBuff) and not Player:BuffUp(Rogue.VanishBuffSpell()) then
+    if Player:BuffDown(S.ShadowDanceBuff) and Player:BuffDown(Rogue.VanishBuffSpell()) then
       ShouldReturn = Rogue.Stealth(Rogue.StealthSpell())
       if ShouldReturn then
         return ShouldReturn
@@ -1019,7 +1019,7 @@ local function APL ()
     end
 
     -- Shuriken Toss Out of Range
-    if S.ShurikenToss:IsCastable() and Target:IsInRange(30) and not TargetInAoERange and not Player:StealthUp(true, true) and not Player:BuffUp(S.Sprint)
+    if S.ShurikenToss:IsCastable() and Target:IsInRange(30) and not TargetInAoERange and not Player:StealthUp(true, true) and Player:BuffDown(S.Sprint)
       and Player:EnergyDeficitPredicted() < 20 and (ComboPointsDeficit >= 1 or Player:EnergyTimeToMax() <= 1.2) then
       if CastPooling(S.ShurikenToss) then
         return "Cast Shuriken Toss"

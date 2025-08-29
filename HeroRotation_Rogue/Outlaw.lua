@@ -242,22 +242,22 @@ local function RtB_Reroll(ForceLoadedDice)
       Cache.APLVar.RtB_Reroll = (Cache.APLVar.RtB_Buffs.Total <= 0) and true or false
       -- Broadside
     elseif Settings.Outlaw.RolltheBonesLogic == "Broadside" then
-      Cache.APLVar.RtB_Reroll = (not Player:BuffUp(S.Broadside)) and true or false
+      Cache.APLVar.RtB_Reroll = (Player:BuffDown(S.Broadside)) and true or false
       -- Buried Treasure
     elseif Settings.Outlaw.RolltheBonesLogic == "Buried Treasure" then
-      Cache.APLVar.RtB_Reroll = (not Player:BuffUp(S.BuriedTreasure)) and true or false
+      Cache.APLVar.RtB_Reroll = (Player:BuffDown(S.BuriedTreasure)) and true or false
       -- Grand Melee
     elseif Settings.Outlaw.RolltheBonesLogic == "Grand Melee" then
-      Cache.APLVar.RtB_Reroll = (not Player:BuffUp(S.GrandMelee)) and true or false
+      Cache.APLVar.RtB_Reroll = (Player:BuffDown(S.GrandMelee)) and true or false
       -- Skull and Crossbones
     elseif Settings.Outlaw.RolltheBonesLogic == "Skull and Crossbones" then
-      Cache.APLVar.RtB_Reroll = (not Player:BuffUp(S.SkullandCrossbones)) and true or false
+      Cache.APLVar.RtB_Reroll = (Player:BuffDown(S.SkullandCrossbones)) and true or false
       -- Ruthless Precision
     elseif Settings.Outlaw.RolltheBonesLogic == "Ruthless Precision" then
-      Cache.APLVar.RtB_Reroll = (not Player:BuffUp(S.RuthlessPrecision)) and true or false
+      Cache.APLVar.RtB_Reroll = (Player:BuffDown(S.RuthlessPrecision)) and true or false
       -- True Bearing
     elseif Settings.Outlaw.RolltheBonesLogic == "True Bearing" then
-      Cache.APLVar.RtB_Reroll = (not Player:BuffUp(S.TrueBearing)) and true or false
+      Cache.APLVar.RtB_Reroll = (Player:BuffDown(S.TrueBearing)) and true or false
       -- SimC Default
     else
       Cache.APLVar.RtB_Reroll = false
