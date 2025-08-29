@@ -249,21 +249,12 @@ function Commons.PotionSelected()
   local Spec = Specs[SpecNum]
 
   local PotionType = HR.GUISettings.APL[Class][Spec].PotionType.Selected
-  local PowerPotionIDs = {
-    -- Fleeting Ultimate Power
-    191914, 191913, 191912,
-    -- Fleeting Power
-    191907, 191906, 191905,
-    -- Ultimate Power
-    191383, 191382, 191381,
-    -- Power
-    191389, 191388, 191387
-  }
-  -- TWW Potions
-  local TemperedIDs = { 212265, 212264, 212263 }
-  local UnwaveringFocusIDs = { 212259, 212258, 212257 }
-  local FrontlineIDs = { 212262, 212261, 212260 }
-  if PotionType == "Tempered" then
+  -- TWW Potions (Fleeting rank 3->1, Regular rank 3->1)
+  local TemperedIDs = { 212971, 212970, 212969, 212265, 212264, 212263 }
+  local UnwaveringFocusIDs = { 212965, 212964, 212963, 212259, 212258, 212257 }
+  local FrontlineIDs = { 212968, 212967, 212966, 212262, 212261, 212260 }
+  -- If the user hasn't selected a TWW potion type, they might still have a DF type. Default to Tempered.
+  if PotionType == "Tempered" or PotionType ~= "Unwavering Focus" and PotionType ~= "Frontline" then
     for _, PotionID in ipairs(TemperedIDs) do
       if Item(PotionID):IsUsable() then
         return Item(PotionID)
@@ -282,36 +273,6 @@ function Commons.PotionSelected()
       end
     end
   end
-  -- DF Potions
-  -- Deprecated. Will be removed when all profiles are updated.
-  local FrozenFocusIDs = { 191365, 191364, 191363 }
-  local ChilledClarityIDs = { 191368, 191367, 191366 }
-  local ShockingDisclosureIDs = { 191401, 191400, 191399 }
-  if PotionType == "Power" then
-    for _, PotionID in ipairs(PowerPotionIDs) do
-      if Item(PotionID):IsUsable() then
-        return Item(PotionID)
-      end
-    end
-  elseif PotionType == "Frozen Focus" then
-    for _, PotionID in ipairs(FrozenFocusIDs) do
-      if Item(PotionID):IsUsable() then
-        return Item(PotionID)
-      end
-    end
-  elseif PotionType == "Chilled Clarity" then
-    for _, PotionID in ipairs(ChilledClarityIDs) do
-      if Item(PotionID):IsUsable() then
-        return Item(PotionID)
-      end
-    end
-  elseif PotionType == "Shocking Disclosure" then
-    for _, PotionID in ipairs(ShockingDisclosureIDs) do
-      if Item(PotionID):IsUsable() then
-        return Item(PotionID)
-      end
-    end
-  else
-    return nil
-  end
+  -- Should never reach here, but just in case.
+  return nil
 end
