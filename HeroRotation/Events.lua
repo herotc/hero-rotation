@@ -11,7 +11,8 @@ local Target        = Unit.Target
 local Spell         = HL.Spell
 local Item          = HL.Item
 -- Lua
-
+-- API
+local GetTime       = GetTime
 -- File Locals
 
 
