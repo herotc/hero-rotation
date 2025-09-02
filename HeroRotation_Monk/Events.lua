@@ -248,6 +248,7 @@ HL:RegisterForCombatEvent(
 -- Track Xuen, the White Tiger
 Monk.Xuen = {}
 Monk.Xuen.Active = false
+Monk.Xuen.Count = 0
 Monk.Xuen.GUID = 0
 Monk.Xuen.ExpireTime = 0
 HL:RegisterForSelfCombatEvent(
@@ -255,6 +256,7 @@ HL:RegisterForSelfCombatEvent(
     local destGUID, _, _, _, spellID = select(8, ...)
     if spellID == 123904 then
       Monk.Xuen.Active = true
+      Monk.Xuen.Count = Monk.Xuen.Count + 1
       Monk.Xuen.GUID = destGUID
       Monk.Xuen.ExpireTime = GetTime() + 45
     end

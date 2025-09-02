@@ -107,6 +107,7 @@ Spell.Monk.ConduitoftheCelestials = {
   HeartoftheJadeSerpentBuff             = Spell(456368),
   HeartoftheJadeSerpentCDRBuff          = Spell(443421),
   HeartoftheJadeSerpentCDRCelestialBuff = Spell(443616),
+  HeartoftheJadeSerpentTWW3TierBuff     = Spell(1238904),
 }
 
 Spell.Monk.MasterofHarmony = {
