@@ -53,6 +53,8 @@ local Settings = {
 local VarSTPlanning, VarAddsRemain
 local VarExecutePhase, VarOnGCDRacials
 local BladestormAbility = S.UnrelentingOnslaught:IsAvailable() and S.SlayerBladestorm or S.Bladestorm
+local TWW3_2pc = Player:HasTier("TWW3", 2)
+local TWW3_4pc = Player:HasTier("TWW3", 4)
 local EnemiesMelee, EnemiesMeleeCount
 local TargetInMeleeRange
 local EnrageUp
@@ -143,6 +145,8 @@ end, "PLAYER_REGEN_ENABLED")
 HL:RegisterForEvent(function()
   BladestormAbility = S.UnrelentingOnslaught:IsAvailable() and S.SlayerBladestorm or S.Bladestorm
   VarTrinketFailures = 0
+  TWW3_2pc = Player:HasTier("TWW3", 2)
+  TWW3_4pc = Player:HasTier("TWW3", 4)
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED", "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
@@ -210,13 +214,17 @@ local function Slayer()
   if S.Execute:IsReady() and (Player:BuffRemains(S.SuddenDeathBuff) < 2 and not VarExecutePhase) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer 10"; end
   end
-  -- thunderous_roar,if=active_enemies>1
-  if S.ThunderousRoar:IsCastable() and (EnemiesMeleeCount > 1) then
+  -- thunderous_roar,if=active_enemies>1&buff.enrage.up
+  if S.ThunderousRoar:IsCastable() and (EnemiesMeleeCount > 1 and EnrageUp) then
     if Cast(S.ThunderousRoar, Settings.Fury.GCDasOffGCD.ThunderousRoar, nil, not TargetInMeleeRange) then return "thunderous_roar slayer 12"; end
   end
   -- champions_spear,if=!cooldown.bladestorm.remains&(!cooldown.avatar.remains|!cooldown.recklessness.remains|buff.avatar.up|buff.recklessness.up)&buff.enrage.up
   if CDsON() and S.ChampionsSpear:IsCastable() and (BladestormAbility:CooldownUp() and (S.Avatar:CooldownUp() or S.Recklessness:CooldownUp() or Player:BuffUp(S.AvatarBuff) or Player:BuffUp(S.RecklessnessBuff)) and EnrageUp) then
     if Cast(S.ChampionsSpear, nil, Settings.CommonsDS.DisplayStyle.ChampionsSpear, not (Target:IsInRange(25) or TargetInMeleeRange)) then return "champions_spear slayer 14"; end
+  end
+  -- odyns_fury,if=active_enemies>1&talent.titanic_rage&buff.meat_cleaver.stack=0
+  if S.OdynsFury:IsCastable() and (EnemiesMeleeCount > 1 and S.TitanicRage:IsAvailable() and Player:BuffDown(S.MeatCleaverBuff)) then
+    if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.OdynsFury, not Target:IsInMeleeRange(12)) then return "odyns_fury slayer 15"; end
   end
   -- bladestorm,if=buff.enrage.up&(talent.reckless_abandon&cooldown.avatar.remains>=24|talent.anger_management&cooldown.recklessness.remains>=15&(buff.avatar.up|cooldown.avatar.remains>=8))
   if CDsON() and BladestormAbility:IsCastable() and (EnrageUp and (S.RecklessAbandon:IsAvailable() and S.Avatar:CooldownRemains() >= 24 or S.AngerManagement:IsAvailable() and S.Recklessness:CooldownRemains() >= 15 and (Player:BuffUp(S.AvatarBuff) or S.Avatar:CooldownRemains() >= 8))) then
@@ -242,8 +250,8 @@ local function Slayer()
   if S.Execute:IsReady() and (Target:DebuffStack(S.MarkedforExecutionDebuff) > 1 and EnrageUp) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer 26"; end
   end
-  -- odyns_fury,if=active_enemies>1&(buff.enrage.up|talent.titanic_rage)
-  if S.OdynsFury:IsCastable() and (EnemiesMeleeCount > 1 and (EnrageUp or S.TitanicRage:IsAvailable())) then
+  -- odyns_fury,if=active_enemies>1&!talent.titanic_rage
+  if S.OdynsFury:IsCastable() and (EnemiesMeleeCount > 1 and not S.TitanicRage:IsAvailable()) then
     if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.OdynsFury, not Target:IsInMeleeRange(12)) then return "odyns_fury slayer 28"; end
   end
   -- crushing_blow,if=action.raging_blow.charges=2|buff.brutal_finish.up&(!debuff.champions_might.up|debuff.champions_might.up&debuff.champions_might.remains>gcd)
@@ -264,13 +272,13 @@ local function Slayer()
   if S.Rampage:IsReady() and (Player:Rage() > 115) then
     if Cast(S.Rampage, nil, nil, not TargetInMeleeRange) then return "rampage slayer 36"; end
   end
-  -- execute,if=variable.execute_phase&debuff.marked_for_execution.up&buff.enrage.up
-  if S.Execute:IsReady() and (VarExecutePhase and Target:DebuffUp(S.MarkedforExecutionDebuff) and EnrageUp) then
+  -- execute,if=variable.execute_phase&debuff.marked_for_execution.up&buff.enrage.up&active_enemies=1
+  if S.Execute:IsReady() and (VarExecutePhase and Target:DebuffUp(S.MarkedforExecutionDebuff) and EnrageUp and EnemiesMeleeCount == 1) then
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer 38"; end
   end
-  -- bloodthirst,if=target.health.pct<35&talent.vicious_contempt&buff.brutal_finish.up&buff.enrage.up&crit_pct_current>=85|active_enemies>=6
+  -- bloodthirst,if=target.health.pct<35&talent.vicious_contempt&buff.brutal_finish.up&buff.enrage.up&crit_pct_current>=85&active_enemies=1|(!set_bonus.tww3_4pc&active_enemies>4)
   local CritPctCurrent = Player:CritChancePct() + num(Player:BuffUp(S.RecklessnessBuff)) * 20 + Player:BuffStack(S.BloodcrazeBuff) * 15
-  if S.Bloodthirst:IsCastable() and (Target:HealthPercentage() < 35 and S.ViciousContempt:IsAvailable() and Player:BuffUp(S.BrutalFinishBuff) and EnrageUp and S.CritChancePct() >= 85 or EnemiesMeleeCount >= 6) then
+  if S.Bloodthirst:IsCastable() and (Target:HealthPercentage() < 35 and S.ViciousContempt:IsAvailable() and Player:BuffUp(S.BrutalFinishBuff) and EnrageUp and S.CritChancePct() >= 85 and EnemiesMeleeCount == 1 or (not TWW3_4pc and EnemiesMeleeCount > 4)) then
     if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst slayer 40"; end
   end
   -- crushing_blow
