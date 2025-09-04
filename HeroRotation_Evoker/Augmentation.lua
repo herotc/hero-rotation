@@ -67,6 +67,10 @@ local PrescienceTargets = {}
 local MaxEmpower = (S.FontofMagic:IsAvailable()) and 4 or 3
 local FoMEmpowerMod = (S.FontofMagic:IsAvailable()) and 0.8 or 1
 local FlameAbility = S.ChronoFlames:IsLearned() and S.ChronoFlames or S.LivingFlame
+local TWW2_2pc = Player:HasTier("TWW2", 2)
+local TWW2_4pc = Player:HasTier("TWW2", 4)
+local TWW3_2pc = Player:HasTier("TWW3", 2)
+local TWW3_4pc = Player:HasTier("TWW3", 4)
 local BossFightRemains = 11111
 local FightRemains = 11111
 local CombatTime
@@ -208,6 +212,10 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
+  TWW2_2pc = Player:HasTier("TWW2", 2)
+  TWW2_4pc = Player:HasTier("TWW2", 4)
+  TWW3_2pc = Player:HasTier("TWW3", 2)
+  TWW3_4pc = Player:HasTier("TWW3", 4)
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
@@ -482,7 +490,7 @@ local function FB()
       FBEmpower = 1
     elseif S.FontofMagic:IsAvailable() and Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(4) then
       FBEmpower = 4
-    elseif S.FontofMagic:IsAvailable() and Player:HasTier("TWW2", 2) and S.MoltenEmbers:IsAvailable() then
+    elseif S.FontofMagic:IsAvailable() and TWW2_2pc and S.MoltenEmbers:IsAvailable() then
       FBEmpower = 3
     end
   end
@@ -636,7 +644,7 @@ local function APL()
     VarTempWound = TemporalWoundCalc(Enemies25y)
     -- variable,name=eons_remains,op=setif,value=cooldown.allied_virtual_cd_time.remains,value_else=cooldown.breath_of_eons.remains,condition=!talent.wingleader&(!set_bonus.tww3_2pc|!talent.temporal_burst.enabled|variable.enforce_timings)|variable.wingleader_force_timings,if=talent.breath_of_eons
     if S.BreathofEons:IsAvailable() then
-      if not S.Wingleader:IsAvailable() and (not Player:HasTier("TWW3", 2) or not S.TemporalBurst:IsAvailable() or VarEnforceTimings) or VarWingleaderForceTimings then
+      if not S.Wingleader:IsAvailable() and (not TWW3_2pc or not S.TemporalBurst:IsAvailable() or VarEnforceTimings) or VarWingleaderForceTimings then
         VarEonsRemains = 0
       else
         VarEonsRemains = S.BreathofEons:CooldownRemains()
@@ -647,7 +655,7 @@ local function APL()
     end
     -- variable,name=pool_for_id,default=0,op=set,value=(variable.eons_remains<8&talent.breath_of_eons&(target.time_to_die>13&raid_event.adds.in>15|fight_remains<30&!fight_style.dungeonroute)|cooldown.deep_breath.remains<8&!talent.breath_of_eons)&essence.deficit>=1&!buff.essence_burst.react,if=(!set_bonus.tww3_4pc|!hero_tree.chronowarden)&talent.imminent_destruction
     VarPoolForID = false
-    if (not Player:HasTier("TWW3", 4) or Player:HeroTreeID() ~= 38) and S.ImminentDestruction:IsAvailable() then
+    if (not TWW3_4pc or Player:HeroTreeID() ~= 38) and S.ImminentDestruction:IsAvailable() then
       VarPoolForID = (VarEonsRemains < 8 and S.BreathofEons:IsAvailable() and (Target:TimeToDie() > 13 or BossFightRemains < 30 and not DungeonRoute) or S.DeepBreath:CooldownRemains() < 8 and not S.BreathofEons:IsAvailable()) and Player:EssenceDeficitP() >= 1 and Player:BuffDown(S.EssenceBurstBuff)
     end
     -- hover,use_off_gcd=1,if=gcd.remains>=0.5&(!raid_event.movement.exists&(trinket.1.is.ovinaxs_mercurial_egg|trinket.2.is.ovinaxs_mercurial_egg)|raid_event.movement.in<=6)
@@ -672,7 +680,7 @@ local function APL()
     -- ebon_might,if=(((buff.ebon_might_self.remains-cast_time)<=buff.ebon_might_self.duration*variable.ebon_might_pandemic_threshold)&(active_enemies>0|raid_event.adds.in<=3)&(variable.eons_remains>0|!talent.breath_of_eons&cooldown.deep_breath.remains>0|raid_event.adds.in<=3|time>30|talent.molten_embers&(set_bonus.tww2_2pc|!talent.breath_of_eons|talent.overlord))&(!buff.imminent_destruction.up|buff.ebon_might_self.remains<=gcd.max)|variable.eons_remains>0&buff.ebon_might_self.value<=0.3&!cooldown.fire_breath.up&!cooldown.upheaval.up&talent.doubletime)&(buff.ebon_might_self.value<=0.3|(buff.ebon_might_self.remains-cast_time)<=buff.ebon_might_self.duration*0.3)
     local EMDuration = EMSelfBuffDuration()
     local EMValue = EMSelfBuffValue()
-    if S.EbonMight:IsReady() and ((((Player:BuffRemains(S.EbonMightSelfBuff) - S.EbonMight:CastTime()) <= EMDuration * VarEbonMightPandemicThreshold) and (VarEonsRemains > 0 or not S.BreathofEons:IsAvailable() and S.DeepBreath:CooldownRemains() > 0 or CombatTime > 30 or S.MoltenEmbers:IsAvailable() and (Player:HasTier("TWW2", 2) or not S.BreathofEons:IsAvailable() or S.Overlord:IsAvailable())) and (Player:BuffDown(S.ImminentDestructionBuff) or Player:BuffRemains(S.EbonMightSelfBuff) <= Player:GCD()) or VarEonsRemains > 0 and EMValue <= 0.3 and S.FireBreath:CooldownDown() and S.Upheaval:CooldownDown() and S.DoubleTime:IsAvailable()) and (EMValue <= 0.3 or (Player:BuffRemains(S.EbonMightSelfBuff) - S.EbonMight:CastTime()) <= EMSDuration * 0.3)) then
+    if S.EbonMight:IsReady() and ((((Player:BuffRemains(S.EbonMightSelfBuff) - S.EbonMight:CastTime()) <= EMDuration * VarEbonMightPandemicThreshold) and (VarEonsRemains > 0 or not S.BreathofEons:IsAvailable() and S.DeepBreath:CooldownRemains() > 0 or CombatTime > 30 or S.MoltenEmbers:IsAvailable() and (TWW2_2pc or not S.BreathofEons:IsAvailable() or S.Overlord:IsAvailable())) and (Player:BuffDown(S.ImminentDestructionBuff) or Player:BuffRemains(S.EbonMightSelfBuff) <= Player:GCD()) or VarEonsRemains > 0 and EMValue <= 0.3 and S.FireBreath:CooldownDown() and S.Upheaval:CooldownDown() and S.DoubleTime:IsAvailable()) and (EMValue <= 0.3 or (Player:BuffRemains(S.EbonMightSelfBuff) - S.EbonMight:CastTime()) <= EMSDuration * 0.3)) then
       if Cast(S.EbonMight, Settings.Augmentation.GCDasOffGCD.EbonMight) then return "ebon_might main 8"; end
     end
     -- call_action_list,name=items
@@ -711,7 +719,7 @@ local function APL()
       if Cast(S.BreathofEons, Settings.Augmentation.GCDasOffGCD.BreathOfEons, nil, not Target:IsInRange(50)) then return "breath_of_eons main 12"; end
     end
     -- upheaval,target_if=target.time_to_die>duration+0.2,empower_to=1,if=buff.ebon_might_self.remains>duration&(raid_event.adds.remains>10|evoker.allied_cds_up>0|!raid_event.adds.exists|raid_event.adds.in>20)&(!talent.molten_embers|dot.fire_breath_damage.ticking|cooldown.fire_breath.remains>=10)&(buff.essence_burst.stack<buff.essence_burst.max_stack|!set_bonus.tww2_4pc&!talent.rockfall|!buff.essence_burst.react)
-    if S.Upheaval:IsReady() and (Target:TimeToDie() > Player:EmpowerCastTime(1) + 0.7 and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1) + 0.5 and (not S.MoltenEmbers:IsAvailable() or S.FireBreathDebuff:AuraActiveCount() > 0 or S.FireBreath:CooldownRemains() >= 10) and (Player:EssenceBurst() < Player:MaxEssenceBurst() or not Player:HasTier("TWW2", 4) and not S.Rockfall:IsAvailable() or Player:BuffDown(S.EssenceBurstBuff)))) then
+    if S.Upheaval:IsReady() and (Target:TimeToDie() > Player:EmpowerCastTime(1) + 0.7 and (Player:BuffRemains(S.EbonMightSelfBuff) > Player:EmpowerCastTime(1) + 0.5 and (not S.MoltenEmbers:IsAvailable() or S.FireBreathDebuff:AuraActiveCount() > 0 or S.FireBreath:CooldownRemains() >= 10) and (Player:EssenceBurst() < Player:MaxEssenceBurst() or not TWW2_4pc and not S.Rockfall:IsAvailable() or Player:BuffDown(S.EssenceBurstBuff)))) then
       if CastAnnotated(S.Upheaval, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "upheaval empower_to=1 main 14"; end
     end
     -- time_skip,if=(((cooldown.fire_breath.remains>?20)+(cooldown.upheaval.remains>?20)))>=30&(cooldown.breath_of_eons.remains>=20&talent.breath_of_eons|!talent.breath_of_eons&cooldown.deep_breath.remains>=20)&(!buff.imminent_destruction.up|talent.temporal_burst&buff.temporal_burst.remains>=15)
@@ -732,16 +740,16 @@ local function APL()
       if Everyone.CastTargetIf(S.AzureStrike, Enemies8ySplash, "max", EvaluateTargetIfFilterBombardments, EvaluateTargetIfLF, not Target:IsSpellInRange(S.AzureStrike)) then return "azure_strike main 22"; end
     end
     -- emerald_blossom,if=talent.dream_of_spring&mana>=650000&talent.ancient_flame&!buff.ancient_flame.up&buff.essence_burst.up&(buff.temporal_burst.up&set_bonus.tww3_4pc&(!buff.imminent_destruction.up|mana>=2000000)|equipped.diamantine_voidcore&mana.pct>=50)
-    if S.EmeraldBlossom:IsReady() and (S.DreamofSpring:IsAvailable() and Player:Mana() >= 650000 and S.AncientFlame:IsAvailable() and Player:BuffDown(S.AncientFlameBuff) and Player:BuffUp(S.EssenceBurstBuff) and (Player:BuffUp(S.TemporalBurstBuff) and Player:HasTier("TWW3", 4) and (Player:BuffDown(S.ImminentDestructionBuff) or Player:Mana() >= 2000000) or I.DiamantineVoidcore:IsEquipped() and Player:ManaPercent() >= 50)) then
+    if S.EmeraldBlossom:IsReady() and (S.DreamofSpring:IsAvailable() and Player:Mana() >= 650000 and S.AncientFlame:IsAvailable() and Player:BuffDown(S.AncientFlameBuff) and Player:BuffUp(S.EssenceBurstBuff) and (Player:BuffUp(S.TemporalBurstBuff) and TWW3_4pc and (Player:BuffDown(S.ImminentDestructionBuff) or Player:Mana() >= 2000000) or I.DiamantineVoidcore:IsEquipped() and Player:ManaPercent() >= 50)) then
       if Cast(S.EmeraldBlossom, Settings.CommonsOGCD.GCDasOffGCD.EmeraldBlossom) then return "emerald_blossom main 24"; end
     end
     -- living_flame,if=desired_targets>=2&buff.temporal_burst.up&set_bonus.tww3_4pc&!buff.essence_burst.up
-    if S.LivingFlame:IsReady() and (EnemiesCount8ySplash >= 2 and Player:BuffUp(S.TemporalBurstBuff) and Player:HasTier("TWW3", 4) and Player:BuffDown(S.EssenceBurstBuff)) then
+    if S.LivingFlame:IsReady() and (EnemiesCount8ySplash >= 2 and Player:BuffUp(S.TemporalBurstBuff) and TWW3_4pc and Player:BuffDown(S.EssenceBurstBuff)) then
       if Cast(S.LivingFlame, nil, nil, not Target:IsSpellInRange(S.LivingFlame)) then return "living_flame main 26"; end
     end
     -- eruption,target_if=min:debuff.bombardments.remains,if=(buff.ebon_might_self.remains>execute_time|essence.deficit=0|buff.essence_burst.stack=buff.essence_burst.max_stack&cooldown.ebon_might.remains>4|buff.essence_burst.react&set_bonus.tww2_4pc)&!variable.pool_for_id&(buff.imminent_destruction.up|essence.deficit<=2|buff.essence_burst.up|variable.ebon_might_pandemic_threshold>0)
     -- Note: Ignoring target_if, as it will hit everything in the area of the primary target.
-    if S.Eruption:IsReady() and ((Player:BuffRemains(S.EbonMightSelfBuff) > S.Eruption:ExecuteTime() or Player:EssenceDeficitP() == 0 or Player:EssenceBurst() == Player:MaxEssenceBurst() and S.EbonMight:CooldownRemains() > 4 or Player:BuffUp(S.EssenceBurstBuff) and Player:HasTier("TWW2", 4)) and not VarPoolForID and (Player:BuffUp(S.ImminentDestructionBuff) or Player:EssenceDeficitP() <= 2 or Player:BuffUp(S.EssenceBurstBuff) or VarEbonMightPandemicThreshold > 0)) then
+    if S.Eruption:IsReady() and ((Player:BuffRemains(S.EbonMightSelfBuff) > S.Eruption:ExecuteTime() or Player:EssenceDeficitP() == 0 or Player:EssenceBurst() == Player:MaxEssenceBurst() and S.EbonMight:CooldownRemains() > 4 or Player:BuffUp(S.EssenceBurstBuff) and TWW2_4pc) and not VarPoolForID and (Player:BuffUp(S.ImminentDestructionBuff) or Player:EssenceDeficitP() <= 2 or Player:BuffUp(S.EssenceBurstBuff) or VarEbonMightPandemicThreshold > 0)) then
       if Cast(S.Eruption, nil, nil, not Target:IsInRange(25)) then return "eruption main 28"; end
     end
     -- blistering_scales,target_if=target.role.tank,if=!evoker.scales_up&buff.ebon_might_self.down

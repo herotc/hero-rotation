@@ -70,6 +70,8 @@ local VilefiendAbility = S.MarkofFharg:IsAvailable() and S.SummonCharhound or (S
 local SoulShards = 0
 local DemonicCoreStacks = 0
 local GCDMax = 0
+local TWW2_2pc = Player:HasTier("TWW2", 2)
+local TWW2_4pc = Player:HasTier("TWW2", 4)
 local Enemies40y
 local Enemies8ySplash, EnemiesCount8ySplash
 local BossFightRemains = 11111
@@ -194,6 +196,8 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
+  TWW2_2pc = Player:HasTier("TWW2", 2)
+  TWW2_4pc = Player:HasTier("TWW2", 4)
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
@@ -256,7 +260,7 @@ end
 -- Note: Greater Dreadstalkers are force-spawned by Summon Demonic Tyrant, so force full duration if we're casting SDT.
 local function GreaterDreadstalkerTime()
   local TableTime = Warlock.GuardiansTable.GreaterDreadstalkerDuration or 0
-  local GDTime = (Player:HasTier("TWW2", 2) and Player:IsCasting(S.SummonDemonicTyrant)) and 12 or TableTime
+  local GDTime = (TWW2_2pc and Player:IsCasting(S.SummonDemonicTyrant)) and 12 or TableTime
   return GDTime
 end
 
@@ -605,7 +609,7 @@ local function APL()
       if Cast(S.HandofGuldan, nil, nil, not Target:IsInRange(40)) then return "hand_of_guldan main 22"; end
     end
     -- implosion,if=(cooldown.summon_demonic_tyrant.remains_expected>10)&(active_enemies>3&set_bonus.tww2_4pc&buff.wild_imps.stack>7&!buff.demonic_core.react&!prev_gcd.1.implosion|!set_bonus.tww2_4pc&active_enemies>2&two_cast_imps>2&!prev_gcd.1.implosion&variable.impl)
-    if S.Implosion:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() > 10 and (EnemiesCount8ySplash > 3 and Player:HasTier("TWW2", 4) and WildImpsCount() > 7 and Player:BuffDown(S.DemonicCoreBuff) and not Player:PrevGCDP(1, S.Implosion) or not Player:HasTier("TWW2", 4) and EnemiesCount8ySplash > 2 and CheckImpCasts(2) > 2 and not Player:PrevGCDP(1, S.Implosion) and VarImpl)) then
+    if S.Implosion:IsReady() and (S.SummonDemonicTyrant:CooldownRemains() > 10 and (EnemiesCount8ySplash > 3 and TWW2_4pc and WildImpsCount() > 7 and Player:BuffDown(S.DemonicCoreBuff) and not Player:PrevGCDP(1, S.Implosion) or not TWW2_4pc and EnemiesCount8ySplash > 2 and CheckImpCasts(2) > 2 and not Player:PrevGCDP(1, S.Implosion) and VarImpl)) then
       if Cast(S.Implosion, Settings.Demonology.GCDasOffGCD.Implosion, nil, not Target:IsInRange(40)) then return "implosion main 24"; end
     end
     -- ruination

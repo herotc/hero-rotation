@@ -55,7 +55,7 @@ local Settings = {
 local MainHandLink, OffHandLink
 local MainHandRuneforge, OffHandRuneforge
 local UsingRazorice, UsingFallenCrusader
-local Var2HCheck
+local Var2HCheck, TWW3_2pc, TWW3_4pc
 local VarRWBuff
 local VarSTPlanning, VarAddsRemain, VarSendingCDs
 local VarCDCheck, VarFWFBuffs
@@ -161,6 +161,8 @@ local function SetWeaponVariables()
   UsingRazorice = (MainHandRuneforge == "3370" or OffHandRuneforge == "3370")
   UsingFallenCrusader = (MainHandRuneforge == "3368" or OffHandRuneforge == "3368")
   Var2HCheck = IsEquippedItemType("Two-Hand")
+  TWW3_2pc = Player:HasTier("TWW3", 2)
+  TWW3_4pc = Player:HasTier("TWW3", 4)
 end
 SetWeaponVariables()
 
@@ -493,7 +495,7 @@ local function Variables()
   -- variable,name=rp_pooling,value=talent.breath_of_sindragosa&cooldown.breath_of_sindragosa.remains<4*gcd.max&runic_power<60+(35+5*buff.icy_onslaught.up)-(10*rune)&variable.sending_cds
   VarRPPooling = S.BreathofSindragosa:IsAvailable() and S.BreathofSindragosa:CooldownRemains() < 4 * Player:GCD() and Player:RunicPower() < 60 + (35 + 5 * num(Player:BuffUp(S.IcyOnslaughtBuff))) - (10 * Player:Rune()) and VarSendingCDs
   -- variable,name=frostscythe_prio,value=3+(1*(set_bonus.tww3_rider_of_the_apocalypse_4pc&!(talent.cleaving_strikes&buff.remorseless_winter.up)))
-  VarFrostscythePrio = 3 + (1 * num(Player:HasTier("TWW3", 4) and not (S.CleavingStrikes:IsAvailable() and Player:BuffUp(VarRWBuff))))
+  VarFrostscythePrio = 3 + (1 * num(TWW3_4pc and not (S.CleavingStrikes:IsAvailable() and Player:BuffUp(VarRWBuff))))
   -- variable,name=breath_of_sindragosa_check,value=talent.breath_of_sindragosa&(cooldown.breath_of_sindragosa.remains>20|(cooldown.breath_of_sindragosa.up&runic_power>=(60-20*hero_tree.deathbringer)))
   VarBreathOfSindragosaCheck = S.BreathofSindragosa:IsAvailable() and (S.BreathofSindragosa:CooldownRemains() > 20 or (S.BreathofSindragosa:CooldownUp() and Player:RunicPower() >= (60 - 20 * num(Player:HeroTreeID() == 33))))
 end

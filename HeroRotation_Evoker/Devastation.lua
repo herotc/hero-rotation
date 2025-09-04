@@ -72,6 +72,10 @@ local VarCanExtendDR = false
 local VarNextDragonrage
 local VarDragonrageUp, VarDragonrageRemains
 local VarPoolForID, VarPoolForCB
+local TWW2_2pc = Player:HasTier("TWW2", 2)
+local TWW2_4pc = Player:HasTier("TWW2", 4)
+local TWW3_2pc = Player:HasTier("TWW3", 2)
+local TWW3_4pc = Player:HasTier("TWW3", 4)
 local Enemies25y, Enemies8ySplash, EnemiesCount8ySplash
 local BossFightRemains = 11111
 local FightRemains = 11111
@@ -190,6 +194,10 @@ local StunInterrupts = {
 
 --- ===== Event Registrations =====
 HL:RegisterForEvent(function()
+  TWW2_2pc = Player:HasTier("TWW2", 2)
+  TWW2_4pc = Player:HasTier("TWW2", 4)
+  TWW3_2pc = Player:HasTier("TWW3", 2)
+  TWW3_4pc = Player:HasTier("TWW3", 4)
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
@@ -440,7 +448,7 @@ local function Aoe()
     if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage) then return "dragonrage aoe 14"; end
   end
   -- call_action_list,name=es,if=(!talent.dragonrage|buff.dragonrage.up|cooldown.dragonrage.remains>variable.dr_prep_time_aoe|!talent.animosity)&(!buff.jackpot.up|!set_bonus.tww2_4pc|talent.mass_disintegrate)
-  if (not S.Dragonrage:IsAvailable() or VarDragonrageUp or S.Dragonrage:CooldownRemains() > VarDRPrepTimeAoe or not S.Animosity:IsAvailable()) and (Player:BuffDown(S.JackpotBuff) or not Player:HasTier("TWW2", 4) or S.MassDisintegrate:IsAvailable()) then
+  if (not S.Dragonrage:IsAvailable() or VarDragonrageUp or S.Dragonrage:CooldownRemains() > VarDRPrepTimeAoe or not S.Animosity:IsAvailable()) and (Player:BuffDown(S.JackpotBuff) or not TWW2_4pc or S.MassDisintegrate:IsAvailable()) then
     local ShouldReturn = ES(); if ShouldReturn then return ShouldReturn; end
   end
   -- deep_breath,if=!buff.dragonrage.up&essence.deficit>3
@@ -499,7 +507,7 @@ end
 
 local function ST()
   -- deep_breath,if=talent.maneuverability&set_bonus.tww3_4pc,cancel_if=gcd.remains=0&ticks>=8&active_enemies=1
-  if DeepBreathAbility:IsCastable() and (S.Maneuverability:IsAvailable() and Player:HasTier("TWW3", 4)) then
+  if DeepBreathAbility:IsCastable() and (S.Maneuverability:IsAvailable() and TWW3_4pc) then
     if Cast(DeepBreathAbility, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath st 2"; end
   end
   -- dragonrage,if=target.time_to_die>=30&raid_event.adds.in>=60|!raid_event.adds.exists
@@ -507,11 +515,11 @@ local function ST()
     if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage) then return "dragonrage st 4"; end
   end
   -- eternity_surge,empower_to=1,if=set_bonus.tww3_4pc&buff.dragonrage.up&cooldown.engulf.full_recharge_time<gcd.max*3&cooldown.fire_breath.remains<gcd.max*3
-  if S.EternitySurge:IsCastable() and (Player:HasTier("TWW3", 4) and VarDragonrageUp and S.Engulf:FullRechargeTime() < Player:GCD() * 3 and S.FireBreath:CooldownRemains() < Player:GCD() * 3) then
+  if S.EternitySurge:IsCastable() and (TWW3_4pc and VarDragonrageUp and S.Engulf:FullRechargeTime() < Player:GCD() * 3 and S.FireBreath:CooldownRemains() < Player:GCD() * 3) then
     if CastAnnotated(S.EternitySurge, false, "1", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "eternity_surge empower 1 st 6"; end
   end
   -- living_flame,if=set_bonus.tww3_4pc&cooldown.engulf.remains<=execute_time*2&buff.essence_burst.stack<(2-talent.arcane_vigor.enabled)&buff.dragonrage.up&cooldown.fire_breath.remains<=execute_time*2
-  if S.LivingFlame:IsCastable() and (Player:HasTier("TWW3", 4) and S.Engulf:CooldownRemains() <= S.LivingFlame:ExecuteTime() * 2 and Player:EssenceBurst() < (2 - num(S.ArcaneVigor:IsAvailable())) and VarDragonrageUp and S.FireBreath:CooldownRemains() <= S.LivingFlame:ExecuteTime() * 2) then
+  if S.LivingFlame:IsCastable() and (TWW3_4pc and S.Engulf:CooldownRemains() <= S.LivingFlame:ExecuteTime() * 2 and Player:EssenceBurst() < (2 - num(S.ArcaneVigor:IsAvailable())) and VarDragonrageUp and S.FireBreath:CooldownRemains() <= S.LivingFlame:ExecuteTime() * 2) then
     if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame st 8"; end
   end
   -- hover,use_off_gcd=1,if=raid_event.movement.in<6&!buff.hover.up&gcd.remains>=0.5|talent.slipstream&gcd.remains>=0.5
@@ -521,7 +529,7 @@ local function ST()
     if Cast(S.TipTheScales, Settings.CommonsOGCD.GCDasOffGCD.TipTheScales) then return "tip_the_scales st 10"; end
   end
   -- shattering_star,if=(!buff.essence_burst.at_max_stacks|!talent.arcane_vigor|talent.engulf)&(set_bonus.tww2_2pc|!talent.scorching_embers|!talent.engulf|dot.fire_breath_damage.ticking&dot.fire_breath_damage.duration<=6|(action.engulf.usable_in<?cooldown.fire_breath.remains_expected+4)>=15)
-  if S.ShatteringStar:IsCastable() and ((not Player:EssenceBurstAtMaxStacks() or not S.ArcaneVigor:IsAvailable() or S.Engulf:IsAvailable()) and (Player:HasTier("TWW2", 2) or not S.ScorchingEmbers:IsAvailable() or not S.Engulf:IsAvailable() or Target:DebuffRemains(S.FireBreathDebuff) <= 6 or mathmax(S.Engulf:CooldownRemains(), S.FireBreath:CooldownRemains() + 4) >= 15)) then
+  if S.ShatteringStar:IsCastable() and ((not Player:EssenceBurstAtMaxStacks() or not S.ArcaneVigor:IsAvailable() or S.Engulf:IsAvailable()) and (TWW2_2pc or not S.ScorchingEmbers:IsAvailable() or not S.Engulf:IsAvailable() or Target:DebuffRemains(S.FireBreathDebuff) <= 6 or mathmax(S.Engulf:CooldownRemains(), S.FireBreath:CooldownRemains() + 4) >= 15)) then
     if Cast(S.ShatteringStar, nil, nil, not Target:IsInRange(25)) then return "shattering_star st 12"; end
   end
   -- fire_breath,target_if=max:target.health.pct,empower_to=4,if=(talent.scorching_embers&talent.engulf&action.engulf.usable_in<=duration+0.5)&variable.can_use_empower&(cooldown.shattering_star.remains<=duration+0.5+6-gcd.max|!talent.shattering_star|cooldown.engulf.full_recharge_time<=cooldown.fire_breath.duration_expected+4)
@@ -567,11 +575,11 @@ local function ST()
     end
   end
   -- deep_breath,if=(talent.imminent_destruction|talent.melt_armor|talent.maneuverability)&!set_bonus.tww3_4pc,interrupt_immediate=1,interrupt_if=gcd.remains=0&ticks>=8,cancel_if=gcd.remains=0&ticks>=8
-  if S.DeepBreath:IsReady() and ((S.ImminentDestruction:IsAvailable() or S.MeltArmor:IsAvailable() or S.Maneuverability:IsAvailable()) and not Player:HasTier("TWW3", 4)) then
+  if S.DeepBreath:IsReady() and ((S.ImminentDestruction:IsAvailable() or S.MeltArmor:IsAvailable() or S.Maneuverability:IsAvailable()) and not TWW3_4pc) then
     if Cast(S.DeepBreath, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath st 32"; end
   end
   -- living_flame,if=buff.leaping_flames.up&buff.essence_burst.stack=0&buff.inner_flame.up&(buff.inner_flame.remains>execute_time|!buff.dragonrage.up&buff.burnout.up)&set_bonus.tww3_4pc
-  if S.LivingFlame:IsReady() and (Player:BuffUp(S.LeapingFlamesBuff) and Player:EssenceBurst() == 0 and Player:BuffUp(S.InnerFlameBuff) and (Player:BuffRemains(S.InnerFlameBuff) > S.LivingFlame:ExecuteTime() or not VarDragonrageUp and Player:BuffUp(S.BurnoutBuff)) and Player:HasTier("TWW3", 4)) then
+  if S.LivingFlame:IsReady() and (Player:BuffUp(S.LeapingFlamesBuff) and Player:EssenceBurst() == 0 and Player:BuffUp(S.InnerFlameBuff) and (Player:BuffRemains(S.InnerFlameBuff) > S.LivingFlame:ExecuteTime() or not VarDragonrageUp and Player:BuffUp(S.BurnoutBuff)) and TWW3_4pc) then
     if Cast(S.LivingFlame, nil, nil, not Target:IsInRange(25)) then return "living_flame st 34"; end
   end
   -- disintegrate,target_if=min:debuff.bombardments.remains,early_chain_if=ticks_remain<=1&buff.mass_disintegrate_stacks.up,if=(raid_event.movement.in>2|buff.hover.up)&buff.mass_disintegrate_stacks.up&talent.mass_disintegrate&!variable.pool_for_id

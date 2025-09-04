@@ -56,6 +56,8 @@ local VarTrueshotReady = false
 local VarSyncActive = false
 local VarSyncReady = false
 local VarSyncRemains = 0
+local TWW3_2pc = Player:HasTier("TWW3", 2)
+local TWW3_4pc = Player:HasTier("TWW3", 4)
 local Enemies10ySplash, EnemiesCount10ySplash
 local TargetInRange40y
 local BossFightRemains = 11111
@@ -110,6 +112,8 @@ local StunInterrupts = {
 
 --- ===== Event Registrations =====
 HL:RegisterForEvent(function()
+  TWW3_2pc = Player:HasTier("TWW3", 2)
+  TWW3_4pc = Player:HasTier("TWW3", 4)
   VarTrinketFailures = 0
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED")
@@ -638,7 +642,7 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(S.CounterShot, Settings.CommonsDS.DisplayStyle.Interrupts, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- variable,name=trueshot_ready,value=!talent.bullseye|fight_remains>cooldown.trueshot.duration+10|buff.bullseye.stack=buff.bullseye.max_stack|fight_remains<25
-    local TrueshotCD = 120 - num(S.CallingtheShots:IsAvailable()) * 30 - num(Player:HasTier("TWW3", 2)) * 30
+    local TrueshotCD = 120 - num(S.CallingtheShots:IsAvailable()) * 30 - num(TWW3_2pc) * 30
     VarTrueshotReady = not S.Bullseye:IsAvailable() or FightRemains > TrueshotCD + 10 or Player:BuffStack(S.BullseyeBuff) == 30 or BossFightRemains < 25
     -- auto_shot
     -- call_action_list,name=cds

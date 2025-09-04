@@ -64,6 +64,10 @@ local Enemies8ySplash, EnemiesCount8ySplash
 local ClearCastingMaxStack = S.ImprovedClearcasting:IsAvailable() and 3 or 1
 local LastSSAM = 0
 local LastSFAM = 0
+local TWW2_2pc = Player:HasTier("TWW2", 2)
+local TWW2_4pc = Player:HasTier("TWW2", 4)
+local TWW3_2pc = Player:HasTier("TWW3", 2)
+local TWW3_4pc = Player:HasTier("TWW3", 4)
 local BossFightRemains = 11111
 local FightRemains = 11111
 local CastAE
@@ -135,6 +139,10 @@ HL:RegisterForEvent(function()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
+  TWW2_2pc = Player:HasTier("TWW2", 2)
+  TWW2_4pc = Player:HasTier("TWW2", 4)
+  TWW3_2pc = Player:HasTier("TWW3", 2)
+  TWW3_4pc = Player:HasTier("TWW3", 4)
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
@@ -252,7 +260,7 @@ local function Spellslinger()
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage spellslinger 12"; end
   end
   -- arcane_missiles,if=buff.aether_attunement.react&cooldown.touch_of_the_magi.remains<gcd.max*3&buff.clearcasting.react&set_bonus.thewarwithin_season_2_4pc
-  if S.ArcaneMissiles:IsReady() and (Player:BuffUp(S.AetherAttunementBuff) and S.TouchoftheMagi:CooldownRemains() < Player:GCD() * 3 and Player:BuffUp(S.ClearcastingBuff) and Player:HasTier("TWW2", 4)) then
+  if S.ArcaneMissiles:IsReady() and (Player:BuffUp(S.AetherAttunementBuff) and S.TouchoftheMagi:CooldownRemains() < Player:GCD() * 3 and Player:BuffUp(S.ClearcastingBuff) and TWW2_4pc) then
     LastSSAM = 0
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles spellslinger 14"; end
   end
@@ -263,11 +271,11 @@ local function Spellslinger()
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage spellslinger 16"; end
   end
   -- arcane_barrage,if=buff.arcane_charge.stack=4&buff.arcane_harmony.stack>=20&set_bonus.thewarwithin_season_3_4pc
-  if S.ArcaneBarrage:IsCastable() and (Player:ArcaneCharges() == 4 and Player:BuffStack(S.ArcaneHarmonyBuff) >= 20 and Player:HasTier("TWW3", 4)) then
+  if S.ArcaneBarrage:IsCastable() and (Player:ArcaneCharges() == 4 and Player:BuffStack(S.ArcaneHarmonyBuff) >= 20 and TWW3_4pc) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage spellslinger 18"; end
   end
   -- arcane_missiles,if=(buff.clearcasting.react&buff.nether_precision.down&((cooldown.touch_of_the_magi.remains>gcd.max*7&cooldown.arcane_surge.remains>gcd.max*7)|buff.clearcasting.react>1|!talent.magis_spark|(cooldown.touch_of_the_magi.remains<gcd.max*4&buff.aether_attunement.react=0)|set_bonus.thewarwithin_season_2_4pc))|(fight_remains<5&buff.clearcasting.react),interrupt_if=tick_time>gcd.remains&(buff.aether_attunement.react=0|(active_enemies>3&(!talent.time_loop|talent.resonance))),interrupt_immediate=1,interrupt_global=1,chain=1
-  if S.ArcaneMissiles:IsReady() and ((Player:BuffUp(S.ClearcastingBuff) and Player:BuffDown(S.NetherPrecisionBuff) and ((S.TouchoftheMagi:CooldownRemains() > Player:GCD() * 7 and S.ArcaneSurge:CooldownRemains() > Player:GCD() * 7) or Player:BuffStack(S.ClearcastingBuff) > 1 or not S.MagisSpark:IsAvailable() or (S.TouchoftheMagi:CooldownRemains() < Player:GCD() * 4 and Player:BuffDown(S.AetherAttunementBuff)) or Player:HasTier("TWW2", 4))) or (FightRemains < 5 and Player:BuffUp(S.ClearcastingBuff))) then
+  if S.ArcaneMissiles:IsReady() and ((Player:BuffUp(S.ClearcastingBuff) and Player:BuffDown(S.NetherPrecisionBuff) and ((S.TouchoftheMagi:CooldownRemains() > Player:GCD() * 7 and S.ArcaneSurge:CooldownRemains() > Player:GCD() * 7) or Player:BuffStack(S.ClearcastingBuff) > 1 or not S.MagisSpark:IsAvailable() or (S.TouchoftheMagi:CooldownRemains() < Player:GCD() * 4 and Player:BuffDown(S.AetherAttunementBuff)) or TWW2_4pc)) or (FightRemains < 5 and Player:BuffUp(S.ClearcastingBuff))) then
     LastSSAM = 1
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles spellslinger 20"; end
   end
@@ -297,15 +305,15 @@ local function Spellslinger()
     if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb spellslinger 32"; end
   end
   -- arcane_barrage,if=active_enemies>=2&buff.arcane_charge.stack=4&cooldown.arcane_orb.remains<gcd.max&(buff.arcane_harmony.stack<=(8+(10*!set_bonus.thewarwithin_season_3_4pc)))&(((prev_gcd.1.arcane_barrage|prev_gcd.1.arcane_orb)&buff.nether_precision.stack=1)|buff.nether_precision.stack=2|buff.nether_precision.down)
-  if S.ArcaneBarrage:IsCastable() and (EnemiesCount8ySplash >= 2 and Player:ArcaneCharges() == 4 and S.ArcaneOrb:CooldownRemains() < Player:GCD() and Player:BuffStack(S.ArcaneHarmonyBuff) <= 8 + (10 * num(not Player:HasTier("TWW3", 4))) and (((Player:PrevGCDP(1, S.ArcaneBarrage) or Player:PrevGCDP(1, S.ArcaneOrb)) and Player:BuffStack(S.NetherPrecisionBuff) == 1) or Player:BuffStack(S.NetherPrecisionBuff) == 2 or Player:BuffDown(S.NetherPrecisionBuff))) then
+  if S.ArcaneBarrage:IsCastable() and (EnemiesCount8ySplash >= 2 and Player:ArcaneCharges() == 4 and S.ArcaneOrb:CooldownRemains() < Player:GCD() and Player:BuffStack(S.ArcaneHarmonyBuff) <= 8 + (10 * num(not TWW3_4pc)) and (((Player:PrevGCDP(1, S.ArcaneBarrage) or Player:PrevGCDP(1, S.ArcaneOrb)) and Player:BuffStack(S.NetherPrecisionBuff) == 1) or Player:BuffStack(S.NetherPrecisionBuff) == 2 or Player:BuffDown(S.NetherPrecisionBuff))) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage spellslinger 34"; end
   end
   -- arcane_barrage,if=active_enemies>2&(buff.arcane_charge.stack=4&!set_bonus.thewarwithin_season_3_4pc)
-  if S.ArcaneBarrage:IsCastable() and (EnemiesCount8ySplash > 2 and Player:ArcaneCharges() == 4 and not Player:HasTier("TWW3", 4)) then
+  if S.ArcaneBarrage:IsCastable() and (EnemiesCount8ySplash > 2 and Player:ArcaneCharges() == 4 and not TWW3_4pc) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage spellslinger 36"; end
   end
   -- arcane_orb,if=active_enemies>1&buff.arcane_harmony.stack<20&(buff.arcane_surge.up|buff.nether_precision.up|active_enemies>=7)&set_bonus.thewarwithin_season_3_4pc
-  if S.ArcaneOrb:IsReady() and (EnemiesCount8ySplash > 1 and Player:BuffStack(S.ArcaneHarmonyBuff) < 20 and (Player:BuffUp(S.ArcaneSurgeBuff) or Player:BuffUp(S.NetherPrecisionBuff) or EnemiesCount8ySplash >= 7) and Player:HasTier("TWW3", 4)) then
+  if S.ArcaneOrb:IsReady() and (EnemiesCount8ySplash > 1 and Player:BuffStack(S.ArcaneHarmonyBuff) < 20 and (Player:BuffUp(S.ArcaneSurgeBuff) or Player:BuffUp(S.NetherPrecisionBuff) or EnemiesCount8ySplash >= 7) and TWW3_4pc) then
     if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb spellslinger 38"; end
   end
   -- arcane_barrage,if=talent.high_voltage&active_enemies>=2&buff.arcane_charge.stack=4&buff.aether_attunement.react&buff.clearcasting.react
@@ -313,7 +321,7 @@ local function Spellslinger()
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage spellslinger 40"; end
   end
   -- arcane_orb,if=active_enemies>1&(active_enemies<3|buff.arcane_surge.up|(buff.nether_precision.up))&set_bonus.thewarwithin_season_3_4pc
-  if S.ArcaneOrb:IsReady() and (EnemiesCount8ySplash > 1 and (EnemiesCount8ySplash < 3 or Player:BuffUp(S.ArcaneSurgeBuff) or Player:BuffUp(S.NetherPrecisionBuff)) and Player:HasTier("TWW3", 4)) then
+  if S.ArcaneOrb:IsReady() and (EnemiesCount8ySplash > 1 and (EnemiesCount8ySplash < 3 or Player:BuffUp(S.ArcaneSurgeBuff) or Player:BuffUp(S.NetherPrecisionBuff)) and TWW3_4pc) then
     if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb spellslinger 42"; end
   end
   -- arcane_barrage,if=active_enemies>1&buff.arcane_charge.stack=4&cooldown.arcane_orb.remains<gcd.max
@@ -325,7 +333,7 @@ local function Spellslinger()
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage spellslinger 46"; end
   end
   -- arcane_barrage,if=(active_enemies=1&(talent.orb_barrage|(target.health.pct<35&talent.arcane_bombardment))&(cooldown.arcane_orb.remains<gcd.max)&buff.arcane_charge.stack=4&(cooldown.touch_of_the_magi.remains>gcd.max*6|!talent.magis_spark)&(buff.nether_precision.down|(buff.nether_precision.stack=1&buff.clearcasting.stack=0)))&!set_bonus.thewarwithin_season_3_4pc
-  if S.ArcaneBarrage:IsCastable() and ((EnemiesCount8ySplash == 1 and (S.OrbBarrage:IsAvailable() or (Target:HealthPercentage() < 35 and S.ArcaneBombardment:IsAvailable())) and S.ArcaneOrb:CooldownRemains() < Player:GCD() and Player:ArcaneCharges() == 4 and (S.TouchoftheMagi:CooldownRemains() > Player:GCD() * 6 or not S.MagisSpark:IsAvailable()) and (Player:BuffDown(S.NetherPrecisionBuff) or (Player:BuffStack(S.NetherPrecisionBuff) == 1 and Player:BuffDown(S.ClearcastingBuff)))) and not Player:HasTier("TWW3", 4)) then
+  if S.ArcaneBarrage:IsCastable() and ((EnemiesCount8ySplash == 1 and (S.OrbBarrage:IsAvailable() or (Target:HealthPercentage() < 35 and S.ArcaneBombardment:IsAvailable())) and S.ArcaneOrb:CooldownRemains() < Player:GCD() and Player:ArcaneCharges() == 4 and (S.TouchoftheMagi:CooldownRemains() > Player:GCD() * 6 or not S.MagisSpark:IsAvailable()) and (Player:BuffDown(S.NetherPrecisionBuff) or (Player:BuffStack(S.NetherPrecisionBuff) == 1 and Player:BuffDown(S.ClearcastingBuff)))) and not TWW3_4pc) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage spellslinger 48"; end
   end
   -- arcane_explosion,if=active_enemies>1&((buff.arcane_charge.stack<1&!talent.high_voltage)|(buff.arcane_charge.stack<3&(buff.clearcasting.react=0|talent.reverberate)))
@@ -337,7 +345,7 @@ local function Spellslinger()
     if CastAE(S.ArcaneExplosion) then return "arcane_explosion spellslinger 52"; end
   end
   -- arcane_barrage,if=(((target.health.pct<35&(debuff.touch_of_the_magi.remains<(gcd.max*1.25))&(debuff.touch_of_the_magi.remains>action.arcane_barrage.travel_time))|((buff.arcane_surge.remains<gcd.max)&buff.arcane_surge.up))&buff.arcane_charge.stack=4)&!set_bonus.thewarwithin_season_3_4pc
-  if S.ArcaneBarrage:IsCastable() and ((((Target:HealthPercentage() < 35 and (Target:DebuffRemains(S.TouchoftheMagiDebuff) < (Player:GCD() * 1.25)) and Target:DebuffRemains(S.TouchoftheMagiDebuff) > S.ArcaneBarrage:TravelTime()) or (Player:BuffRemains(S.ArcaneSurgeBuff) < Player:GCD() and Player:BuffUp(S.ArcaneSurgeBuff))) and Player:ArcaneCharges() == 4) and not Player:HasTier("TWW3", 4)) then
+  if S.ArcaneBarrage:IsCastable() and ((((Target:HealthPercentage() < 35 and (Target:DebuffRemains(S.TouchoftheMagiDebuff) < (Player:GCD() * 1.25)) and Target:DebuffRemains(S.TouchoftheMagiDebuff) > S.ArcaneBarrage:TravelTime()) or (Player:BuffRemains(S.ArcaneSurgeBuff) < Player:GCD() and Player:BuffUp(S.ArcaneSurgeBuff))) and Player:ArcaneCharges() == 4) and not TWW3_4pc) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage spellslinger 54"; end
   end
   -- arcane_blast
@@ -392,7 +400,7 @@ local function Sunfury()
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 18"; end
   end
   -- arcane_missiles,if=buff.clearcasting.react&set_bonus.thewarwithin_season_2_4pc&buff.aether_attunement.react&cooldown.touch_of_the_magi.remains<gcd.max*(3-(1.5*(active_enemies>3&(!talent.time_loop|talent.resonance)))),interrupt_if=tick_time>gcd.remains&(buff.aether_attunement.react=0|(active_enemies>3&(!talent.time_loop|talent.resonance))),interrupt_immediate=1,interrupt_global=1,chain=1
-  if S.ArcaneMissiles:IsReady() and (Player:BuffUp(S.ClearcastingBuff) and Player:HasTier("TWW2", 4) and Player:BuffUp(S.AetherAttunementBuff) and S.TouchoftheMagi:CooldownRemains() < Player:GCD() * (3 - (1.5 * num(EnemiesCount8ySplash > 3 and (not S.TimeLoop:IsAvailable() or S.Resonance:IsAvailable()))))) then
+  if S.ArcaneMissiles:IsReady() and (Player:BuffUp(S.ClearcastingBuff) and TWW2_4pc and Player:BuffUp(S.AetherAttunementBuff) and S.TouchoftheMagi:CooldownRemains() < Player:GCD() * (3 - (1.5 * num(EnemiesCount8ySplash > 3 and (not S.TimeLoop:IsAvailable() or S.Resonance:IsAvailable()))))) then
     LastSFAM = 2
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles sunfury 20"; end
   end
@@ -478,7 +486,7 @@ local function APL()
 
     -- VarSoulCD from Precombat, since we can't check active_enemies until here.
     --variable,name=soul_cd,op=set,value=1,if=set_bonus.thewarwithin_season_3_4pc&talent.spellfire_spheres&talent.resonance&!talent.magis_spark&(active_enemies>=3)&variable.soul_burst
-    VarSoulCD = VarSoulBurst and Player:HasTier("TWW3", 4) and Player:HeroTreeID() == 39 and S.Resonance:IsAvailable() and not S.MagisSpark:IsAvailable() and EnemiesCount8ySplash >= 3
+    VarSoulCD = VarSoulBurst and TWW3_4pc and Player:HeroTreeID() == 39 and S.Resonance:IsAvailable() and not S.MagisSpark:IsAvailable() and EnemiesCount8ySplash >= 3
   end
 
   if Everyone.TargetIsValid() then

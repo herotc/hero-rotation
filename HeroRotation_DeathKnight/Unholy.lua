@@ -70,6 +70,10 @@ local AnyDnD = (S.Defile:IsAvailable()) and S.Defile or S.DeathAndDecay
 local FesterStacks, FesterTargets
 local FesteringAction, FesteringRange
 local FesterMaxStacks = 6
+local TWW2_2pc = Player:HasTier("TWW2", 2)
+local TWW2_4pc = Player:HasTier("TWW2", 4)
+local TWW3_2pc = Player:HasTier("TWW3", 2)
+local TWW3_4pc = Player:HasTier("TWW3", 4)
 local EnemiesMelee, EnemiesMeleeCount, ActiveEnemies
 local Enemies10ySplash, Enemies10ySplashCount
 local EnemiesWithoutVP
@@ -201,9 +205,16 @@ end, "PLAYER_REGEN_ENABLED")
 HL:RegisterForEvent(function()
   WoundSpender = (S.ClawingShadows:IsAvailable()) and S.ClawingShadows or S.ScourgeStrike
   AnyDnD = (S.Defile:IsAvailable()) and S.Defile or S.DeathAndDecay
+end, "PLAYER_EQUIPMENT_CHANGED", "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
+
+HL:RegisterForEvent(function()
+  TWW2_2pc = Player:HasTier("TWW2", 2)
+  TWW2_4pc = Player:HasTier("TWW2", 4)
+  TWW3_2pc = Player:HasTier("TWW3", 2)
+  TWW3_4pc = Player:HasTier("TWW3", 4)
   VarTrinketFailures = 0
   SetTrinketVariables()
-end, "PLAYER_EQUIPMENT_CHANGED", "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 --- ===== Helper Functions =====
 local function DeathStrikeHeal()
@@ -292,7 +303,7 @@ end
 
 local function EvaluateCycleOutbreakCDsSan(TargetUnit)
   -- target_if=target.time_to_die>dot.frost_fever.remains&dot.frost_fever.ticks_remain<5,if=talent.superstrain&set_bonus.tww2_4pc&dot.frost_fever.refreshable&(!talent.unholy_blight|talent.unholy_blight&cooldown.dark_transformation.remains>6)&(!talent.raise_abomination|talent.raise_abomination&cooldown.raise_abomination.remains>6)
-  return (TargetUnit:TimeToDie() > TargetUnit:DebuffRemains(S.FrostFeverDebuff) and TargetUnit:DebuffTicksRemain(S.FrostFeverDebuff) < 5) and (S.Superstrain:IsAvailable() and Player:HasTier("TWW3", 4) and TargetUnit:DebuffRefreshable(S.FrostFeverDebuff) and (not S.UnholyBlight:IsAvailable() or S.UnholyBlight:IsAvailable() and S.DarkTransformation:CooldownRemains() > 6) and (not S.RaiseAbomination:IsAvailable() or S.RaiseAbomination:IsAvailable() and S.RaiseAbomination:CooldownRemains() > 6))
+  return (TargetUnit:TimeToDie() > TargetUnit:DebuffRemains(S.FrostFeverDebuff) and TargetUnit:DebuffTicksRemain(S.FrostFeverDebuff) < 5) and (S.Superstrain:IsAvailable() and TWW2_4pc and TargetUnit:DebuffRefreshable(S.FrostFeverDebuff) and (not S.UnholyBlight:IsAvailable() or S.UnholyBlight:IsAvailable() and S.DarkTransformation:CooldownRemains() > 6) and (not S.RaiseAbomination:IsAvailable() or S.RaiseAbomination:IsAvailable() and S.RaiseAbomination:CooldownRemains() > 6))
 end
 
 local function EvaluateCycleTrollbaneSlow(TargetUnit)
@@ -506,7 +517,7 @@ local function CDsAoE()
     if Cast(S.DarkTransformation, Settings.Unholy.GCDasOffGCD.DarkTransformation) then return "dark_transformation cds_aoe 4"; end
   end
   -- apocalypse,target_if=max:debuff.festering_wound.stack,if=variable.adds_remain&(death_and_decay.ticking|cooldown.death_and_decay.remains<3|rune<3|set_bonus.tww3_rider_of_the_apocalypse_2pc)
-  if S.Apocalypse:IsReady() and (VarAddsRemain and (Player:DnDTicking() or AnyDnD:CooldownRemains() < 3 or Player:Rune() < 3 or Player:HasTier("TWW3", 2))) then
+  if S.Apocalypse:IsReady() and (VarAddsRemain and (Player:DnDTicking() or AnyDnD:CooldownRemains() < 3 or Player:Rune() < 3 or TWW3_2pc)) then
     if Everyone.CastTargetIf(S.Apocalypse, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, nil, not Target:IsInMeleeRange(5), Settings.Unholy.GCDasOffGCD.Apocalypse) then return "apocalypse cds_aoe 6"; end
   end
   -- outbreak,if=dot.virulent_plague.ticks_remain<5&dot.virulent_plague.refreshable&(!talent.unholy_blight|talent.unholy_blight&cooldown.dark_transformation.remains)&(!talent.raise_abomination|talent.raise_abomination&cooldown.raise_abomination.remains)
@@ -529,7 +540,7 @@ local function CDsAoESan()
     if Everyone.CastTargetIf(S.Apocalypse, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, nil, not Target:IsInMeleeRange(5), Settings.Unholy.GCDasOffGCD.Apocalypse) then return "apocalypse cds_aoe_san 6"; end
   end
   -- outbreak,if=(dot.virulent_plague.ticks_remain<5|set_bonus.tww2_4pc&talent.superstrain&dot.frost_fever.ticks_remain<5&!pet.abomination.active)&(talent.unholy_blight&!cooldown.dark_transformation.ready|!talent.unholy_blight)&(dot.virulent_plague.refreshable|talent.morbidity&!buff.gift_of_the_sanlayn.up&talent.superstrain&dot.frost_fever.refreshable&dot.blood_plague.refreshable)&(!dot.virulent_plague.ticking&variable.epidemic_targets<active_enemies|(!talent.unholy_blight|talent.unholy_blight&cooldown.dark_transformation.remains>5)&(!talent.raise_abomination|talent.raise_abomination&cooldown.raise_abomination.remains>5))|buff.visceral_strength_unholy.up
-  if S.Outbreak:IsReady() and ((Target:DebuffTicksRemain(S.VirulentPlagueDebuff) < 5 or Player:HasTier("TWW2", 4) and S.Superstrain:IsAvailable() and Target:DebuffTicksRemain(S.FrostFeverDebuff) < 5 and not VarAbomActive) and (S.UnholyBlight:IsAvailable() and S.DarkTransformation:CooldownDown() or not S.UnholyBlight:IsAvailable()) and (Target:DebuffRefreshable(S.VirulentPlagueDebuff) or S.Morbidity:IsAvailable() and Player:BuffDown(S.GiftoftheSanlaynBuff) and S.Superstrain:IsAvailable() and Target:DebuffRefreshable(S.FrostFeverDebuff) and Target:DebuffRefreshable(S.BloodPlagueDebuff)) and (Target:DebuffDown(S.VirulentPlagueDebuff) and VarEpidemicTargets < ActiveEnemies or (not S.UnholyBlight:IsAvailable() or S.UnholyBlight:IsAvailable() and S.DarkTransformation:CooldownRemains() > 5) and (not S.RaiseAbomination:IsAvailable() or S.RaiseAbomination:IsAvailable() and S.RaiseAbomination:CooldownRemains() > 5)) or Player:BuffUp(S.VisceralStrengthUnholy)) then
+  if S.Outbreak:IsReady() and ((Target:DebuffTicksRemain(S.VirulentPlagueDebuff) < 5 or TWW2_4pc and S.Superstrain:IsAvailable() and Target:DebuffTicksRemain(S.FrostFeverDebuff) < 5 and not VarAbomActive) and (S.UnholyBlight:IsAvailable() and S.DarkTransformation:CooldownDown() or not S.UnholyBlight:IsAvailable()) and (Target:DebuffRefreshable(S.VirulentPlagueDebuff) or S.Morbidity:IsAvailable() and Player:BuffDown(S.GiftoftheSanlaynBuff) and S.Superstrain:IsAvailable() and Target:DebuffRefreshable(S.FrostFeverDebuff) and Target:DebuffRefreshable(S.BloodPlagueDebuff)) and (Target:DebuffDown(S.VirulentPlagueDebuff) and VarEpidemicTargets < ActiveEnemies or (not S.UnholyBlight:IsAvailable() or S.UnholyBlight:IsAvailable() and S.DarkTransformation:CooldownRemains() > 5) and (not S.RaiseAbomination:IsAvailable() or S.RaiseAbomination:IsAvailable() and S.RaiseAbomination:CooldownRemains() > 5)) or Player:BuffUp(S.VisceralStrengthUnholy)) then
     if Cast(S.Outbreak, nil, nil, not Target:IsSpellInRange(S.Outbreak)) then return "outbreak cds_aoe_san 8"; end
   end
 end
@@ -697,7 +708,7 @@ local function SanFishing()
     if Cast(AnyDnD, Settings.CommonsOGCD.GCDasOffGCD.DeathAndDecay) then return "any_dnd san_fishing 6"; end
   end
   -- death_coil,if=buff.sudden_doom.react&talent.doomed_bidding|set_bonus.tww2_4pc&buff.essence_of_the_blood_queen.at_max_stacks&talent.frenzied_bloodthirst&!buff.vampiric_strike.react
-  if S.DeathCoil:IsReady() and (Player:BuffUp(S.SuddenDoomBuff) and S.DoomedBidding:IsAvailable() or Player:HasTier("TWW2", 4) and Player:BuffStack(S.EssenceoftheBloodQueenBuff) >= 5 and S.FrenziedBloodthirst:IsAvailable() and not S.VampiricStrikeAction:IsLearned()) then
+  if S.DeathCoil:IsReady() and (Player:BuffUp(S.SuddenDoomBuff) and S.DoomedBidding:IsAvailable() or TWW2_4pc and Player:BuffStack(S.EssenceoftheBloodQueenBuff) >= 5 and S.FrenziedBloodthirst:IsAvailable() and not S.VampiricStrikeAction:IsLearned()) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil san_fishing 8"; end
   end
   -- soul_reaper,if=target.health.pct<=35&fight_remains>5
@@ -728,7 +739,7 @@ local function SanST()
     if Cast(S.FesteringScytheAction, nil, nil, not Target:IsInMeleeRange(14)) then return "festering_scythe san_st 4"; end
   end
   -- death_coil,if=buff.sudden_doom.react&buff.gift_of_the_sanlayn.remains&(talent.doomed_bidding|talent.rotten_touch)|rune<3&!buff.runic_corruption.up|set_bonus.tww2_4pc&runic_power>80|buff.gift_of_the_sanlayn.up&buff.essence_of_the_blood_queen.at_max_stacks&talent.frenzied_bloodthirst&set_bonus.tww2_4pc&buff.winning_streak_unholy.at_max_stacks&rune<=3&buff.essence_of_the_blood_queen.remains>3
-  if S.DeathCoil:IsReady() and (Player:BuffUp(S.SuddenDoomBuff) and Player:BuffUp(S.GiftoftheSanlaynBuff) and (S.DoomedBidding:IsAvailable() or S.RottenTouch:IsAvailable()) or Player:Rune() < 3 and Player:BuffDown(S.RunicCorruptionBuff) or Player:HasTier("TWW2", 4) and Player:RunicPower() > 80 or Player:BuffUp(S.GiftoftheSanlaynBuff) and Player:BuffStack(S.EssenceoftheBloodQueenBuff) >= 5 and S.FrenziedBloodthirst:IsAvailable() and Player:HasTier("TWW2", 4) and Player:BuffStack(S.WinningStreakBuff) >= 6 and Player:Rune() <= 3 and Player:BuffRemains(S.EssenceoftheBloodQueenBuff) > 3) then
+  if S.DeathCoil:IsReady() and (Player:BuffUp(S.SuddenDoomBuff) and Player:BuffUp(S.GiftoftheSanlaynBuff) and (S.DoomedBidding:IsAvailable() or S.RottenTouch:IsAvailable()) or Player:Rune() < 3 and Player:BuffDown(S.RunicCorruptionBuff) or TWW2_4pc and Player:RunicPower() > 80 or Player:BuffUp(S.GiftoftheSanlaynBuff) and Player:BuffStack(S.EssenceoftheBloodQueenBuff) >= 5 and S.FrenziedBloodthirst:IsAvailable() and TWW2_4pc and Player:BuffStack(S.WinningStreakBuff) >= 6 and Player:Rune() <= 3 and Player:BuffRemains(S.EssenceoftheBloodQueenBuff) > 3) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil san_st 6"; end
   end
   -- wound_spender,if=buff.vampiric_strike.react&debuff.festering_wound.stack>=1|buff.gift_of_the_sanlayn.up|talent.gift_of_the_sanlayn&buff.dark_transformation.up&buff.dark_transformation.remains<gcd

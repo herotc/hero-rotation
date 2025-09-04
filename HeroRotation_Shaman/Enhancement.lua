@@ -69,6 +69,10 @@ local VarFlameShockSaturated
 local EnemiesMelee, EnemiesMeleeCount, Enemies40yCount
 local MaxEBCharges = S.LavaBurst:IsAvailable() and 2 or 1
 local TIAction = S.LightningBolt
+local TWW2_2pc = Player:HasTier("TWW2", 2)
+local TWW2_4pc = Player:HasTier("TWW2", 4)
+local TWW3_2pc = Player:HasTier("TWW3", 2)
+local TWW3_4pc = Player:HasTier("TWW3", 4)
 local BossFightRemains = 11111
 local FightRemains = 11111
 
@@ -125,6 +129,10 @@ HL:RegisterForEvent(function()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
+  TWW2_2pc = Player:HasTier("TWW2", 2)
+  TWW2_4pc = Player:HasTier("TWW2", 4)
+  TWW3_2pc = Player:HasTier("TWW3", 2)
+  TWW3_4pc = Player:HasTier("TWW3", 4)
   VarTrinketFailures = 0
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED")
@@ -278,7 +286,7 @@ local function SingleOpen()
     end
   end
   -- ascendance,if=(buff.legacy_of_the_frost_witch.up|!talent.legacy_of_the_frost_witch.enabled)&(buff.maelstrom_weapon.stack>=6|!set_bonus.tww3_4pc)
-  if CDsON() and S.Ascendance:IsCastable() and ((Player:BuffUp(S.LegacyoftheFrostWitchBuff) or not S.LegacyoftheFrostWitch:IsAvailable()) and (MaelstromStacks >= 6 or not Player:HasTier("TWW3", 4))) then
+  if CDsON() and S.Ascendance:IsCastable() and ((Player:BuffUp(S.LegacyoftheFrostWitchBuff) or not S.LegacyoftheFrostWitch:IsAvailable()) and (MaelstromStacks >= 6 or not TWW3_4pc)) then
     if Cast(S.Ascendance, Settings.CommonsOGCD.GCDasOffGCD.Ascendance) then return "ascendance single_open 12"; end
   end
   -- primordial_storm,if=(buff.maelstrom_weapon.stack>=10)&(buff.legacy_of_the_frost_witch.up|!talent.legacy_of_the_frost_witch.enabled)
@@ -312,7 +320,7 @@ local function SingleOpen()
     if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single_open 26"; end
   end
   -- crash_lightning,if=set_bonus.tww2_4pc
-  if S.CrashLightning:IsReady() and (Player:HasTier("TWW2", 4)) then
+  if S.CrashLightning:IsReady() and (TWW2_4pc) then
     if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInMeleeRange(8)) then return "crash_lightning single_open 28"; end
   end
   -- voltatic_blaze
@@ -340,7 +348,7 @@ local function Single()
     if Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "feral_spirit single 4"; end
   end
   -- doom_winds,if=(!buff.ascendance.up|(buff.tempest.up&buff.ascendance.remains>1*gcd&buff.maelstrom_weapon.stack<=9))&set_bonus.tww3_4pc
-  if S.DoomWinds:IsCastable() and ((Player:BuffDown(S.AscendanceBuff) or (Player:BuffUp(S.TempestBuff) and Player:BuffRemains(S.AscendanceBuff) > Player:GCD() and MaelstromStacks <= 9)) and Player:HasTier("TWW3", 4)) then
+  if S.DoomWinds:IsCastable() and ((Player:BuffDown(S.AscendanceBuff) or (Player:BuffUp(S.TempestBuff) and Player:BuffRemains(S.AscendanceBuff) > Player:GCD() and MaelstromStacks <= 9)) and TWW3_4pc) then
     if Cast(S.DoomWinds, Settings.Enhancement.GCDasOffGCD.DoomWinds, nil, not Target:IsInMeleeRange(5)) then return "doom_winds single 6"; end
   end
   -- ice_strike,if=buff.tempest.up&buff.ascendance.remains>5*gcd&buff.maelstrom_weapon.stack<=1
@@ -401,7 +409,7 @@ local function Single()
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 34"; end
   end
   -- elemental_blast,if=((!talent.overflowing_maelstrom.enabled&buff.maelstrom_weapon.stack>=5)|(buff.maelstrom_weapon.stack>=9&talent.ascendance.enabled)|(talent.deeply_rooted_elements.enabled&buff.maelstrom_weapon.stack>=8))&(charges_fractional>=1.6|set_bonus.tww2_4pc)
-  if S.ElementalBlast:IsReady() and (((not S.OverflowingMaelstrom:IsAvailable() and MaelstromStacks >= 5) or (MaelstromStacks >= 9 and S.Ascendance:IsAvailable()) or (S.DeeplyRootedElements:IsAvailable() and MaelstromStacks >= 8)) and (S.ElementalBlast:ChargesFractional() >= 1.6 or Player:HasTier("TWW2", 4))) then
+  if S.ElementalBlast:IsReady() and (((not S.OverflowingMaelstrom:IsAvailable() and MaelstromStacks >= 5) or (MaelstromStacks >= 9 and S.Ascendance:IsAvailable()) or (S.DeeplyRootedElements:IsAvailable() and MaelstromStacks >= 8)) and (S.ElementalBlast:ChargesFractional() >= 1.6 or TWW2_4pc)) then
     if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 36"; end
   end
   -- stormstrike,if=charges_fractional>=2&(buff.maelstrom_weapon.stack<=6)&!buff.tempest.up&tww3_procs_to_asc=1
@@ -446,7 +454,7 @@ local function Single()
     if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single 56"; end
   end
   -- crash_lightning,if=(talent.unrelenting_storms.enabled&talent.alpha_wolf.enabled&alpha_wolf_min_remains=0)|set_bonus.tww2_4pc
-  if S.CrashLightning:IsReady() and ((S.UnrelentingStorms:IsAvailable() and S.AlphaWolf:IsAvailable() and AlphaWolfMinRemains() == 0) or Player:HasTier("TWW2", 4)) then
+  if S.CrashLightning:IsReady() and ((S.UnrelentingStorms:IsAvailable() and S.AlphaWolf:IsAvailable() and AlphaWolfMinRemains() == 0) or TWW2_4pc) then
     if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInRange(8)) then return "crash_lightning single 58"; end
   end
   -- voltaic_blaze,if=dot.flame_shock.remains<=4
@@ -695,7 +703,7 @@ local function SingleTotemic()
     if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single_totemic 46"; end
   end
   -- crash_lightning,if=set_bonus.tww2_4pc
-  if S.CrashLightning:IsReady() and (Player:HasTier("TWW2", 4)) then
+  if S.CrashLightning:IsReady() and (TWW2_4pc) then
     if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInMeleeRange(8)) then return "crash_lightning single_totemic 48"; end
   end
   -- voltaic_blaze

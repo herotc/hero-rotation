@@ -56,8 +56,19 @@ local ActiveMitigationNeeded
 local IsTanking
 local Enemies8y, Enemies30y
 local EnemiesCount8y, EnemiesCount30y
+local TWW2_2pc = Player:HasTier("TWW2", 2)
+local TWW2_4pc = Player:HasTier("TWW2", 4)
+local TWW3_2pc = Player:HasTier("TWW3", 2)
+local TWW3_4pc = Player:HasTier("TWW3", 4)
 local BossFightRemains = 11111
 local FightRemains = 11111
+
+HL:RegisterForEvent(function()
+  TWW2_2pc = Player:HasTier("TWW2", 2)
+  TWW2_4pc = Player:HasTier("TWW2", 4)
+  TWW3_2pc = Player:HasTier("TWW3", 2)
+  TWW3_4pc = Player:HasTier("TWW3", 4)
+end, "PLAYER_EQUIPMENT_CHANGED")
 
 --- ===== Stun Interrupts List =====
 local StunInterrupts = {
@@ -216,8 +227,8 @@ local function Standard()
   end
   if S.ShieldoftheRighteous:IsReady() and (not S.HammerofLight:IsCastable()) and (
     (Player:BuffUp(S.LuckoftheDrawBuff) and ((Player:HolyPower() + Player:JudgmentPower() >= 5) or (not S.RighteousProtector:IsAvailable() or RighteousProtectorICD == 0))) or
-    (Player:HasTier("TWW2", 4) and ((Player:HolyPower() + Player:JudgmentPower() > 5) or (Player:HolyPower() + Player:JudgmentPower() >= 5 and RighteousProtectorICD == 0))) or
-    (not Player:HasTier("TWW2", 4) and (not S.RighteousProtector:IsAvailable() or RighteousProtectorICD == 0)) or
+    (TWW2_4pc and ((Player:HolyPower() + Player:JudgmentPower() > 5) or (Player:HolyPower() + Player:JudgmentPower() >= 5 and RighteousProtectorICD == 0))) or
+    (not TWW2_4pc and (not S.RighteousProtector:IsAvailable() or RighteousProtectorICD == 0)) or
     (Player:HolyPower() == 5 and (Player:BuffDown(S.BlessingofDawnBuff) or not S.LightsGuidance:IsAvailable()))
   ) then
     if Cast(S.ShieldoftheRighteous, nil, Settings.Protection.DisplayStyle.ShieldOfTheRighteous) then return "shield_of_the_righteous standard 8"; end
@@ -227,11 +238,11 @@ local function Standard()
     if Everyone.CastTargetIf(S.Judgment, Enemies30y, "min", EvaluateTargetIfFilterJudgment, nil, not Target:IsSpellInRange(S.Judgment)) then return "judgment standard 10"; end
   end
   -- holy_armaments,if=next_armament=holy_bulwark&set_bonus.thewarwithin_season_3_4pc
-  if S.HolyBulwark:IsCastable() and (Player:HasTier("TWW3", 4)) then
+  if S.HolyBulwark:IsCastable() and (TWW3_4pc) then
     if Cast(S.HolyBulwark, nil, Settings.CommonsDS.DisplayStyle.HolyArmaments) then return "holy_armaments standard 12"; end
   end
   -- blessed_hammer,if=set_bonus.thewarwithin_season_3_4pc&talent.hammer_and_anvil.enabled
-  if S.BlessedHammer:IsCastable() and (Player:HasTier("TWW3", 4) and S.HammerandAnvil:IsAvailable()) then
+  if S.BlessedHammer:IsCastable() and (TWW3_4pc and S.HammerandAnvil:IsAvailable()) then
     if Cast(S.BlessedHammer, nil, nil, not Target:IsInMeleeRange(5)) then return "blessed_hammer standard 14"; end
   end
   -- avengers_shield,if=!buff.bulwark_of_righteous_fury.up&talent.bulwark_of_righteous_fury.enabled&spell_targets.shield_of_the_righteous>=3
@@ -255,7 +266,7 @@ local function Standard()
     if Cast(S.Consecration) then return "consecration standard 24"; end
   end
   -- holy_armaments,if=next_armament=sacred_weapon&((!buff.sacred_weapon.up|(buff.sacred_weapon.remains<6&!buff.avenging_wrath.up&cooldown.avenging_wrath.remains<=30))&(!set_bonus.thewarwithin_season_3_4pc|buff.masterwork.stack=5))
-  if S.SacredWeapon:IsCastable() and ((Player:BuffDown(S.SacredWeaponBuff) or (Player:BuffRemains(S.SacredWeaponBuff) < 6 and Player:BuffDown(S.AvengingWrathBuff) and S.AvengingWrath:CooldownRemains() <= 30)) and (not Player:HasTier("TWW3", 4) or Player:BuffStack(S.MasterworkBuff) == 5)) then
+  if S.SacredWeapon:IsCastable() and ((Player:BuffDown(S.SacredWeaponBuff) or (Player:BuffRemains(S.SacredWeaponBuff) < 6 and Player:BuffDown(S.AvengingWrathBuff) and S.AvengingWrath:CooldownRemains() <= 30)) and (not TWW3_4pc or Player:BuffStack(S.MasterworkBuff) == 5)) then
     if Cast(S.SacredWeapon, nil, Settings.CommonsDS.DisplayStyle.HolyArmaments) then return "holy_armaments standard 26"; end
   end
   -- hammer_of_wrath

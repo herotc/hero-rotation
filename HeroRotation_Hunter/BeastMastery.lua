@@ -58,6 +58,8 @@ local FightRemains = 11111
 local VarBuffSyncActive = false
 local VarBuffSyncReady = false
 local VarBuffSyncRemains = 0
+local TWW3_2pc = Player:HasTier("TWW3", 2)
+local TWW3_4pc = Player:HasTier("TWW3", 4)
 local Enemies40y, PetEnemiesMixed, PetEnemiesMixedCount
 local TargetInRange40y, TargetInRange30y
 local TargetInRangePet30y
@@ -120,6 +122,8 @@ HL:RegisterForEvent(function()
 end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
+  TWW3_2pc = Player:HasTier("TWW3", 2)
+  TWW3_4pc = Player:HasTier("TWW3", 4)
   VarTrinketFailures = 0
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED")

@@ -63,6 +63,8 @@ local VarMaelCap = 100 + 50 * num(S.SwellingMaelstrom:IsAvailable()) + 25 * num(
 local BossFightRemains = 11111
 local FightRemains = 11111
 local HasMainHandEnchant, MHEnchantTimeRemains
+local TWW3_2pc = Player:HasTier("TWW3", 2)
+local TWW3_4pc = Player:HasTier("TWW3", 4)
 local Enemies40y, Enemies10ySplash
 Shaman.ClusterTargets = 0
 
@@ -116,6 +118,8 @@ SetTrinketVariables()
 
 --- ===== Event Registrations =====
 HL:RegisterForEvent(function()
+  TWW3_2pc = Player:HasTier("TWW3", 2)
+  TWW3_4pc = Player:HasTier("TWW3", 4)
   VarTrinketFailures = 0
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED")
@@ -297,15 +301,15 @@ local function Aoe()
     if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 28"; end
   end
   -- earthquake,if=(maelstrom>variable.mael_cap-10*(spell_targets.chain_lightning+1)|buff.master_of_the_elements.up|buff.ascendance.up&buff.ascendance.remains<3|fight_remains<5)&(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up|!talent.echoes_of_great_sundering&(!talent.elemental_blast|active_enemies>1+3*talent.tempest))&(cooldown.primordial_wave.remains>8|!(set_bonus.tww3_4pc&talent.ancestral_swiftness)|maelstrom>variable.mael_cap-20)
-  if S.Earthquake:IsViable() and ((VarMaelstrom > VarMaelCap - 10 * (Shaman.ClusterTargets + 1) or Player:MotEUp() or Player:BuffUp(S.AscendanceBuff) and Player:BuffRemains(S.AscendanceBuff) < 3 or BossFightRemains < 5) and (Player:BuffUp(S.EchoesofGreatSunderingBuff) or not S.EchoesofGreatSundering:IsAvailable() and (not S.ElementalBlast:IsAvailable() or Shaman.ClusterTargets > 1 + 3* num(S.Tempest:IsAvailable()))) and (S.PrimordialWave:CooldownRemains() > 8 or not (Player:HasTier("TWW3", 4) and S.AncestralSwiftness:IsAvailable()) or VarMaelstrom > VarMaelCap - 20)) then
+  if S.Earthquake:IsViable() and ((VarMaelstrom > VarMaelCap - 10 * (Shaman.ClusterTargets + 1) or Player:MotEUp() or Player:BuffUp(S.AscendanceBuff) and Player:BuffRemains(S.AscendanceBuff) < 3 or BossFightRemains < 5) and (Player:BuffUp(S.EchoesofGreatSunderingBuff) or not S.EchoesofGreatSundering:IsAvailable() and (not S.ElementalBlast:IsAvailable() or Shaman.ClusterTargets > 1 + 3* num(S.Tempest:IsAvailable()))) and (S.PrimordialWave:CooldownRemains() > 8 or not (TWW3_4pc and S.AncestralSwiftness:IsAvailable()) or VarMaelstrom > VarMaelCap - 20)) then
     if Cast(S.Earthquake, nil, nil, not Target:IsInRange(40)) then return "earthquake aoe 30"; end
   end
   -- elemental_blast,target_if=min:debuff.lightning_rod.remains,if=(maelstrom>variable.mael_cap-10*(spell_targets.chain_lightning+1)|buff.master_of_the_elements.up|buff.ascendance.up&buff.ascendance.remains<3|fight_remains<5)&(cooldown.primordial_wave.remains>8|!(set_bonus.tww3_4pc&talent.ancestral_swiftness)|maelstrom>variable.mael_cap-20)
-  if S.ElementalBlast:IsViable() and ((VarMaelstrom > VarMaelCap - 10 * (Shaman.ClusterTargets + 1) or Player:MotEUp() or Player:BuffUp(S.AscendanceBuff) and Player:BuffRemains(S.AscendanceBuff) < 3 or BossFightRemains < 5) and (S.PrimordialWave:CooldownRemains() > 8 or not (Player:HasTier("TWW3", 4) and S.AncestralSwiftness:IsAvailable()) or VarMaelstrom > VarMaelCap - 20)) then
+  if S.ElementalBlast:IsViable() and ((VarMaelstrom > VarMaelCap - 10 * (Shaman.ClusterTargets + 1) or Player:MotEUp() or Player:BuffUp(S.AscendanceBuff) and Player:BuffRemains(S.AscendanceBuff) < 3 or BossFightRemains < 5) and (S.PrimordialWave:CooldownRemains() > 8 or not (TWW3_4pc and S.AncestralSwiftness:IsAvailable()) or VarMaelstrom > VarMaelCap - 20)) then
     if Everyone.CastTargetIf(S.ElementalBlast, Enemies10ySplash, "min", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe 32"; end
   end
   -- earth_shock,target_if=min:debuff.lightning_rod.remains,if=(maelstrom>variable.mael_cap-10*(spell_targets.chain_lightning+1)|buff.master_of_the_elements.up|buff.ascendance.up&buff.ascendance.remains<3|fight_remains<5)&(cooldown.primordial_wave.remains>8|!(set_bonus.tww3_4pc&talent.ancestral_swiftness)|maelstrom>variable.mael_cap-20)
-  if S.EarthShock:IsViable() and ((VarMaelstrom > VarMaelCap - 10 * (Shaman.ClusterTargets + 1) or Player:MotEUp() or Player:BuffUp(S.AscendanceBuff) and Player:BuffRemains(S.AscendanceBuff) < 3 or BossFightRemains < 5) and (S.PrimordialWave:CooldownRemains() > 8 or not (Player:HasTier("TWW3", 4) and S.AncestralSwiftness:IsAvailable()) or VarMaelstrom > VarMaelCap - 20)) then
+  if S.EarthShock:IsViable() and ((VarMaelstrom > VarMaelCap - 10 * (Shaman.ClusterTargets + 1) or Player:MotEUp() or Player:BuffUp(S.AscendanceBuff) and Player:BuffRemains(S.AscendanceBuff) < 3 or BossFightRemains < 5) and (S.PrimordialWave:CooldownRemains() > 8 or not (TWW3_4pc and S.AncestralSwiftness:IsAvailable()) or VarMaelstrom > VarMaelCap - 20)) then
     if Everyone.CastTargetIf(S.EarthShock, Enemies10ySplash, "min", EvaluateTargetIfFilterLightningRodRemains, nil, not Target:IsSpellInRange(S.EarthShock)) then return "earth_shock aoe 34"; end
   end
   -- earthquake,if=talent.lightning_rod&lightning_rod<active_enemies&(buff.stormkeeper.up|buff.tempest.up|!talent.surge_of_power)&(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up|!talent.echoes_of_great_sundering&(!talent.elemental_blast|active_enemies>1+3*talent.tempest))
@@ -384,7 +388,7 @@ local function SingleTarget()
     if Cast(S.Stormkeeper, Settings.Elemental.GCDasOffGCD.Stormkeeper) then return "stormkeeper aoe 6"; end
   end
   -- liquid_magma_totem,if=active_dot.flame_shock=0&!buff.surge_of_power.up&!buff.master_of_the_elements.up&!(set_bonus.tww3_2pc&talent.ancestral_swiftness)
-  if S.LiquidMagmaTotem:IsViable() and (S.FlameShockDebuff:AuraActiveCount() == 0 and Player:BuffDown(S.SurgeofPowerBuff) and not Player:MotEUp() and not (Player:HasTier("TWW3", 2) and S.AncestralSwiftness:IsAvailable())) then
+  if S.LiquidMagmaTotem:IsViable() and (S.FlameShockDebuff:AuraActiveCount() == 0 and Player:BuffDown(S.SurgeofPowerBuff) and not Player:MotEUp() and not (TWW3_2pc and S.AncestralSwiftness:IsAvailable())) then
     if Cast(S.LiquidMagmaTotem, Settings.Elemental.GCDasOffGCD.LiquidMagmaTotem, nil, not Target:IsInRange(40)) then return "liquid_magma_totem single_target 8"; end
   end
   -- liquid_magma_totem,if=dot.flame_shock.refreshable&!buff.surge_of_power.up&!buff.master_of_the_elements.up&cooldown.ascendance.ready
@@ -444,7 +448,7 @@ local function SingleTarget()
     if Cast(S.Icefury, nil, nil, not Target:IsSpellInRange(S.Icefury)) then return "icefury single_target 36"; end
   end
   -- lava_burst,target_if=dot.flame_shock.remains>=2,if=!buff.master_of_the_elements.up&(buff.lava_surge.up|buff.tempest.up|buff.stormkeeper.up|cooldown.lava_burst.charges_fractional>1.8|maelstrom>variable.mael_cap-30|(maelstrom>52-5*talent.eye_of_the_storm*(1+talent.elemental_blast)+30*talent.elemental_blast)&(cooldown.primordial_wave.remains>8|!(set_bonus.tww3_4pc&talent.ancestral_swiftness)))
-  if S.LavaBurst:IsViable() and (not Player:MotEUp() and (Player:BuffUp(S.LavaSurgeBuff) or Player:BuffUp(S.TempestBuff) or Player:StormkeeperUp() or S.LavaBurst:ChargesFractional() > 1.8 or VarMaelstrom > VarMaelCap - 30 or (VarMaelstrom > 52 - 5 * num(S.EyeoftheStorm:IsAvailable()) * (1 + num(S.ElementalBlast:IsAvailable())) + 30 * num(S.ElementalBlast:IsAvailable())) and (S.PrimordialWave:CooldownRemains() > 8 or not (Player:HasTier("TWW3", 4) and S.AncestralSwiftness:IsAvailable())))) then
+  if S.LavaBurst:IsViable() and (not Player:MotEUp() and (Player:BuffUp(S.LavaSurgeBuff) or Player:BuffUp(S.TempestBuff) or Player:StormkeeperUp() or S.LavaBurst:ChargesFractional() > 1.8 or VarMaelstrom > VarMaelCap - 30 or (VarMaelstrom > 52 - 5 * num(S.EyeoftheStorm:IsAvailable()) * (1 + num(S.ElementalBlast:IsAvailable())) + 30 * num(S.ElementalBlast:IsAvailable())) and (S.PrimordialWave:CooldownRemains() > 8 or not (TWW3_4pc and S.AncestralSwiftness:IsAvailable())))) then
     if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains3, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single_target 38"; end
   end
   -- earthquake,if=buff.echoes_of_great_sundering_eb.up&(buff.tempest.up|buff.stormkeeper.up)&talent.surge_of_power&!talent.master_of_the_elements
