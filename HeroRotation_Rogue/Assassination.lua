@@ -674,10 +674,11 @@ local function UsableItems ()
   end
 
   -- actions.items+=/use_item,name=unyielding_netherprism,use_off_gcd=1,if=dot.deathmark.ticking
-  -- &(buff.latent_energy.stack>=16|fight_remains<=90|time<=15)|fight_remains<=20
+  -- &(buff.latent_energy.stack>=16|fight_remains<=90|(!trinket.2.cooldown.ready|!trinket.1.cooldown.ready))|fight_remains<=20
   if I.UnyieldingNetherprism:IsEquippedAndReady() then
     if Target:DebuffUp(S.Deathmark) and
-      (Player:BuffStack(S.LatentEnergyBuff) >= 16 or HL.BossFilteredFightRemains('<=', 90) or HL.CombatTime() <= 15)
+      (Player:BuffStack(S.LatentEnergyBuff) >= 16 or HL.BossFilteredFightRemains('<=', 90)
+      or (not TrinketItem2:IsReady() or not TrinketItem1:IsReady()))
       or HL.BossFilteredFightRemains('<=', 20) then
       if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
         return "Unyeilding Netherprism";
@@ -713,11 +714,11 @@ local function UsableItems ()
     end
   end
 
-  -- actions.items+=/use_items,slots=trinket1,if=(variable.trinket_sync_slot=1&(debuff.deathmark.up|dot.kingsbane.ticking)
+  -- actions.items+=/use_items,slots=trinket1,if=(variable.trinket_sync_slot=1&(debuff.deathmark.up)
   -- |(variable.trinket_sync_slot=2&!trinket.2.cooldown.ready&cooldown.deathmark.remains>20))|!variable.trinket_sync_slot|fight_remains<=20
   if TrinketItem1 and TrinketItem1:IsReady() then
     if not Player:IsItemBlacklisted(TrinketItem1) and not ValueIsInArray(OnUseExcludeTrinkets, TrinketItem1:ID())
-      and (TrinketSyncSlot == 1 and (S.Deathmark:AnyDebuffUp() or Target:DebuffUp(S.Kingsbane))
+      and (TrinketSyncSlot == 1 and (S.Deathmark:AnyDebuffUp())
       or (TrinketSyncSlot == 2 and not TrinketItem2:IsReady() and S.Deathmark:CooldownRemains() > 20))
       or TrinketSyncSlot == 0 or HL.BossFilteredFightRemains("<", 20) then
       if Cast(TrinketItem1, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
@@ -726,11 +727,11 @@ local function UsableItems ()
     end
   end
 
-  -- actions.items+=/use_items,slots=trinket2,if=(variable.trinket_sync_slot=2&(debuff.deathmark.up|dot.kingsbane.ticking)
-  -- |(variable.trinket_sync_slot=1&!trinket.1.cooldown.ready&cooldown.deathmark.remains>20))|!variable.trinket_sync_slot|fight_remains<=20
+  -- actions.items+=/use_items,slots=trinket2,if=(variable.trinket_sync_slot=2&(debuff.deathmark.up)
+  --|(variable.trinket_sync_slot=1&!trinket.1.cooldown.ready&cooldown.deathmark.remains>20))|!variable.trinket_sync_slot|fight_remains<=20
   if TrinketItem2 and TrinketItem2:IsReady() then
     if not Player:IsItemBlacklisted(TrinketItem2) and not ValueIsInArray(OnUseExcludeTrinkets, TrinketItem2:ID())
-      and (TrinketSyncSlot == 2 and (S.Deathmark:AnyDebuffUp() or Target:DebuffUp(S.Kingsbane))
+      and (TrinketSyncSlot == 2 and (S.Deathmark:AnyDebuffUp())
       or (TrinketSyncSlot == 1 and not TrinketItem1:IsReady() and S.Deathmark:CooldownRemains() > 20))
       or TrinketSyncSlot == 0 or HL.BossFilteredFightRemains("<", 20) then
       if Cast(TrinketItem2, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then
@@ -806,7 +807,8 @@ local function ShivUsage ()
     if S.LightweightShiv:IsAvailable() then
       if ShivKingsbaneCondition
         and (Target:DebuffUp(S.Kingsbane) and Target:DebuffRemains(S.Kingsbane) < (8+3*BoolToInt(TWW3DeathstalkerHasTier4PC))
-        and Target:DebuffRemains(S.Kingsbane) > 4 or S.Kingsbane:CooldownRemains() <= 1 and S.Shiv:ChargesFractional() >= 1.7) then
+        and Target:DebuffRemains(S.Kingsbane) > 4 or S.Kingsbane:CooldownRemains() <= 1 and S.Shiv:ChargesFractional() >= 1.7)
+        and (S.Deathmark:IsReady() or S.Deathmark:CooldownRemains() >= 30) then
         if Cast(S.Shiv, Settings.Assassination.GCDasOffGCD.Shiv) then
           return "Cast Shiv (Double-charge Shiv case for Kingsbane)"
         end

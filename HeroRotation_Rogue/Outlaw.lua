@@ -217,6 +217,9 @@ local function RtB_Buffs ()
       end
     end
 
+    -- If loaded dice is up we are guaranteed a 2 roll so we can reduce the buffs will lose by 2
+    Cache.APLVar.RtB_Buffs.Will_Lose.Total = Cache.APLVar.RtB_Buffs.Will_Lose.Total- 2*num(Player:BuffUp(S.LoadedDiceBuff))
+
     if enableRtBDebugging then
       print("have: ", Cache.APLVar.RtB_Buffs.Total)
       print("will lose: ", Cache.APLVar.RtB_Buffs.Will_Lose.Total)
@@ -1003,7 +1006,7 @@ function Build (ReturnSpellOnly)
   -- Trickster should prefer to use this at low CPs unless AR isn't active.
   -- actions.build+=/blade_flurry,if=talent.deft_maneuvers&spell_targets>=4&(combo_points<=2|!buff.adrenaline_rush.up|!hero_tree.trickster)
   if S.BladeFlurry:IsCastable() then
-    if S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 4 and (ComboPoints <= 2 or Player:BuffDown(S.AdrenalineRush) or not OutlawTrickster) then
+    if S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 4 and (ComboPoints <= 2 or Player:BuffDown(S.AdrenalineRush) or not Trickster) then
       if ReturnSpellOnly then
         return S.BladeFlurry
       else

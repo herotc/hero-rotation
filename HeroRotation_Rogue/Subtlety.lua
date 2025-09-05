@@ -247,15 +247,16 @@ local function Finish (ReturnSpellOnly, ForceStealth)
 
   -- # Maintenance Finisher
   -- actions.finish+=/rupture,if=!variable.skip_rupture&(!dot.rupture.ticking|refreshable|buff.flagellation_buff.up
-  -- &!buff.symbols_of_death.up&variable.targets<=2)&target.time_to_die-remains>6
+  -- &!buff.symbols_of_death.up&variable.targets<=2)&target.time_to_die-remains>6&cooldown.flagellation.remains>=10
   if S.Rupture:IsCastable() then
     if not SkipRupture and (Target:DebuffDown(S.Rupture) or Target:DebuffRefreshable(S.Rupture, RuptureThreshold) or Player:BuffUp(S.FlagellationBuff)
-    and Player:BuffDown(S.SymbolsofDeath) and MeleeEnemies10yCount <= 2) and Target:TimeToDie() > 6 then
+    and Player:BuffDown(S.SymbolsofDeath) and MeleeEnemies10yCount <= 2) and Target:TimeToDie() > 6
+    and (S.Flagellation:CooldownRemains() >= 10 or Settings.Subtlety.DontHoldForCDs) then
       if ReturnSpellOnly then
         return S.Rupture
       else
         if CastPooling(S.Rupture, nil, not Target:IsSpellInRange(S.Rupture)) then
-          return "Cast Rupture"
+          return "Cast Rupture Maintenance"
         end
       end
     end
@@ -273,25 +274,10 @@ local function Finish (ReturnSpellOnly, ForceStealth)
     end
   end
 
-  -- actions.finish+=/rupture,if=talent.unseen_blade&cooldown.flagellation.remains<10&variable.targets>=3
-  -- &dot.rupture.remains<fight_remains
-  if S.Rupture:IsCastable() then
-    if S.UnseenBlade:IsAvailable() and S.Flagellation:CooldownRemains() < 10 and MeleeEnemies10yCount >= 3
-      and (Target:DebuffRemains(S.Rupture) < HL.FightRemains(MeleeEnemies10y, false)) then
-      if ReturnSpellOnly then
-        return S.Rupture
-      else
-        if CastPooling(S.Rupture, nil, not Target:IsSpellInRange(S.Rupture)) then
-          return "Cast Rupture"
-        end
-      end
-    end
-  end
-
   -- # Direct Damage Finisher
   -- actions.finish+=/coup_de_grace,if=debuff.fazed.up&cooldown.flagellation.remains>=20|fight_remains<=10
   if S.CoupDeGrace:IsCastable() then
-    if Target:DebuffUp(S.FazedDebuff) and (S.Flagellation:CooldownRemains() >= 20
+    if Target:DebuffUp(S.FazedDebuff) and (S.Flagellation:CooldownRemains() >= 20 or Settings.Subtlety.DontHoldForCDs
       or HL.BossFilteredFightRemains("<=", 10)) then
       if ReturnSpellOnly then
         return S.CoupDeGrace
@@ -310,7 +296,7 @@ local function Finish (ReturnSpellOnly, ForceStealth)
     if not PriorityRotation and Maintenance and (((MeleeEnemies10yCount >= 2 and S.DeathStalkersMark:IsAvailable()
     and (Player:BuffDown(S.DarkestNightBuff) or Player:BuffUp(S.ShadowDanceBuff) and MeleeEnemies10yCount >= 5))
     or S.UnseenBlade:IsAvailable() and MeleeEnemies10yCount >= 4)
-      or S.CoupDeGrace:IsReady() and MeleeEnemies10yCount >= 3) then
+      or (S.CoupDeGrace:IsReady() and Settings.Subtlety.DontHoldForCDs) and MeleeEnemies10yCount >= 3) then
       if ReturnSpellOnly then
         return S.BlackPowder
       else
@@ -323,7 +309,7 @@ local function Finish (ReturnSpellOnly, ForceStealth)
 
   -- actions.finish+=/eviscerate,if=cooldown.flagellation.remains>=10|variable.targets>=3
   if S.Eviscerate:IsCastable() then
-    if (S.Flagellation:IsReady() or S.Flagellation:CooldownRemains() >= 10) or MeleeEnemies10yCount >= 3 then
+    if (S.Flagellation:IsReady() or S.Flagellation:CooldownRemains() >= 10) or MeleeEnemies10yCount >= 3 or Settings.Subtlety.DontHoldForCDs then
       if ReturnSpellOnly then
         return S.Eviscerate
       else
@@ -383,12 +369,28 @@ local function Build (ReturnSpellOnly, ForceStealth, BaseSpell)
   end
 
   -- actions.build+=/shuriken_tornado,if=buff.lingering_darkness.up|talent.deathstalkers_mark
-  -- &cooldown.shadow_blades.remains>=32&variable.targets>=3|talent.unseen_blade&(!variable.stealth|variable.targets>=3)
-  -- &(buff.symbols_of_death.up|!raid_event.adds.up)
+  -- &cooldown.shadow_blades.remains>=32&variable.targets>=3
   if S.ShurikenTornado:IsCastable() and S.ShurikenTornado:IsAvailable() then
     if Player:BuffUp(S.LingeringDarknessBuff) or S.DeathStalkersMark:IsAvailable()
-      and S.ShadowBlades:CooldownRemains() >= 32 and MeleeEnemies10yCount >= 3 or S.UnseenBlade:IsAvailable()
-      and (not Stealth or MeleeEnemies10yCount >=3) and Player:BuffUp(S.SymbolsofDeath) then
+      and S.ShadowBlades:CooldownRemains() >= 32 and MeleeEnemies10yCount >= 3 then
+      if ReturnSpellOnly then
+        return S.ShurikenTornado
+      else
+        if Cast(S.ShurikenTornado, Settings.Subtlety.GCDasOffGCD.ShurikenTornado) then
+          return "Cast ShurikenTornado"
+        end
+      end
+    end
+  end
+
+  -- actions.build+=/shuriken_tornado,if=talent.unseen_blade&!buff.stealth.up
+  -- &((buff.shadow_dance.up&!talent.shadowcraft&variable.targets>=3)|(talent.shadowcraft
+  -- &variable.targets>=3)|!variable.stealth&variable.targets<=2)
+  -- &(buff.symbols_of_death.up|!raid_event.adds.up)
+  if S.ShurikenTornado:IsCastable() and S.ShurikenTornado:IsAvailable() then
+    if S.UnseenBlade:IsAvailable() and not Player:StealthUp(true, true)
+      and ((Player:BuffUp(S.ShadowDanceBuff) or not S.Shadowcraft:IsAvailable() and MeleeEnemies10yCount >= 3)
+      or S.Shadowcraft:IsAvailable() and Player:BuffUp(S.SymbolsofDeath)) then
       if ReturnSpellOnly then
         return S.ShurikenTornado
       else
@@ -451,9 +453,11 @@ local function Build (ReturnSpellOnly, ForceStealth, BaseSpell)
     end
   end
 
-  -- actions.build+=/shuriken_storm,if=buff.tww3_trickster_4pc.up&buff.shadow_blades.up
+  -- actions.build+=/shuriken_storm,if=(buff.tww3_trickster_4pc.up|buff.escalating_blade.stack=4)
+  -- &!used_for_danse&(buff.shadow_blades.up|variable.targets>=4)
   if S.ShurikenStorm:IsCastable() and not ForceStealth and HR.AoEON() then
-    if S.CoupDeGrace:IsCastable() and Player:BuffUp(S.ShadowBlades) then
+    if (S.CoupDeGrace:IsCastable() or Player:BuffStack(S.EscalatingBlade) == 4)
+      and not Used_For_Danse(S.ShurikenStorm) and (Player:BuffUp(S.ShadowBlades) or MeleeEnemies10yCount >= 4 ) then
       if ReturnSpellOnly then
         return S.ShurikenStorm
       else
@@ -556,9 +560,10 @@ end
 
 -- # Cooldowns
 local function CDs ()
-  -- actions.cds=cold_blood,if=cooldown.secret_technique.up&buff.shadow_dance.up&combo_points>=6&variable.secret&buff.flagellation_persist.up
+  -- actions.cds=cold_blood,if=cooldown.secret_technique.up&buff.shadow_dance.up&combo_points>=6&variable.secret
+  -- &(buff.flagellation_persist.up|buff.flagellation_buff.remains<=3)
   if HR.CDsON() and S.ColdBlood:IsReady() and S.SecretTechnique:IsReady() and Player:BuffUp(S.ShadowDanceBuff)
-    and ComboPoints >= 6 and Secret and Player:BuffUp(S.FlagellationPersistBuff) then
+    and ComboPoints >= 6 and Secret and (Player:BuffUp(S.FlagellationPersistBuff) or Player:BuffRemains(S.FlagellationBuff) <= 3) then
     if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then
       return "Cast Cold Blood"
     end
@@ -575,14 +580,14 @@ local function CDs ()
   end
 
   -- actions.cds+=/symbols_of_death,if=(buff.symbols_of_death.remains<=3.5&variable.maintenance
-  -- &(variable.targets>=3|!buff.flagellation_buff.up|dot.rupture.remains>=30)
+  -- &(variable.targets>1|raid_event.adds.up|!buff.flagellation_buff.up|dot.rupture.remains>=30)
   -- &(!talent.flagellation|cooldown.flagellation.remains>=30-15*!talent.death_perception
   -- &cooldown.secret_technique.remains<8|!talent.death_perception)|fight_remains<=15)
   if HR.CDsON() and S.SymbolsofDeath:IsReady() then
     if (Player:BuffRemains(S.SymbolsofDeath) <= 3.5 and Maintenance
-      and (MeleeEnemies10yCount >=3 or Player:BuffDown(S.FlagellationBuff) or Target:DebuffRemains(S.Rupture) >= 30)
-      and (not S.Flagellation:IsAvailable() or (S.Flagellation:CooldownRemains() >= 30 - 15 * num(not S.DeathPerception:IsAvailable())
-      or S.Flagellation:IsReady())
+      and (MeleeEnemies10yCount > 1 or Player:BuffDown(S.FlagellationBuff) or Target:DebuffRemains(S.Rupture) >= 30)
+      and (not S.Flagellation:IsAvailable() or S.Flagellation:CooldownRemains() >= 30 - 15 * num(not S.DeathPerception:IsAvailable())
+      or (S.Flagellation:IsReady() and Settings.Subtlety.DontHoldForCDs)
       and S.SecretTechnique:CooldownRemains() < 8 or not S.DeathPerception:IsAvailable()) or HL.BossFilteredFightRemains("<=", 15)) then
       if Cast(S.SymbolsofDeath, Settings.Subtlety.OffGCDasOffGCD.SymbolsofDeath) then
         return "Cast Symbols of Death"
@@ -862,10 +867,10 @@ local function APL ()
 
   Stealth = Player:StealthUp(true, false)
 
-  -- actions+=/variable,name=skip_rupture,value=buff.shadow_dance.up|buff.darkest_night.up|variable.targets>=8
+  -- actions+=/variable,name=skip_rupture,value=buff.shadow_dance.up|buff.darkest_night.up|variable.targets>=4
     -- &!talent.replicating_shadows&talent.unseen_blade
   SkipRupture = Player:BuffUp(S.ShadowDanceBuff) or Player:BuffUp(S.DarkestNightBuff)
-    or MeleeEnemies10yCount >= 8 and not S.ReplicatingShadows:IsAvailable() and S.UnseenBlade:IsAvailable()
+    or MeleeEnemies10yCount >= 4 and not S.ReplicatingShadows:IsAvailable() and S.UnseenBlade:IsAvailable()
 
   -- actions+=/variable,name=maintenance,value=(dot.rupture.ticking|variable.skip_rupture)&(buff.slice_and_dice.up|variable.targets<=2)
   Maintenance = (Target:DebuffUp(S.Rupture) or SkipRupture) and (Player:BuffUp(S.SliceandDice) or MeleeEnemies10yCount <= 2)
