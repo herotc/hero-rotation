@@ -217,9 +217,6 @@ local function RtB_Buffs ()
       end
     end
 
-    -- If loaded dice is up we are guaranteed a 2 roll so we can reduce the buffs will lose by 2
-    Cache.APLVar.RtB_Buffs.Will_Lose.Total = Cache.APLVar.RtB_Buffs.Will_Lose.Total- 2*num(Player:BuffUp(S.LoadedDiceBuff))
-
     if enableRtBDebugging then
       print("have: ", Cache.APLVar.RtB_Buffs.Total)
       print("will lose: ", Cache.APLVar.RtB_Buffs.Will_Lose.Total)
@@ -282,7 +279,7 @@ local function RtB_Reroll(ForceLoadedDice)
         -- &(buff.loaded_dice.up|talent.sleight_of_hand&!talent.keep_it_rolling))&rtb_buffs<=2
       if not Cache.APLVar.RtB_Reroll then
         Cache.APLVar.RtB_Reroll = (Player:HasTier("TWW2", 4) or S.Supercharger:IsAvailable()
-        and (Player:BuffUp(S.LoadedDice) or S.SleightOfHand:IsAvailable() and not S.KeepItRolling:IsAvailable()))
+        and (Player:BuffUp(S.LoadedDiceBuff) or S.SleightOfHand:IsAvailable() and not S.KeepItRolling:IsAvailable()))
         and Cache.APLVar.RtB_Buffs.Total <= 2
       end
 
@@ -299,7 +296,7 @@ local function RtB_Reroll(ForceLoadedDice)
       -- &buff.loaded_dice.up&rtb_buffs<=2&!buff.broadside.up&!buff.ruthless_precision.up&!buff.true_bearing.up
       if not Cache.APLVar.RtB_Reroll then
         Cache.APLVar.RtB_Reroll = not Player:HasTier("TWW2", 4) and not S.KeepItRolling:IsAvailable()
-        and not S.Supercharger:IsAvailable() and (Player:BuffUp(S.LoadedDice) or ForceLoadedDice) and Cache.APLVar.RtB_Buffs.Total <= 2
+        and not S.Supercharger:IsAvailable() and (Player:BuffUp(S.LoadedDiceBuff) or ForceLoadedDice) and Cache.APLVar.RtB_Buffs.Total <= 2
         and Player:BuffDown(S.Broadside) and Player:BuffDown(S.RuthlessPrecision) and Player:BuffDown(S.TrueBearing)
       end
     end
