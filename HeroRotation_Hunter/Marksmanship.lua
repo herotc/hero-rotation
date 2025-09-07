@@ -293,8 +293,8 @@ local function DRST()
   if S.Volley:IsReady() and (Player:BuffDown(S.DoubleTapBuff)) then
     if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley dr_st 4"; end
   end
-  -- steady_shot,if=focus+cast_regen<focus.max&action.aimed_shot.in_flight&!action.black_arrow.cooldown_react&buff.trueshot.down&cooldown.trueshot.remains
-  if S.SteadyShot:IsCastable() and (CheckFocusCap(S.SteadyShot:CastTime()) and S.AimedShot:InFlight() and not S.BlackArrow:IsReady() and Player:BuffDown(S.TrueshotBuff) and S.Trueshot:CooldownDown()) then
+  -- steady_shot,if=variable.buffer_deathblow&buff.trueshot.down&cooldown.trueshot.remains
+  if S.SteadyShot:IsCastable() and (VarBufferDeathblow and Player:BuffDown(S.TrueshotBuff) and S.Trueshot:CooldownDown()) then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot dr_st 6"; end
   end
   -- trueshot,if=variable.trueshot_ready&buff.double_tap.down&!action.black_arrow.cooldown_react&(!talent.bulletstorm|buff.bulletstorm.up)
