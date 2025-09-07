@@ -172,6 +172,7 @@ Spell.Warlock.Demonology = MergeTableByKey(Spell.Warlock.Commons, {
   SummonGloomhound                      = Spell(455465),
   SummonVilefiend                       = Spell(264119),
   TheExpendables                        = Spell(387600),
+  TheHoundmastersGambit                 = Spell(455572),
   -- Buffs
   DemonicCallingBuff                    = Spell(205146),
   DemonicCoreBuff                       = Spell(264173),
