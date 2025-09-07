@@ -279,7 +279,7 @@ local function RtB_Reroll(ForceLoadedDice)
         -- &(buff.loaded_dice.up|talent.sleight_of_hand&!talent.keep_it_rolling))&rtb_buffs<=2
       if not Cache.APLVar.RtB_Reroll then
         Cache.APLVar.RtB_Reroll = (Player:HasTier("TWW2", 4) or S.Supercharger:IsAvailable()
-        and (Player:BuffUp(S.LoadedDice) or S.SleightOfHand:IsAvailable() and not S.KeepItRolling:IsAvailable()))
+        and (Player:BuffUp(S.LoadedDiceBuff) or S.SleightOfHand:IsAvailable() and not S.KeepItRolling:IsAvailable()))
         and Cache.APLVar.RtB_Buffs.Total <= 2
       end
 
@@ -296,7 +296,7 @@ local function RtB_Reroll(ForceLoadedDice)
       -- &buff.loaded_dice.up&rtb_buffs<=2&!buff.broadside.up&!buff.ruthless_precision.up&!buff.true_bearing.up
       if not Cache.APLVar.RtB_Reroll then
         Cache.APLVar.RtB_Reroll = not Player:HasTier("TWW2", 4) and not S.KeepItRolling:IsAvailable()
-        and not S.Supercharger:IsAvailable() and (Player:BuffUp(S.LoadedDice) or ForceLoadedDice) and Cache.APLVar.RtB_Buffs.Total <= 2
+        and not S.Supercharger:IsAvailable() and (Player:BuffUp(S.LoadedDiceBuff) or ForceLoadedDice) and Cache.APLVar.RtB_Buffs.Total <= 2
         and Player:BuffDown(S.Broadside) and Player:BuffDown(S.RuthlessPrecision) and Player:BuffDown(S.TrueBearing)
       end
     end
@@ -1003,7 +1003,7 @@ function Build (ReturnSpellOnly)
   -- Trickster should prefer to use this at low CPs unless AR isn't active.
   -- actions.build+=/blade_flurry,if=talent.deft_maneuvers&spell_targets>=4&(combo_points<=2|!buff.adrenaline_rush.up|!hero_tree.trickster)
   if S.BladeFlurry:IsCastable() then
-    if S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 4 and (ComboPoints <= 2 or Player:BuffDown(S.AdrenalineRush) or not OutlawTrickster) then
+    if S.DeftManeuvers:IsAvailable() and EnemiesBFCount >= 4 and (ComboPoints <= 2 or Player:BuffDown(S.AdrenalineRush) or not Trickster) then
       if ReturnSpellOnly then
         return S.BladeFlurry
       else

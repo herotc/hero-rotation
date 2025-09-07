@@ -207,6 +207,7 @@ Spell.Hunter.Marksmanship = MergeTableByKey(Spell.Hunter.Commons, {
   CarefulAim                            = Spell(260228),
   ChimaeraShot                          = Spell(342049),
   DoubleTap                             = Spell(260402),
+  FocusedAim                            = Spell(378767),
   Headshot                              = Spell(471363),
   InTheRhythm                           = Spell(407404),
   KillShot                              = Spell(53351),
