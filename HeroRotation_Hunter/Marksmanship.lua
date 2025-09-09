@@ -61,6 +61,7 @@ local VarSyncReady = false
 local VarSyncRemains = 0
 local TWW3_2pc = Player:HasTier("TWW3", 2)
 local TWW3_4pc = Player:HasTier("TWW3", 4)
+local TrueshotCD = 120 - num(S.CallingtheShots:IsAvailable()) * 30 - num(TWW3_2pc) * 30
 local Enemies10ySplash, EnemiesCount10ySplash
 local TargetInRange40y
 local BossFightRemains = 11111
@@ -118,6 +119,7 @@ HL:RegisterForEvent(function()
   TWW3_2pc = Player:HasTier("TWW3", 2)
   TWW3_4pc = Player:HasTier("TWW3", 4)
   VarTrinketFailures = 0
+  TrueshotCD = 120 - num(S.CallingtheShots:IsAvailable()) * 30 - num(TWW3_2pc) * 30
   SetTrinketVariables()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
@@ -128,6 +130,9 @@ end, "PLAYER_REGEN_ENABLED")
 
 HL:RegisterForEvent(function()
   S.AimedShot:RegisterInFlight()
+  TWW3_2pc = Player:HasTier("TWW3", 2)
+  TWW3_4pc = Player:HasTier("TWW3", 4)
+  TrueshotCD = 120 - num(S.CallingtheShots:IsAvailable()) * 30 - num(TWW3_2pc) * 30
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 S.AimedShot:RegisterInFlight()
 
@@ -263,18 +268,12 @@ local function Trinkets()
       if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "unyielding_netherprism trinket 10"; end
     end
     -- use_items,check_existing=0,slots=trinket1:trinket2,if=!this_trinket.is.unyielding_netherprism&this_trinket.has_use_buff&(other_trinket.is.unyielding_netherprism&fight_remains<cooldown.trueshot.remains+cooldown.trueshot.duration+10&cooldown.trueshot.remains>20|buff.trueshot.remains>14|buff.trueshot.up&fight_remains<cooldown.trueshot.remains+15|fight_remains<21)
-    if T1Check and (VarTrinket2ID == I.UnyieldingNetherprism:ID() and BossFightRemains < S.Trueshot:CooldownRemains() + TrueshotCD + 10 and S.Trueshot:CooldownRemains() > 20 or Player:BuffRemains(S.TrueshotBuff) > 14 or Player:BuffUp(S.TrueshotBuff) and BossFightRemains < S.Trueshot:CooldownRemains() + 15 or BossFightRemains < 21) then
+    if I.UnyieldingNetherprism:IsReady() and (BossFightRemains < S.Trueshot:CooldownRemains() + TrueshotCD + 10 and S.Trueshot:CooldownRemains() > 20 or Player:BuffRemains(S.TrueshotBuff) > 14 or Player:BuffUp(S.TrueshotBuff) and BossFightRemains < S.Trueshot:CooldownRemains() + 15 or BossFightRemains < 21) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") trinkets 12"; end
     end
-    if T2Check and (VarTrinket1ID == I.UnyieldingNetherprism:ID() and BossFightRemains < S.Trueshot:CooldownRemains() + TrueshotCD + 10 and S.Trueshot:CooldownRemains() > 20 or Player:BuffRemains(S.TrueshotBuff) > 14 or Player:BuffUp(S.TrueshotBuff) and BossFightRemains < S.Trueshot:CooldownRemains() + 15 or BossFightRemains < 21) then
-      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") trinkets 14"; end
-    end
     -- use_items,check_existing=0,slots=trinket1:trinket2,if=this_trinket.is.unyielding_netherprism&buff.trueshot.remains>14&buff.latent_energy.stack>3&(buff.latent_energy.stack+floor((fight_remains-20)%cooldown.trueshot.duration)*(cooldown.trueshot.duration%10))>17
-    if T1Check and (VarTrinket1ID == I.UnyieldingNetherprism:ID() and Player:BuffRemains(S.TrueshotBuff) > 14 and Player:BuffStack(S.LatentEnergyBuff) > 3 and (Player:BuffStack(S.LatentEnergyBuff) + mathfloor((BossFightRemains - 20) / TrueshotCD) * (TrueshotCD / 10)) > 17) then
-      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") trinkets 16"; end
-    end
-    if T2Check and (VarTrinket2ID == I.UnyieldingNetherprism:ID() and Player:BuffRemains(S.TrueshotBuff) > 14 and Player:BuffStack(S.LatentEnergyBuff) > 3 and (Player:BuffStack(S.LatentEnergyBuff) + mathfloor((BossFightRemains - 20) / TrueshotCD) * (TrueshotCD / 10)) > 17) then
-      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") trinkets 18"; end
+    if I.UnyieldingNetherprism:IsEquippedAndReady() and (Player:BuffRemains(S.TrueshotBuff) > 14 and Player:BuffStack(S.LatentEnergyBuff) > 3 and (Player:BuffStack(S.LatentEnergyBuff) + mathfloor((BossFightRemains - 20) / TrueshotCD) * (TrueshotCD / 10)) > 17) then
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "unyielding_netherprism (" .. Trinket1:Name() .. ") trinkets 14"; end
     end
     -- use_items,check_existing=0,slots=trinket1:trinket2,if=this_trinket.has_use_damage&cooldown.trueshot.remains>20
     if T1Check and (Trinket1:HasUseDamage() and S.Trueshot:CooldownRemains() > 20) then
@@ -657,7 +656,6 @@ local function APL()
     -- Interrupts
     local ShouldReturn = Everyone.Interrupt(S.CounterShot, Settings.CommonsDS.DisplayStyle.Interrupts, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- variable,name=trueshot_ready,value=!talent.bullseye|fight_remains>cooldown.trueshot.duration+10|buff.bullseye.stack=buff.bullseye.max_stack|fight_remains<25
-    local TrueshotCD = 120 - num(S.CallingtheShots:IsAvailable()) * 30 - num(TWW3_2pc) * 30
     VarTrueshotReady = not S.Bullseye:IsAvailable() or FightRemains > TrueshotCD + 10 or Player:BuffStack(S.BullseyeBuff) == 30 or BossFightRemains < 25
     -- variable,name=trueshot_ready,op=setif,condition=fight_style.dungeonroute,value_else=variable.trueshot_ready,value=raid_event.pull.remains>30|raid_event.pull.in>60
     if Player:IsInDungeonArea() then
