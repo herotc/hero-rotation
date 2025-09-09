@@ -53,7 +53,6 @@ local Settings = {
 --- ===== Rotation Variables =====
 local BossFightRemains = 11111
 local FightRemains = 11111
-local TimeToHPG
 local HolyPower = 0
 local PlayerGCD = 0
 local VarDSCastable
@@ -161,7 +160,8 @@ local function TemplarStrikesRemains()
   end
   return Remains > 0 and Remains or 0
 end
--- time_to_hpg_expr_t @ https://github.com/simulationcraft/simc/blob/shadowlands/engine/class_modules/paladin/sc_paladin.cpp#L3236
+
+-- time_to_hpg_expr_t @ https://github.com/simulationcraft/simc/blob/shadowlands/engine/class_modules/paladin/sc_paladin.cpp#L3248
 --[[local function ComputeTimeToHPG()
   local GCDRemains = Player:GCDRemains()
   local ShortestHPGTime = mathmin(
@@ -169,7 +169,8 @@ end
     S.BladeofJustice:CooldownRemains(),
     S.Judgment:CooldownRemains(),
     S.HammerofWrath:IsUsable() and S.HammerofWrath:CooldownRemains() or 10, -- if not usable, return a dummy 10
-    S.WakeofAshes:CooldownRemains()
+    S.WakeofAshes:CooldownRemains(),
+    S.ArcaneTorrent:IsAvailable() and S.ArcaneTorrent:CooldownRemains() or 999 -- if not available, return a dummy 999
   )
 
   if GCDRemains > ShortestHPGTime then
@@ -255,11 +256,11 @@ local function Cooldowns()
     end
   end
   -- shield_of_vengeance,if=fight_remains>15&(!talent.execution_sentence|!debuff.execution_sentence.up)&!buff.divine_hammer.up
-  if S.ShieldofVengeance:IsCastable() and (FightRemains > 15 and (not S.ExecutionSentence:IsAvailable() or Target:DebuffDown(S.ExecutionSentence)) and not Paladin.DivineHammerActive) then
+  if S.ShieldofVengeance:IsCastable() and (FightRemains > 15 and (not S.ExecutionSentence:IsAvailable() or Target:DebuffDown(S.ExecutionSentenceDebuff)) and not Paladin.DivineHammerActive) then
     if Cast(S.ShieldofVengeance, Settings.Retribution.GCDasOffGCD.ShieldOfVengeance) then return "shield_of_vengeance cooldowns 18"; end
   end
   -- execution_sentence,if=(!buff.crusade.up&cooldown.crusade.remains>15|buff.crusade.stack=10|cooldown.avenging_wrath.remains<0.75|cooldown.avenging_wrath.remains>15|talent.radiant_glory)&(holy_power>=4&time<5|holy_power>=3&time>5|(holy_power>=2|time<5)&(talent.divine_auxiliary|talent.radiant_glory))&(cooldown.divine_hammer.remains>5|buff.divine_hammer.up|!talent.divine_hammer)&(target.time_to_die>8&!talent.executioners_will|target.time_to_die>12)&cooldown.wake_of_ashes.remains<gcd
-  if S.ExecutionSentence:IsCastable() and ((Settings.Retribution.DisableCrusadeAWCDCheck or Player:BuffDown(S.CrusadeBuff) and S.Crusade:CooldownRemains() > 15 or Player:BuffStack(S.CrusadeBuff) == 10 or not S.Crusade:IsAvailable() and S.AvengingWrath:CooldownRemains() < 0.75 or S.AvengingWrath:CooldownRemains() > 15 or S.RadiantGlory:IsAvailable()) and (HolyPower >= 4 and HL.CombatTime() < 5 or HolyPower >= 3 and HL.CombatTime() > 5 or (HolyPower >= 2 or HL.CombatTime() < 5) and (S.DivineAuxiliary:IsAvailable() or S.RadiantGlory:IsAvailable())) and (S.DivineHammer:CooldownRemains() > 5 or Paladin.DivineHammerActive or not S.DivineHammer:IsAvailable()) and (Target:TimeToDie() > 8 and not S.ExecutionersWill:IsAvailable() or Target:TimeToDie() > 12) and S.WakeofAshes:CooldownRemains() < PlayerGCD) then
+  if S.ExecutionSentence:IsCastable() and ((Settings.Retribution.DisableCrusadeAWCDCheck or Player:BuffDown(S.CrusadeBuff) and S.Crusade:CooldownRemains() > 15 or Player:BuffStack(S.CrusadeBuff) == 10 or not S.Crusade:IsAvailable() and S.AvengingWrath:CooldownRemains() < 0.75 or S.AvengingWrath:CooldownRemains() > 15 or S.RadiantGlory:IsAvailable()) and (HolyPower >= 4 and HL.CombatTime() < 5 or HolyPower >= 3 and HL.CombatTime() > 5 or (HolyPower >= 2 or HL.CombatTime() < 5) and (S.DivineAuxiliary:IsAvailable() or S.RadiantGlory:IsAvailable())) and (Settings.Retribution.DisableDivineHammerCheck or S.DivineHammer:CooldownRemains() > 5 or Paladin.DivineHammerActive or not S.DivineHammer:IsAvailable()) and (Target:TimeToDie() > 8 and not S.ExecutionersWill:IsAvailable() or Target:TimeToDie() > 12) and S.WakeofAshes:CooldownRemains() < PlayerGCD) then
     if Cast(S.ExecutionSentence, Settings.Retribution.GCDasOffGCD.ExecutionSentence, nil, not Target:IsSpellInRange(S.ExecutionSentence)) then return "execution_sentence cooldowns 20"; end
   end
   -- avenging_wrath,if=(holy_power>=4&time<5|holy_power>=3&time>5|holy_power>=2&talent.divine_auxiliary&(cooldown.execution_sentence.remains=0|cooldown.final_reckoning.remains=0))&(!raid_event.adds.up|target.time_to_die>10)
@@ -271,7 +272,7 @@ local function Cooldowns()
     if Cast(S.Crusade, Settings.Retribution.OffGCDasOffGCD.AvengingWrath) then return "crusade cooldowns 24" end
   end
   -- final_reckoning,if=(holy_power>=4&time<8|holy_power>=3&time>=8|holy_power>=2&(talent.divine_auxiliary|talent.radiant_glory))&(cooldown.avenging_wrath.remains>10|cooldown.crusade.remains&(!buff.crusade.up|buff.crusade.stack>=10)|talent.radiant_glory&(buff.avenging_wrath.up|talent.crusade&cooldown.wake_of_ashes.remains<gcd))&(!raid_event.adds.exists|raid_event.adds.up|raid_event.adds.in>40)&(cooldown.divine_hammer.remains>5|buff.divine_hammer.up|!talent.divine_hammer)
-  if S.FinalReckoning:IsCastable() and ((HolyPower >= 4 and HL.CombatTime() < 8 or HolyPower >= 3 and HL.CombatTime() >= 8 or HolyPower >= 2 and (S.DivineAuxiliary:IsAvailable() or S.RadiantGlory:IsAvailable())) and (Settings.Retribution.DisableCrusadeAWCDCheck or S.AvengingWrath:CooldownRemains() > 10 or S.Crusade:CooldownDown() and (Player:BuffDown(S.CrusadeBuff) or Player:BuffStack(S.CrusadeBuff) >= 10) or S.RadiantGlory:IsAvailable() and (Player:BuffUp(S.AvengingWrathBuff) or S.Crusade:IsAvailable() and S.WakeofAshes:CooldownRemains() < PlayerGCD)) and (S.DivineHammer:CooldownRemains() > 5 or Paladin.DivineHammerActive or not S.DivineHammer:IsAvailable())) then
+  if S.FinalReckoning:IsCastable() and ((HolyPower >= 4 and HL.CombatTime() < 8 or HolyPower >= 3 and HL.CombatTime() >= 8 or HolyPower >= 2 and (S.DivineAuxiliary:IsAvailable() or S.RadiantGlory:IsAvailable())) and (Settings.Retribution.DisableCrusadeAWCDCheck or S.AvengingWrath:CooldownRemains() > 10 or S.Crusade:CooldownDown() and (Player:BuffDown(S.CrusadeBuff) or Player:BuffStack(S.CrusadeBuff) >= 10) or S.RadiantGlory:IsAvailable() and (Player:BuffUp(S.AvengingWrathBuff) or S.Crusade:IsAvailable() and S.WakeofAshes:CooldownRemains() < PlayerGCD)) and (Settings.Retribution.DisableDivineHammerCheck or S.DivineHammer:CooldownRemains() > 5 or Paladin.DivineHammerActive or not S.DivineHammer:IsAvailable())) then
     if Cast(S.FinalReckoning, Settings.Retribution.GCDasOffGCD.FinalReckoning, nil, not Target:IsInRange(30)) then return "final_reckoning cooldowns 26" end
   end
 end
@@ -280,7 +281,7 @@ local function Finishers()
   -- variable,name=ds_castable,value=(spell_targets.divine_storm>=3|spell_targets.divine_storm>=2&talent.tempest_of_the_lightbringer&!talent.rush_of_light|buff.empyrean_power.up|!talent.final_verdict&talent.tempest_of_the_lightbringer)&!buff.empyrean_legacy.up&!(buff.divine_arbiter.up&buff.divine_arbiter.stack>24)
   VarDSCastable = (EnemiesCount8y >= 3 or EnemiesCount8y >= 2 and S.TempestoftheLightbringer:IsAvailable() and not S.RushofLight:IsAvailable() or Player:BuffUp(S.EmpyreanPowerBuff) or not S.FinalVerdict:IsAvailable() and S.TempestoftheLightbringer:IsAvailable()) and Player:BuffDown(S.EmpyreanLegacyBuff) and not (Player:BuffUp(S.DivineArbiterBuff) and Player:BuffStack(S.DivineArbiterBuff) > 24)
   -- hammer_of_light,if=buff.hammer_of_light_ready.up|!talent.divine_hammer|buff.divine_hammer.up|cooldown.divine_hammer.remains>10
-  if S.HammerofLight:IsReady() and (Player:BuffUp(S.HammerofLightBuff) or not S.DivineHammer:IsAvailable() or Paladin.DivineHammerActive or S.DivineHammer:CooldownRemains() > 10) then
+  if S.HammerofLight:IsReady() and (Player:BuffUp(S.HammerofLightBuff) or not S.DivineHammer:IsAvailable() or Paladin.DivineHammerActive or S.DivineHammer:CooldownRemains() > 10 or Settings.Retribution.DisableDivineHammerCheck) then
     if Cast(S.HammerofLight, Settings.Retribution.GCDasOffGCD.WakeOfAshes, nil, not Target:IsInRange(12)) then return "hammer_of_light finishers 2"; end
   end
   -- divine_hammer,if=!buff.divine_hammer.up
@@ -288,15 +289,15 @@ local function Finishers()
     if Cast(S.DivineHammer, Settings.Retribution.GCDasOffGCD.DivineHammer, nil, not Target:IsInRange(8)) then return "divine_hammer finishers 4"; end
   end
   -- divine_storm,if=variable.ds_castable&(!buff.hammer_of_light_ready.up|buff.empyrean_power.up)&(cooldown.divine_hammer.remains|buff.divine_hammer.up|!talent.divine_hammer)&(!talent.crusade|cooldown.crusade.remains>gcd*3|buff.crusade.up&buff.crusade.stack<10|talent.radiant_glory)
-  if S.DivineStorm:IsReady() and (VarDSCastable and (Player:BuffDown(S.HammerofLightBuff) or Player:BuffUp(S.EmpyreanPowerBuff)) and (S.DivineHammer:CooldownDown() or Paladin.DivineHammerActive or not S.DivineHammer:IsAvailable()) and (Settings.Retribution.DisableCrusadeAWCDCheck or not S.Crusade:IsAvailable() or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10 or S.RadiantGlory:IsAvailable())) then
+  if S.DivineStorm:IsReady() and (VarDSCastable and (Player:BuffDown(S.HammerofLightBuff) or Player:BuffUp(S.EmpyreanPowerBuff)) and (Settings.Retribution.DisableDivineHammerCheck or S.DivineHammer:CooldownDown() or Paladin.DivineHammerActive or not S.DivineHammer:IsAvailable()) and (Settings.Retribution.DisableCrusadeAWCDCheck or not S.Crusade:IsAvailable() or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10 or S.RadiantGlory:IsAvailable())) then
     if Cast(S.DivineStorm, nil, nil, not Target:IsInRange(8)) then return "divine_storm finishers 6" end
   end
   -- justicars_vengeance,if=(!talent.crusade|cooldown.crusade.remains>gcd*3|buff.crusade.up&buff.crusade.stack<10|talent.radiant_glory)&!buff.hammer_of_light_ready.up&(cooldown.divine_hammer.remains|buff.divine_hammer.up|!talent.divine_hammer)
-  if S.JusticarsVengeance:IsReady() and ((Settings.Retribution.DisableCrusadeAWCDCheck or not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > PlayerGCD * 3 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10 or S.RadiantGlory:IsAvailable()) and Player:BuffDown(S.HammerofLightBuff) and (S.DivineHammer:CooldownDown() or Paladin.DivineHammerActive or not S.DivineHammer:IsAvailable())) then
+  if S.JusticarsVengeance:IsReady() and ((Settings.Retribution.DisableCrusadeAWCDCheck or not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > PlayerGCD * 3 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10 or S.RadiantGlory:IsAvailable()) and Player:BuffDown(S.HammerofLightBuff) and (Settings.Retribution.DisableDivineHammerCheck or S.DivineHammer:CooldownDown() or Paladin.DivineHammerActive or not S.DivineHammer:IsAvailable())) then
     if Cast(S.JusticarsVengeance, nil, nil, not Target:IsSpellInRange(S.JusticarsVengeance)) then return "justicars_vengeance finishers 8"; end
   end
   -- templars_verdict,if=(!talent.crusade|cooldown.crusade.remains>gcd*3|buff.crusade.up&buff.crusade.stack<10|talent.radiant_glory)&!buff.hammer_of_light_ready.up&(cooldown.divine_hammer.remains|buff.divine_hammer.up|!talent.divine_hammer)
-  if VerdictSpell:IsReady() and ((Settings.Retribution.DisableCrusadeAWCDCheck or not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > PlayerGCD * 3 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10 or S.RadiantGlory:IsAvailable()) and Player:BuffDown(S.HammerofLightBuff) and (S.DivineHammer:CooldownDown() or Paladin.DivineHammerActive or not S.DivineHammer:IsAvailable())) then
+  if VerdictSpell:IsReady() and ((Settings.Retribution.DisableCrusadeAWCDCheck or not S.Crusade:IsAvailable() or S.Crusade:CooldownRemains() > PlayerGCD * 3 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10 or S.RadiantGlory:IsAvailable()) and Player:BuffDown(S.HammerofLightBuff) and (Settings.Retribution.DisableDivineHammerCheck or S.DivineHammer:CooldownDown() or Paladin.DivineHammerActive or not S.DivineHammer:IsAvailable())) then
     if Cast(VerdictSpell, nil, nil, not Target:IsSpellInRange(VerdictSpell)) then return "either verdict finishers 10" end
   end
 end
@@ -323,7 +324,7 @@ local function Generators()
     if Cast(S.DivineToll, nil, Settings.CommonsDS.DisplayStyle.DivineToll, not Target:IsInRange(30)) then return "divine_toll generators 8"; end
   end
   -- call_action_list,name=finishers,if=holy_power>=4|buff.crusade.up&buff.crusade.stack<10|buff.divine_hammer.up|spell_targets.divine_storm>=4
-  if HolyPower >= 4 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10 or Player:BuffUp(S.DivineHammerBuff) or EnemiesCount8y >= 4 then
+  if HolyPower >= 4 or Player:BuffUp(S.CrusadeBuff) and Player:BuffStack(S.CrusadeBuff) < 10 or (Settings.Retribution.DisableDivineHammerCheck or Player:BuffUp(S.DivineHammerBuff)) or EnemiesCount8y >= 4 then
     local ShouldReturn = Finishers(); if ShouldReturn then return ShouldReturn; end
   end
   -- templar_slash,if=buff.templar_strikes.remains<gcd&spell_targets.divine_storm>=2
