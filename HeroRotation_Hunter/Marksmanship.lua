@@ -21,6 +21,8 @@ local AoEON      = HR.AoEON
 -- Num/Bool Helper Functions
 local num        = HR.Commons.Everyone.num
 local bool       = HR.Commons.Everyone.bool
+-- Lua
+local mathfloor  = math.floor
 -- WoW API
 local Delay      = C_Timer.After
 
@@ -254,10 +256,10 @@ local function Trinkets()
     if T2Check and (not I.UnyieldingNetherprism:IsEquipped() and Trinket2:HasUseBuff() and VarTrinket1CD % TrueshotCD == 0 and (Player:BuffRemains(S.TrueshotBuff) > 14 and Trinket1:CooldownDown() or S.Trueshot:CooldownRemains() > 20 and Trinket1:CooldownRemains() <= S.Trueshot:CooldownRemains())) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") trinkets 8"; end
     end
-    -- use_items,check_existing=0,slots=trinket1:trinket2,if=this_trinket.is.unyielding_netherprism&(buff.trueshot.remains>14&(buff.latent_energy.stack>(18-cooldown.trueshot.duration%10)|fight_remains<(cooldown.trueshot.duration+20))|fight_remains<22&(buff.latent_energy.stack>8|!other_trinket.has_use_buff|other_trinket.cooldown.remains))
+    -- use_items,check_existing=0,slots=trinket1:trinket2,if=this_trinket.is.unyielding_netherprism&(buff.trueshot.remains>14&(buff.latent_energy.stack>(19-cooldown.trueshot.duration%10)|fight_remains<(cooldown.trueshot.duration+20))|fight_remains<22&(buff.latent_energy.stack>8|!other_trinket.has_use_buff|other_trinket.cooldown.remains))
     local OtherTrinket = Trinket2
     if VarTrinket2ID == I.UnyieldingNetherprism:ID() then OtherTrinket = Trinket1 end
-    if I.UnyieldingNetherprism:IsEquippedAndReady() and (Player:BuffRemains(S.TrueshotBuff) > 14 and (Player:BuffStack(S.LatentEnergyBuff) > (18 - TrueshotCD / 10) or BossFightRemains < (TrueshotCD + 20)) or BossFightRemains < 22 and (Player:BuffStack(S.LatentEnergyBuff) > 8 or OtherTrinket:HasUseBuff() or OtherTrinket:CooldownDown())) then
+    if I.UnyieldingNetherprism:IsEquippedAndReady() and (Player:BuffRemains(S.TrueshotBuff) > 14 and (Player:BuffStack(S.LatentEnergyBuff) > (19 - TrueshotCD / 10) or BossFightRemains < (TrueshotCD + 20)) or BossFightRemains < 22 and (Player:BuffStack(S.LatentEnergyBuff) > 8 or OtherTrinket:HasUseBuff() or OtherTrinket:CooldownDown())) then
       if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "unyielding_netherprism trinket 10"; end
     end
     -- use_items,check_existing=0,slots=trinket1:trinket2,if=!this_trinket.is.unyielding_netherprism&this_trinket.has_use_buff&(other_trinket.is.unyielding_netherprism&fight_remains<cooldown.trueshot.remains+cooldown.trueshot.duration+10&cooldown.trueshot.remains>20|buff.trueshot.remains>14|buff.trueshot.up&fight_remains<cooldown.trueshot.remains+15|fight_remains<21)
@@ -266,6 +268,13 @@ local function Trinkets()
     end
     if T2Check and (VarTrinket1ID == I.UnyieldingNetherprism:ID() and BossFightRemains < S.Trueshot:CooldownRemains() + TrueshotCD + 10 and S.Trueshot:CooldownRemains() > 20 or Player:BuffRemains(S.TrueshotBuff) > 14 or Player:BuffUp(S.TrueshotBuff) and BossFightRemains < S.Trueshot:CooldownRemains() + 15 or BossFightRemains < 21) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") trinkets 14"; end
+    end
+    -- use_items,check_existing=0,slots=trinket1:trinket2,if=this_trinket.is.unyielding_netherprism&buff.trueshot.remains>14&buff.latent_energy.stack>3&(buff.latent_energy.stack+floor((fight_remains-20)%cooldown.trueshot.duration)*(cooldown.trueshot.duration%10))>17
+    if T1Check and (VarTrinket1ID == I.UnyieldingNetherprism:ID() and Player:BuffRemains(S.TrueshotBuff) > 14 and Player:BuffStack(S.LatentEnergyBuff) > 3 and (Player:BuffStack(S.LatentEnergyBuff) + mathfloor((BossFightRemains - 20) / TrueshotCD) * (TrueshotCD / 10)) > 17) then
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") trinkets 16"; end
+    end
+    if T2Check and (VarTrinket2ID == I.UnyieldingNetherprism:ID() and Player:BuffRemains(S.TrueshotBuff) > 14 and Player:BuffStack(S.LatentEnergyBuff) > 3 and (Player:BuffStack(S.LatentEnergyBuff) + mathfloor((BossFightRemains - 20) / TrueshotCD) * (TrueshotCD / 10)) > 17) then
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") trinkets 18"; end
     end
     -- use_items,check_existing=0,slots=trinket1:trinket2,if=this_trinket.has_use_damage&cooldown.trueshot.remains>20
     if T1Check and (Trinket1:HasUseDamage() and S.Trueshot:CooldownRemains() > 20) then
@@ -297,7 +306,7 @@ local function DRST()
   if S.SteadyShot:IsCastable() and (VarBufferDeathblow and Player:BuffDown(S.TrueshotBuff) and S.Trueshot:CooldownDown()) then
     if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot dr_st 6"; end
   end
-  -- trueshot,if=variable.trueshot_ready&buff.double_tap.down&!action.black_arrow.cooldown_react&(!talent.bulletstorm|buff.bulletstorm.up)
+  -- trueshot,if=variable.trueshot_ready&buff.double_tap.down&!action.black_arrow.ready&(!talent.bulletstorm|buff.bulletstorm.up)
   if CDsON() and S.Trueshot:IsReady() and (VarTrueshotReady and Player:BuffDown(S.DoubleTapBuff) and not S.BlackArrow:IsReady() and (not S.Bulletstorm:IsAvailable() or Player:BuffUp(S.BulletstormBuff))) then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot dr_st 8"; end
   end
@@ -305,25 +314,25 @@ local function DRST()
   if S.BlackArrow:IsReady() and (S.Headshot:IsAvailable() and Player:BuffUp(S.PreciseShotsBuff) and VarSpotterOrMovingDown or not S.Headshot:IsAvailable()) then
     if Cast(S.BlackArrow, nil, nil, not TargetInRange40y) then return "black_arrow dr_st 10"; end
   end
-  -- aimed_shot,if=buff.trueshot.up&buff.precise_shots.down|buff.lock_and_load.up&buff.moving_target.up
-  if S.AimedShot:IsReady() and (Player:BuffUp(S.TrueshotBuff) and Player:BuffDown(S.PreciseShotsBuff) or Player:BuffUp(S.LockandLoadBuff) and Player:BuffUp(S.MovingTargetBuff)) then
+  -- aimed_shot,if=(buff.trueshot.up|action.black_arrow.ready)&buff.precise_shots.down|buff.lock_and_load.up&buff.moving_target.up
+  if S.AimedShot:IsReady() and ((Player:BuffUp(S.TrueshotBuff) or S.BlackArrow:IsReady()) and Player:BuffDown(S.PreciseShotsBuff) or Player:BuffUp(S.LockandLoadBuff) and Player:BuffUp(S.MovingTargetBuff)) then
     if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot dr_st 12"; end
   end
-  -- rapid_fire,if=!buff.deathblow.react
-  if S.RapidFire:IsCastable() and (Player:BuffDown(S.DeathblowBuff)) then
+  -- rapid_fire,if=!action.black_arrow.ready
+  if S.RapidFire:IsCastable() and (not S.BlackArrow:IsReady()) then
     if Cast(S.RapidFire, Settings.Marksmanship.GCDasOffGCD.RapidFire, nil, not TargetInRange40y) then return "rapid_fire dr_st 14"; end
   end
-  -- trueshot,if=variable.trueshot_ready&buff.double_tap.down&!buff.deathblow.react
-  if CDsON() and S.Trueshot:IsReady() and (VarTrueshotReady and Player:BuffDown(S.DoubleTapBuff) and Player:BuffDown(S.DeathblowBuff)) then
+  -- trueshot,if=variable.trueshot_ready&buff.double_tap.down
+  if CDsON() and S.Trueshot:IsReady() and (VarTrueshotReady and Player:BuffDown(S.DoubleTapBuff)) then
     if Cast(S.Trueshot, Settings.Marksmanship.OffGCDasOffGCD.Trueshot) then return "trueshot dr_st 16"; end
-  end
-  -- arcane_shot,if=buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)
-  if S.ArcaneShot:IsReady() and (Player:BuffUp(S.PreciseShotsBuff) and VarSpotterOrMovingDown) then
-    if Cast(S.ArcaneShot, Settings.Marksmanship.GCDasOffGCD.ArcaneShot, nil, not TargetInRange40y) then return "arcane_shot dr_st 18"; end
   end
   -- aimed_shot,if=buff.precise_shots.down|debuff.spotters_mark.up&buff.moving_target.up
   if S.AimedShot:IsReady() and (Player:BuffDown(S.PreciseShotsBuff) or Target:DebuffUp(S.SpottersMarkDebuff) and Player:BuffUp(S.MovingTargetBuff)) then
-    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot dr_st 20"; end
+    if Cast(S.AimedShot, nil, nil, not TargetInRange40y) then return "aimed_shot dr_st 18"; end
+  end
+  -- arcane_shot,if=buff.precise_shots.up&(debuff.spotters_mark.down|buff.moving_target.down)&(cooldown.black_arrow.remains>action.steady_shot.execute_time|target.health.pct<80&target.health.pct>20)
+  if S.ArcaneShot:IsReady() and (Player:BuffUp(S.PreciseShotsBuff) and VarSpotterOrMovingDown and (S.BlackArrow:CooldownRemains() > S.SteadyShot:ExecuteTime() or Target:HealthPercentage() < 80 and Target:HealthPercentage() > 20)) then
+    if Cast(S.ArcaneShot, Settings.Marksmanship.GCDasOffGCD.ArcaneShot, nil, not TargetInRange40y) then return "arcane_shot dr_st 20"; end
   end
   -- explosive_shot,if=talent.shrapnel_shot&buff.lock_and_load.down
   if S.ExplosiveShot:IsReady() and (S.ShrapnelShot:IsAvailable() and Player:BuffDown(S.LockandLoadBuff)) then
