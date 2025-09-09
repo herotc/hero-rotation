@@ -171,6 +171,7 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   ScentofBlood                          = Spell(193532),
   SolitaryCompanion                     = Spell(474746),
   Stomp                                 = Spell(199530),
+  ThrilloftheHunt                       = Spell(257944),
   ThunderingHooves                      = Spell(459693),
   WildCall                              = Spell(185789),
   WildInstincts                         = Spell(378442),
@@ -185,6 +186,7 @@ Spell.Hunter.BeastMastery = MergeTableByKey(Spell.Hunter.Commons, {
   HuntersPreyBuff                       = Spell(378215),
   HuntmastersCallBuff                   = Spell(459731),
   SolitaryCompanionBuff                 = Spell(474751),
+  ThrilloftheHuntBuff                   = Spell(257946),
   -- Debuffs
   BarbedShotDebuff                      = Spell(217200),
   LacerationDebuff                      = Spell(459555), -- "laceration_driver"

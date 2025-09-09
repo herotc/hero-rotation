@@ -262,37 +262,50 @@ local function DRCleave()
 end
 
 local function DRST()
+  -- Localize buff.withering_fire.tick_time_remains
+  local WFTTR = 999
+  if Player:BuffUp(S.WitheringFireBuff) then
+    WFTTR = 4 - S.BlackArrow:TimeSinceLastCast()
+  end
+  -- The condition 'buff.withering_fire.tick_time_remains>0.5&cooldown.black_arrow.remains>0.5' is used multiple times, so let's make it a local.
+  local WFTTRCheck = WFTTR > 0.5 and S.BlackArrow:CooldownRemains() > 0.5
   -- kill_shot
   if S.BlackArrow:IsReady() then
     if Cast(S.BlackArrow, nil, nil, not Target:IsSpellInRange(S.BlackArrow)) then return "kill_shot dr_st 2"; end
   end
-  -- bestial_wrath,if=cooldown.call_of_the_wild.remains>20|!talent.call_of_the_wild
-  if S.BestialWrath:IsReady() and (S.CalloftheWild:CooldownRemains() > 20 or not S.CalloftheWild:IsAvailable()) then
+  -- bestial_wrath,if=cooldown.call_of_the_wild.remains>25|!talent.call_of_the_wild
+  if S.BestialWrath:IsReady() and (S.CalloftheWild:CooldownRemains() > 25 or not S.CalloftheWild:IsAvailable()) then
     if Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath dr_st 4"; end
   end
-  -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=full_recharge_time<gcd
-  if S.BarbedShot:IsCastable() and (S.BarbedShot:FullRechargeTime() < Player:GCD()) then
-    if Everyone.CastTargetIf(S.BarbedShot, Enemies40y, "min", EvaluateTargetIfFilterBarbedShot, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot dr_st 6"; end
+  -- barbed_shot,if=buff.thrill_of_the_hunt.remains<1.5*gcd|!talent.thrill_of_the_hunt
+  if S.BarbedShot:IsCastable() and (Player:BuffRemains(S.ThrilloftheHuntBuff) < Player:GCD() * 1.5 or not S.ThrilloftheHunt:IsAvailable()) then
+    if Cast(S.BarbedShot, nil, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot dr_st 6"; end
+  end
+  -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=buff.withering_fire.tick_time_remains>0.5&cooldown.black_arrow.remains>0.5&(full_recharge_time<gcd|cooldown.bestial_wrath.remains<12&buff.withering_fire.up)
+  -- Note: ST function, so only using Cast instead of CastTargetIf.
+  if S.BarbedShot:IsCastable() and (WFTTRCheck and (S.BarbedShot:FullRechargeTime() < Player:GCD() or S.BestialWrath:CooldownRemains() < 12 and Player:BuffUp(S.WitheringFireBuff))) then
+    if Cast(S.BarbedShot, nil, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot dr_st 8"; end
   end
   -- bloodshed
   if S.Bloodshed:IsCastable() then
-    if Cast(S.Bloodshed, Settings.BeastMastery.GCDasOffGCD.Bloodshed, nil, not Target:IsSpellInRange(S.Bloodshed)) then return "bloodshed dr_st 8"; end
+    if Cast(S.Bloodshed, Settings.BeastMastery.GCDasOffGCD.Bloodshed, nil, not Target:IsSpellInRange(S.Bloodshed)) then return "bloodshed dr_st 10"; end
   end
   -- call_of_the_wild
   if CDsON() and S.CalloftheWild:IsCastable() then
-    if Cast(S.CalloftheWild, Settings.BeastMastery.GCDasOffGCD.CallOfTheWild) then return "call_of_the_wild dr_st 10"; end
+    if Cast(S.CalloftheWild, Settings.BeastMastery.GCDasOffGCD.CallOfTheWild) then return "call_of_the_wild dr_st 12"; end
   end
-  -- kill_command
-  if S.KillCommand:IsReady() then
-    if Cast(S.KillCommand, nil, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command dr_st 12"; end
+  -- kill_command,if=buff.withering_fire.down|buff.withering_fire.tick_time_remains>gcd&cooldown.black_arrow.remains>0.5
+  if S.KillCommand:IsReady() and (Player:BuffDown(S.WitheringFireBuff) or WFTTR > Player:GCD() and S.BlackArrow:CooldownRemains() > 0.5) then
+    if Cast(S.KillCommand, nil, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command dr_st 14"; end
   end
-  -- barbed_shot,target_if=min:dot.barbed_shot.remains
-  if S.BarbedShot:IsCastable() then
-    if Everyone.CastTargetIf(S.BarbedShot, Enemies40y, "min", EvaluateTargetIfFilterBarbedShot, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot dr_st 14"; end
+  -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=buff.withering_fire.tick_time_remains>0.5&cooldown.black_arrow.remains>0.5
+  -- Note: ST function, so only using Cast instead of CastTargetIf.
+  if S.BarbedShot:IsCastable() and (WFTTRCheck) then
+    if Cast(S.BarbedShot, nil, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot dr_st 16"; end
   end
-  -- cobra_shot
-  if S.CobraShot:IsReady() then
-    if Cast(S.CobraShot, nil, nil, not Target:IsSpellInRange(S.CobraShot)) then return "cobra_shot dr_st 16"; end
+  -- cobra_shot,if=buff.withering_fire.tick_time_remains>0.5&cooldown.black_arrow.remains>0.5
+  if S.CobraShot:IsReady() and (WFTTRCheck) then
+    if Cast(S.CobraShot, nil, nil, not Target:IsSpellInRange(S.CobraShot)) then return "cobra_shot dr_st 18"; end
   end
 end
 
