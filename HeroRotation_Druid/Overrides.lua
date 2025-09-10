@@ -47,22 +47,26 @@ HL.AddCoreOverride ("Player.AstralPowerP",
 HL.AddCoreOverride ("Spell.EnergizeAmount",
   function(self)
     local Amount = 0
-    if self == SpellBalance.StellarFlare then
+    if self == SpellBalance.Wrath then
+      Amount = 8
+    elseif self == SpellBalance.Starfire then
+      Amount = 10
+    elseif self == SpellBalance.StellarFlare then
       Amount = 12
     elseif self == SpellBalance.AstralCommunion then
       Amount = 60
     elseif self == SpellBalance.ForceofNature then
       Amount = 20
     elseif self == SpellBalance.Sunfire then
-      Amount = 8
+      Amount = 6
     elseif self == SpellBalance.Moonfire then
       Amount = 6
     elseif self == SpellBalance.NewMoon then
-      Amount = 12
+      Amount = 10
     elseif self == SpellBalance.HalfMoon then
-      Amount = 24
+      Amount = 20
     elseif self == SpellBalance.FullMoon then
-      Amount = 50
+      Amount = 40
     end
     return Amount
   end

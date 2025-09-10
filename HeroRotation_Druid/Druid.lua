@@ -115,6 +115,7 @@ Spell.Druid.KeeperoftheGrove = {
   PoweroftheDream                       = Spell(434220),
   TreantsoftheMoon                      = Spell(428544),
   -- Buffs
+  BounteousBloomBuff                    = Spell(429217),
   DryadsFavorBuff                       = Spell(1236807), -- TWW S3 4pc Buff
   HarmonyoftheGroveBuff                 = Spell(428735),
 }
