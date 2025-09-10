@@ -630,7 +630,7 @@ local function SSCleave()
     if Cast(Bolt, nil, nil, not Target:IsSpellInRange(Bolt)) then return "frostbolt ss_cleave 22"; end
   end
   -- ice_lance,target_if=max:debuff.winters_chill.stack,if=remaining_winters_chill
-  if S.IceLance:IsReady() and (RemainingWintersChill == 0) then
+  if S.IceLance:IsReady() and (RemainingWintersChill > 0) then
     if Everyone.CastTargetIf(S.IceLance, Enemies16ySplash, "max", EvaluateTargetIfFilterWCStacks, nil, not Target:IsSpellInRange(S.IceLance)) then return "ice_lance ss_cleave 24"; end
   end
   -- shifting_power,if=equipped.arazs_ritual_forge&buff.icy_veins.down&cooldown.flurry.charges<2&cooldown.icy_veins.remains>8
@@ -783,8 +783,8 @@ local function APL()
       if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for FFST()"; end
     end
     -- run_action_list,name=ss_st
-    local ShouldReturn = SSST(); if ShouldReturn then return ShouldReturn; end
-    if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for SSST()"; end
+    local ShouldReturn = STSS(); if ShouldReturn then return ShouldReturn; end
+    if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for STSS()"; end
   end
 end
 
