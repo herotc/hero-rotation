@@ -784,7 +784,7 @@ local function Stealth_CDs ()
     end
 
     --actions.stealth_cds+=/shadowmeld,if=energy>=40&combo_points.deficit>=3
-    if Settings.Commons.ShowPooling and S.Shadowmeld:IsReady() and Player:Energy() >= 40 and ComboPointsDeficit >= 3 then
+    if Settings.Commons.ShowPooling and Settings.Subtlety.StealthMacro.Shadowmeld and S.Shadowmeld:IsReady() and Player:Energy() >= 40 and ComboPointsDeficit >= 3 then
       ShouldReturn = StealthMacro(S.Shadowmeld)
       if ShouldReturn then
         return "Shadowmeld Macro " .. ShouldReturn
