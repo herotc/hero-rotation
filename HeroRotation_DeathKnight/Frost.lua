@@ -221,7 +221,7 @@ local function Precombat()
   -- Note: Manual trinkets handled via OnUseExcludes.
   -- Note: Moved the above variable definitions to initial profile load, SPELLS_CHANGED, and PLAYER_EQUIPMENT_CHANGED.
   -- Manually added openers: HowlingBlast if at range, RemorselessWinter if in melee
-  if S.HowlingBlast:IsReady() and not Target:IsInRange(8) then
+  if S.HowlingBlast:IsReady() and not Target:IsSpellInRange(S.HowlingBlast) then
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast precombat 2"; end
   end
   if S.RemorselessWinter:IsReady() and Target:IsInRange(8) then
@@ -359,7 +359,7 @@ local function SingleTarget()
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast single_target 4"; end
   end
   -- frost_strike,target_if=max:(talent.shattering_blade&debuff.razorice.react=5),if=debuff.razorice.react=5&talent.shattering_blade&!variable.rp_pooling
-  if S.FrostStrike:IsReady() and (S.ShatteringBlade:IsAvailable() and not VarRPPooling) then
+  if S.FrostStrike:IsReady() and (S.ShatteringBlade:IsAvailable() and Target:DebuffStack(S.RazoriceDebuff) == 5 and not VarRPPooling) then
     if Everyone.CastCycle(S.FrostStrike, EnemiesMelee, EvaluateCycleFrostStrike, not Target:IsSpellInRange(S.FrostStrike), Settings.Frost.GCDasOffGCD.FrostStrike) then return "frost_strike single_target 6"; end
   end
   -- howling_blast,if=buff.rime.react
@@ -402,19 +402,19 @@ local function AoE()
     if Cast(S.HowlingBlast, nil, nil, not Target:IsSpellInRange(S.HowlingBlast)) then return "howling_blast aoe 6"; end
   end
   -- frost_strike,target_if=max:(talent.shattering_blade&debuff.razorice.react=5),if=debuff.razorice.react=5&buff.frostbane.react
-  if S.FrostStrike:IsReady() and (S.ShatteringBlade:IsAvailable() and Player:BuffUp(S.FrostbaneBuff)) then
+  if S.FrostStrike:IsReady() and (S.ShatteringBlade:IsAvailable() and Target:DebuffStack(S.RazoriceDebuff) == 5 and Player:BuffUp(S.FrostbaneBuff)) then
     if Everyone.CastCycle(S.FrostStrike, EnemiesMelee, EvaluateCycleFrostStrike, not Target:IsSpellInRange(S.FrostStrike), Settings.Frost.GCDasOffGCD.FrostStrike) then return "frost_strike aoe 8"; end
   end
   -- frost_strike,target_if=max:(talent.shattering_blade&debuff.razorice.react=5),if=debuff.razorice.react=5&talent.shattering_blade&active_enemies<5&!variable.rp_pooling&!talent.frostbane
-  if S.FrostStrike:IsReady() and (S.ShatteringBlade:IsAvailable() and EnemiesMeleeCount < 5 and not VarRPPooling and not S.Frostbane:IsAvailable()) then
+  if S.FrostStrike:IsReady() and (S.ShatteringBlade:IsAvailable() and Target:DebuffStack(S.RazoriceDebuff) == 5 and EnemiesMeleeCount < 5 and not VarRPPooling and not S.Frostbane:IsAvailable()) then
     if Everyone.CastCycle(S.FrostStrike, EnemiesMelee, EvaluateCycleFrostStrike, not Target:IsSpellInRange(S.FrostStrike), Settings.Frost.GCDasOffGCD.FrostStrike) then return "frost_strike aoe 10"; end
   end
   -- frostscythe,if=buff.killing_machine.react&!variable.rune_pooling&active_enemies>=variable.frostscythe_prio
-  if S.Frostscythe:IsReady() and (Player:BuffUp(S.KillingMachineBuff) and not VarRPPooling and EnemiesMeleeCount >= VarFrostscythePrio) then
+  if S.Frostscythe:IsReady() and (Player:BuffUp(S.KillingMachineBuff) and not VarRunePooling and EnemiesMeleeCount >= VarFrostscythePrio) then
     if Cast(S.Frostscythe, nil, nil, not Target:IsInMeleeRange(8)) then return "frostscythe aoe 12"; end
   end
   -- obliterate,target_if=max:(hero_tree.rider_of_the_apocalypse&debuff.chains_of_ice_trollbane_slow.react),if=buff.killing_machine.react&!variable.rune_pooling
-  if S.Obliterate:IsReady() and (Player:HeroTreeID() == 32 and Player:BuffUp(S.KillingMachineBuff) and not VarRPPooling) then
+  if S.Obliterate:IsReady() and (Player:HeroTreeID() == 32 and Player:BuffUp(S.KillingMachineBuff) and not VarRunePooling) then
     if Everyone.CastCycle(S.Obliterate, EnemiesMelee, EvaluateCycleObliterateAoE, not Target:IsInMeleeRange(5)) then return "obliterate aoe 14"; end
   end
   -- howling_blast,if=buff.rime.react
@@ -426,11 +426,11 @@ local function AoE()
     if Cast(S.GlacialAdvance, Settings.Frost.GCDasOffGCD.GlacialAdvance, nil, not Target:IsInRange(100)) then return "glacial_advance aoe 18"; end
   end
   -- frostscythe,if=!variable.rune_pooling&!(talent.obliteration&buff.pillar_of_frost.up)&active_enemies>=variable.frostscythe_prio
-  if S.Frostscythe:IsReady() and (not VarRPPooling and not (S.Obliteration:IsAvailable() and Player:BuffUp(S.PillarofFrostBuff)) and EnemiesMeleeCount >= VarFrostscythePrio) then
+  if S.Frostscythe:IsReady() and (not VarRunePooling and not (S.Obliteration:IsAvailable() and Player:BuffUp(S.PillarofFrostBuff)) and EnemiesMeleeCount >= VarFrostscythePrio) then
     if Cast(S.Frostscythe, nil, nil, not Target:IsInMeleeRange(8)) then return "frostscythe aoe 20"; end
   end
   -- obliterate,target_if=max:(hero_tree.rider_of_the_apocalypse&debuff.chains_of_ice_trollbane_slow.react),if=!variable.rune_pooling&!(talent.obliteration&buff.pillar_of_frost.up)
-  if S.Obliterate:IsReady() and (Player:HeroTreeID() == 32 and not VarRPPooling and not (S.Obliteration:IsAvailable() and Player:BuffUp(S.PillarofFrostBuff))) then
+  if S.Obliterate:IsReady() and (Player:HeroTreeID() == 32 and not VarRunePooling and not (S.Obliteration:IsAvailable() and Player:BuffUp(S.PillarofFrostBuff))) then
     if Everyone.CastCycle(S.Obliterate, EnemiesMelee, EvaluateCycleObliterateAoE, not Target:IsInMeleeRange(5)) then return "obliterate aoe 22"; end
   end
   -- howling_blast,if=!buff.killing_machine.react&(talent.obliteration&buff.pillar_of_frost.up)
