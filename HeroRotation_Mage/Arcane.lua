@@ -196,7 +196,7 @@ local function CDOpener()
   end
   -- arcane_barrage,if=buff.arcane_tempo.up&cooldown.evocation.ready&buff.arcane_tempo.remains<gcd.max*5,line_cd=11
   if S.ArcaneBarrage:IsReady() and S.ArcaneBarrage:TimeSinceLastCast() >= 11 and (Player:BuffUp(S.ArcaneTempoBuff) and S.Evocation:CooldownUp() and Player:BuffRemains(S.ArcaneTempoBuff) < Player:GCD() * 5) then
-    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsInRange(8)) then return "arcane_barrage cd_opener 8"; end
+    if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage cd_opener 8"; end
   end
   -- evocation,if=cooldown.arcane_surge.remains<(gcd.max*3)&cooldown.touch_of_the_magi.remains<(gcd.max*5)|fight_remains<25
   if S.Evocation:IsCastable() and (S.ArcaneSurge:CooldownRemains() < (Player:GCD() * 3) and S.TouchoftheMagi:CooldownRemains() < (Player:GCD() * 5) or BossFightRemains < 25) then
