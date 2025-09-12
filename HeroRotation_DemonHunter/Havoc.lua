@@ -1262,7 +1262,7 @@ local function AROpener()
   end
   -- reavers_glaive,target_if=max:debuff.reavers_mark.remains,if=debuff.reavers_mark.down&debuff.essence_break.down
   if S.ReaversGlaive:IsCastable() and (Target:DebuffDown(S.ReaversMarkDebuff)) then
-    if Everyone.CastTargetIf(S.ReaversGlaive, Enemies8y, "max", ETIFReaversMark, ETIEssenceBreakDown, not Target:IsInRange(50)) then return "reavers_glaive ar_opener 32"; end
+    if Everyone.CastTargetIf(S.ReaversGlaive, Enemies8y, "max", ETIFReaversMark, ETIEssenceBreakDown, not Target:IsInRange(50), Settings.CommonsOGCD.OffGCDasOffGCD.ReaversGlaive) then return "reavers_glaive ar_opener 32"; end
   end
   -- chaos_strike,target_if=max:debuff.reavers_mark.remains,if=buff.rending_strike.up&active_enemies>2
   if S.ChaosStrike:IsReady() and (Player:BuffUp(S.RendingStrikeBuff) and Enemies8yCount > 2) then
@@ -1350,11 +1350,11 @@ local function AR()
   end
   -- reavers_glaive,target_if=max:debuff.reavers_mark.remains,if=buff.glaive_flurry.down&buff.rending_strike.down&buff.thrill_of_the_fight_damage.remains<gcd.max*4+(variable.rg_ds=2)+(cooldown.the_hunt.remains<gcd.max*3)*3+(cooldown.eye_beam.remains<gcd.max*3&talent.shattered_destiny)*3&(variable.rg_ds=0|variable.rg_ds=1&cooldown.blade_dance.up|variable.rg_ds=2&cooldown.blade_dance.remains)&(buff.thrill_of_the_fight_damage.up|!prev_gcd.1.death_sweep|!variable.rg_inc)&active_enemies<3&!action.reavers_glaive.last_used<5&debuff.essence_break.down&(buff.metamorphosis.remains>2|cooldown.eye_beam.remains<10|fight_remains<10)&(variable.pull_remains>=10|fight_remains<=10)|fight_remains<=10
   if S.ReaversGlaive:IsReady() and (Player:BuffDown(S.GlaiveFlurryBuff) and Player:BuffDown(S.RendingStrikeBuff) and Player:BuffRemains(S.ThrilloftheFightHavocDmgBuff) < Player:GCD() * 4 + num(VarRGDS == 2) + num(S.TheHunt:CooldownRemains() < Player:GCD() * 3) * 3 + num(BeamAbility:CooldownRemains() < Player:GCD() * 3 and S.ShatteredDestiny:IsAvailable()) * 3 and (VarRGDS == 0 or VarRGDS == 1 and S.BladeDance:CooldownUp() or VarRGDS == 2 and S.BladeDance:CooldownDown()) and (Player:BuffUp(S.ThrilloftheFightHavocDmgBuff) or not Player:PrevGCD(1, S.DeathSweep) or not VarRGInc) and Enemies8yCount < 3 and S.ReaversGlaive:TimeSinceLastCast() >= 5 and Target:DebuffDown(S.EssenceBreakDebuff) and (Player:BuffRemains(S.MetamorphosisBuff) > 2 or BeamAbility:CooldownRemains() < 10 or BossFightRemains < 10) and (FightRemains >= 10 or BossFightRemains <= 10) or BossFightRemains <= 10) then
-    if CastSwitch(HighRMTarget, S.ReaversGlaive, nil, nil, not Target:IsInRange(50)) then return "reavers_glaive ar 6"; end
+    if CastSwitch(HighRMTarget, S.ReaversGlaive, Settings.CommonsOGCD.OffGCDasOffGCD.ReaversGlaive, nil, not Target:IsInRange(50)) then return "reavers_glaive ar_opener 6"; end
   end
   -- reavers_glaive,target_if=max:debuff.reavers_mark.remains,if=buff.glaive_flurry.down&buff.rending_strike.down&buff.thrill_of_the_fight_damage.remains<4&(buff.thrill_of_the_fight_damage.up|!prev_gcd.1.death_sweep|!variable.rg_inc)&active_enemies>=2&(variable.pull_remains>=10|fight_remains<10)
   if S.ReaversGlaive:IsReady() and (Player:BuffDown(S.GlaiveFlurryBuff) and Player:BuffDown(S.RendingStrikeBuff) and Player:BuffRemains(S.ThrilloftheFightHavocDmgBuff) < 4 and (Player:BuffUp(S.ThrilloftheFightHavocDmgBuff) or not Player:PrevGCD(1, S.DeathSweep) or not VarRGInc) and Enemies8yCount > 2 and (FightRemains >= 10 or BossFightRemains < 10)) then
-    if CastSwitch(HighRMTarget, S.ReaversGlaive, nil, nil, not Target:IsInRange(50)) then return "reavers_glaive ar 8"; end
+    if CastSwitch(HighRMTarget, S.ReaversGlaive, Settings.CommonsOGCD.OffGCDasOffGCD.ReaversGlaive, nil, not Target:IsInRange(50)) then return "reavers_glaive ar 8"; end
   end
   -- call_action_list,name=ar_cooldown
   local ShouldReturn = ARCooldown(); if ShouldReturn then return ShouldReturn; end
