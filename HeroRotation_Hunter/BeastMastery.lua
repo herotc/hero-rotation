@@ -216,8 +216,8 @@ end
 
 local function DRCleave()
   -- kill_shot
-  if S.BlackArrow:IsReady() then
-    if Cast(S.BlackArrow, nil, nil, not Target:IsSpellInRange(S.BlackArrow)) then return "kill_shot dr_cleave 2"; end
+  if S.KillShot:IsReady() then
+    if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot dr_cleave 2"; end
   end
   -- bestial_wrath,if=cooldown.call_of_the_wild.remains>20|!talent.call_of_the_wild
   if CDsON() and S.BestialWrath:IsCastable() and (S.CalloftheWild:CooldownRemains() > 20 or not S.CalloftheWild:IsAvailable()) then
@@ -270,11 +270,11 @@ local function DRST()
   -- The condition 'buff.withering_fire.tick_time_remains>0.5&cooldown.black_arrow.remains>0.5' is used multiple times, so let's make it a local.
   local WFTTRCheck = WFTTR > 0.5 and S.BlackArrow:CooldownRemains() > 0.5
   -- kill_shot
-  if S.BlackArrow:IsReady() then
-    if Cast(S.BlackArrow, nil, nil, not Target:IsSpellInRange(S.BlackArrow)) then return "kill_shot dr_st 2"; end
+  if S.KillShot:IsReady() then
+    if Cast(S.KillShot, nil, nil, not Target:IsSpellInRange(S.KillShot)) then return "kill_shot dr_st 2"; end
   end
   -- bestial_wrath,if=cooldown.call_of_the_wild.remains>25|!talent.call_of_the_wild
-  if S.BestialWrath:IsReady() and (S.CalloftheWild:CooldownRemains() > 25 or not S.CalloftheWild:IsAvailable()) then
+  if CDsON() and S.BestialWrath:IsCastable() and (S.CalloftheWild:CooldownRemains() > 25 or not S.CalloftheWild:IsAvailable()) then
     if Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath dr_st 4"; end
   end
   -- barbed_shot,if=buff.thrill_of_the_hunt.remains<1.5*gcd|!talent.thrill_of_the_hunt
@@ -323,7 +323,7 @@ local function Cleave()
     if Cast(S.Bloodshed, Settings.BeastMastery.GCDasOffGCD.Bloodshed, nil, not Target:IsSpellInRange(S.Bloodshed)) then return "bloodshed cleave 6"; end
   end
   -- multishot,if=pet.main.buff.beast_cleave.down&(!talent.bloody_frenzy|cooldown.call_of_the_wild.remains)
-  if S.MultiShot:IsReady() and (Pet:BuffDown(S.BeastCleavePetBuff) and (not S.BloodyFrenzy:IsAvailable() or S.CalloftheWild:CooldownDown() or not CDsON())) then
+  if S.MultiShot:IsReady() and (Pet:BuffDown(S.BeastCleavePetBuff) and (not S.BloodyFrenzy:IsAvailable() or S.CalloftheWild:CooldownDown())) then
     if Cast(S.MultiShot, nil, nil, not Target:IsSpellInRange(S.MultiShot)) then return "multishot cleave 8"; end
   end
   -- call_of_the_wild
