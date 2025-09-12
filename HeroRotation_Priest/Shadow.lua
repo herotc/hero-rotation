@@ -44,6 +44,7 @@ local OnUseExcludes = {
   I.FlarendosPilotLight:ID(),
   I.GeargrindersSpareKeys:ID(),
   I.NeuralSynapseEnhancer:ID(),
+  I.NexusKingsCommand:ID(),
   I.SpymastersWeb:ID(),
   -- TWW Other Items
   I.AstralGladiatorsBadge:ID(),
@@ -432,7 +433,7 @@ local function Trinkets()
       end
     end
     -- use_item,use_off_gcd=1,name=perfidious_projector,if=gcd.remains>0&(!talent.voidheart|buff.voidheart.up|fight_remains<20)
-    if I.PerfidiousProjector:IsEquippedAndReady() and (not S.Voidheard:IsAvailable() or Player:BuffUp(S.VoidheartBuff) or BossFightRemains < 20) then
+    if I.PerfidiousProjector:IsEquippedAndReady() and (not S.Voidheart:IsAvailable() or Player:BuffUp(S.VoidheartBuff) or BossFightRemains < 20) then
       if Cast(I.PerfidiousProjector, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(45)) then return "perfidious_projector trinkets 16"; end
     end
   end
@@ -478,8 +479,12 @@ local function CDs()
     -- invoke_external_buff,name=bloodlust,if=buff.power_infusion.up&fight_remains<120|fight_remains<=40
     -- Note: Not handling external buffs
     -- power_infusion,if=(buff.voidform.up|buff.dark_ascension.up&(fight_remains<=80|fight_remains>=140)|active_allied_augmentations)&(!buff.power_infusion.up|set_bonus.tww2_4pc&buff.power_infusion.remains<=15)
-    if S.PowerInfusion:IsCastable() and Settings.Shadow.SelfPI and ((Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscension) and (BossFightRemains <= 80 or BossFightRemains >= 140)) and (Player:PowerInfusionDown() or Player:HasTier("TWW2", 4) and Player:PowerInfusionRemains() <= 15)) then
+    if S.PowerInfusion:IsCastable() and Settings.Shadow.SelfPI and ((Player:BuffUp(S.VoidformBuff) or Player:BuffUp(S.DarkAscensionBuff) and (BossFightRemains <= 80 or BossFightRemains >= 140)) and (Player:PowerInfusionDown() or Player:HasTier("TWW2", 4) and Player:PowerInfusionRemains() <= 15)) then
       if Cast(S.PowerInfusion, Settings.Shadow.OffGCDasOffGCD.PowerInfusion) then return "power_infusion cds 12"; end
+    end
+    -- flash_heal,if=equipped.nexuskings_command&buff.oathbound.up&(!buff.boon_of_the_oathsworn.up|buff.boon_of_the_oathsworn.remains<3)&((talent.void_eruption&(buff.voidform.up|cooldown.void_eruption.up))|(talent.dark_ascension&cooldown.dark_ascension.up)|(talent.power_surge&cooldown.halo.up)|(talent.entropic_rift&cooldown.void_torrent.up))
+    if S.FlashHeal:IsReady() and (I.NexusKingsCommand:IsEquipped() and Player:BuffUp(S.OathboundBuff) and (Player:BuffDown(S.BoonOfTheOathswornBuff) or Player:BuffRemains(S.BoonOfTheOathswornBuff) < 3) and ((S.VoidEruption:IsAvailable() and (Player:BuffUp(S.VoidformBuff) or S.VoidEruption:CooldownUp())) or (S.DarkAscension:IsAvailable() and S.DarkAscension:CooldownUp()) or (S.PowerSurge:IsAvailable() and S.Halo:CooldownUp()) or (S.EntropicRift:IsAvailable() and S.VoidTorrent:CooldownUp()))) then
+      if Cast(S.FlashHeal, nil, nil, not Target:IsSpellInRange(S.FlashHeal)) then return "flash_heal cds 13"; end
     end
     -- halo,if=talent.power_surge&(pet.fiend.active&cooldown.fiend.remains>=4&talent.mindbender|!talent.mindbender&!cooldown.fiend.up|active_enemies>2&!talent.inescapable_torment|!talent.dark_ascension)&(cooldown.mind_blast.charges=0|!cooldown.void_torrent.up|!talent.void_eruption|cooldown.void_eruption.remains>=gcd.max*4|buff.mind_devourer.up&talent.mind_devourer)
     if S.Halo:IsReady() and (S.PowerSurge:IsAvailable() and (FiendUp and Fiend:CooldownRemains() >= 4 and S.Mindbender:IsAvailable() or not S.Mindbender:IsAvailable() and Fiend:CooldownDown() or EnemiesCount10ySplash > 2 and not S.InescapableTorment:IsAvailable() or not S.DarkAscension:IsAvailable()) and (S.MindBlast:Charges() == 0 or S.VoidTorrent:CooldownDown() or not S.VoidEruption:IsAvailable() or S.VoidEruption:CooldownRemains() >= GCDMax * 4 or Player:BuffUp(S.MindDevourerBuff) and S.MindDevourer:IsAvailable())) then

@@ -65,6 +65,9 @@ Spell.Priest.Commons = {
   SpymastersReportBuff        = Spell(451199), -- Stacking buff from before using Spymaster's Web trinket
   SpymastersWebBuff           = Spell(444959), -- Buff from using Spymaster's Web trinket
   TwistofFateBuff             = Spell(390978),
+  -- Nexus King's Command trinket buffs
+  OathboundBuff               = Spell(1239997),
+  BoonOfTheOathswornBuff      = Spell(1240578),
   -- Debuffs
   -- Other
   Pool                        = Spell(999910)
@@ -128,6 +131,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   ShadowCrashTarget           = Spell(457042),
   Silence                     = Spell(15487),
   UnfurlingDarkness           = Spell(341273),
+  Voidheart                   = Spell(449887),
   VoidTorrent                 = Spell(263165),
   Voidtouched                 = Spell(407430),
   VoidVolley                  = Spell(1242173),
@@ -143,6 +147,7 @@ Spell.Priest.Shadow = MergeTableByKey(Spell.Priest.Commons, {
   ShadowformBuff              = Spell(232698),
   UnfurlingDarknessBuff       = Spell(341282),
   VoidformBuff                = Spell(194249),
+  VoidheartBuff               = Spell(449887),
   VoidVolleyBuff              = Spell(1242171),
   -- Debuffs
   DevouringPlagueDebuff       = Spell(335467),
@@ -159,6 +164,7 @@ Item.Priest.Shadow = {
   AstralGladiatorsBadge       = Item(230638, {13, 14}),
   FlarendosPilotLight         = Item(230191, {13, 14}),
   GeargrindersSpareKeys       = Item(230197, {13, 14}),
+  NexusKingsCommand           = Item(242400, {13, 14}),
   PerfidiousProjector         = Item(242403, {13, 14}),
   PrizedGladiatorsBadge       = Item(229780, {13, 14}),
   SignetofthePriory           = Item(219308, {13, 14}),
