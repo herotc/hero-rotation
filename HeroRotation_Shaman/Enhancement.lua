@@ -166,6 +166,8 @@ local function TotemFinder(Totem, ReturnTime)
       end
     end
   end
+  -- If totem not found, return appropriate default value.
+  return ReturnTime and 0 or false
 end
 
 local function AlphaWolfMinRemains()
