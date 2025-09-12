@@ -107,11 +107,11 @@ local function SetTrinketVariables()
   VarTrinket2Exclude = T2.ID == I.TreacherousTransmitter:ID()
 
   VarTrinket1Sync = 0.5
-  if Trinket1:HasUseBuff() and (VarTrinket1CD % 90 == 0 or VarTrinket1CD) then
+  if Trinket1:HasUseBuff() and (VarTrinket1CD % 90 == 0 or VarTrinket1CD % 45 == 0) then
     VarTrinket1Sync = 1
   end
   VarTrinket2Sync = 0.5
-  if Trinket2:HasUseBuff() and (VarTrinket2CD % 90 == 0) then
+  if Trinket2:HasUseBuff() and (VarTrinket2CD % 90 == 0 or VarTrinket2CD % 45 == 0) then
     VarTrinket2Sync = 1
   end
 
@@ -278,7 +278,7 @@ local function Slayer()
   end
   -- bloodthirst,if=target.health.pct<35&talent.vicious_contempt&buff.brutal_finish.up&buff.enrage.up&crit_pct_current>=85&active_enemies=1|(!set_bonus.tww3_4pc&active_enemies>4)
   local CritPctCurrent = Player:CritChancePct() + num(Player:BuffUp(S.RecklessnessBuff)) * 20 + Player:BuffStack(S.BloodcrazeBuff) * 15
-  if S.Bloodthirst:IsCastable() and (Target:HealthPercentage() < 35 and S.ViciousContempt:IsAvailable() and Player:BuffUp(S.BrutalFinishBuff) and EnrageUp and S.CritChancePct() >= 85 and EnemiesMeleeCount == 1 or (not TWW3_4pc and EnemiesMeleeCount > 4)) then
+  if S.Bloodthirst:IsCastable() and (Target:HealthPercentage() < 35 and S.ViciousContempt:IsAvailable() and Player:BuffUp(S.BrutalFinishBuff) and EnrageUp and CritPctCurrent >= 85 and EnemiesMeleeCount == 1 or (not TWW3_4pc and EnemiesMeleeCount > 4)) then
     if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst slayer 40"; end
   end
   -- crushing_blow
@@ -412,7 +412,7 @@ local function Thane()
   end
   -- odyns_fury,if=active_enemies>1&(buff.enrage.up|talent.titanic_rage)
   if S.OdynsFury:IsCastable() and (EnemiesMeleeCount > 1 and (EnrageUp or S.TitanicRage:IsAvailable())) then
-    if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.OdynsFury, not Target:IsInMeleeRange(12)) then return "odyns_fury slayer 36"; end
+    if Cast(S.OdynsFury, nil, Settings.CommonsDS.DisplayStyle.OdynsFury, not Target:IsInMeleeRange(12)) then return "odyns_fury thane 36"; end
   end
   -- raging_blow
   if S.RagingBlow:IsCastable() then
