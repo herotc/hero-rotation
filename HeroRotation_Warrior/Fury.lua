@@ -277,7 +277,8 @@ local function Slayer()
     if Cast(S.Execute, nil, nil, not TargetInMeleeRange) then return "execute slayer 38"; end
   end
   -- bloodthirst,if=target.health.pct<35&talent.vicious_contempt&buff.brutal_finish.up&buff.enrage.up&crit_pct_current>=85&active_enemies=1|(!set_bonus.tww3_4pc&active_enemies>4)
-  local CritPctCurrent = Player:CritChancePct()
+  -- Effective crit chance for Bloodthirst: base sheet crit + Recklessness (+20) + Bloodcraze (+15 per stack)
+  local CritPctCurrent = Player:CritChancePct() + num(Player:BuffUp(S.RecklessnessBuff)) * 20 + Player:BuffStack(S.BloodcrazeBuff) * 15
   if S.Bloodthirst:IsCastable() and (Target:HealthPercentage() < 35 and S.ViciousContempt:IsAvailable() and Player:BuffUp(S.BrutalFinishBuff) and EnrageUp and CritPctCurrent >= 85 and EnemiesMeleeCount == 1 or (not TWW3_4pc and EnemiesMeleeCount > 4)) then
     if Cast(S.Bloodthirst, nil, nil, not TargetInMeleeRange) then return "bloodthirst slayer 40"; end
   end
