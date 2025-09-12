@@ -30,7 +30,7 @@ Shaman.MoltenWeaponStacks = 0
 Shaman.TempestMaelstrom = 0
 Shaman.SearingTotemActive = false
 Shaman.SearingTotemGUID = 0
-Shaman.TWW3ProcsToAsc = 999
+Shaman.TWW3ProcsToAsc = 8
 
 --- ============================ CONTENT ============================
 HL:RegisterForSelfCombatEvent(

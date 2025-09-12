@@ -273,7 +273,7 @@ local function Aoe()
     if Cast(S.AncestralSwiftness, Settings.CommonsOGCD.GCDasOffGCD.AncestralSwiftness) then return "ancestral_swiftness aoe 14"; end
   end
   -- ascendance,if=(talent.first_ascendant|fight_remains>200|fight_remains<80|variable.trinket_1_buffs&trinket.1.ready_cooldown|variable.trinket_2_buffs&trinket.2.ready_cooldown|equipped.neural_synapse_enhancer&cooldown.neural_synapse_enhancer.remains=0|equipped.bestinslots&cooldown.bestinslots.remains=0)&(buff.fury_of_storms.up|!talent.fury_of_the_storms)
-  if CDsON() and S.Ascendance:IsCastable() and ((S.FirstAscendant:IsAvailable() or FightRemains > 200 or FightRemains < 80 or VarTrinket1Buffs and Trinket1:CooldownUp() or VarTrinekt2Buffs and Trinket2:CooldownUp() or I.NeuralSynapseEnhancer:IsEquippedAndReady() or I.BestinSlotsCaster:IsEquippedAndReady()) and (Player:BuffUp(S.FuryofStormsBuff) or not S.FuryoftheStorms:IsAvailable())) then
+  if CDsON() and S.Ascendance:IsCastable() and ((S.FirstAscendant:IsAvailable() or FightRemains > 200 or FightRemains < 80 or VarTrinket1Buffs and Trinket1:CooldownUp() or VarTrinket2Buffs and Trinket2:CooldownUp() or I.NeuralSynapseEnhancer:IsEquippedAndReady() or I.BestinSlotsCaster:IsEquippedAndReady()) and (Player:BuffUp(S.FuryofStormsBuff) or not S.FuryoftheStorms:IsAvailable())) then
     if Cast(S.Ascendance, Settings.CommonsOGCD.GCDasOffGCD.Ascendance) then return "ascendance aoe 16"; end
   end
   -- tempest,target_if=min:debuff.lightning_rod.remains,if=buff.arc_discharge.stack<2&(buff.surge_of_power.up|!talent.surge_of_power)
@@ -297,7 +297,7 @@ local function Aoe()
     if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 26"; end
   end
   -- lava_burst,target_if=dot.flame_shock.remains,if=cooldown_react&buff.lava_surge.up&buff.fusion_of_elements_fire.up&!buff.master_of_the_elements.up&(maelstrom>52-5*talent.eye_of_the_storm&(buff.echoes_of_great_sundering_es.up|!talent.echoes_of_great_sundering))
-  if S.LavaBurst:IsViable() and (Player:BuffUp(S.LavaSurgeBuff) and Player:BuffUp(S.FusionofElementsFire) and not Player:MotEUp() and (VarMaelstrom > 52 - 5 * num(S.EyeoftheStorm:IsAvailable() and Player:BuffUp(S.EchoesofGreatSunderingBuff)))) then
+  if S.LavaBurst:IsViable() and (Player:BuffUp(S.LavaSurgeBuff) and Player:BuffUp(S.FusionofElementsFire) and not Player:MotEUp() and (VarMaelstrom > 52 - 5 * num(S.EyeoftheStorm:IsAvailable()) and (Player:BuffUp(S.EchoesofGreatSunderingBuff) or not S.EchoesofGreatSundering:IsAvailable()))) then
     if Everyone.CastCycle(S.LavaBurst, Enemies10ySplash, EvaluateCycleFlameShockRemains, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst aoe 28"; end
   end
   -- earthquake,if=(maelstrom>variable.mael_cap-10*(spell_targets.chain_lightning+1)|buff.master_of_the_elements.up|buff.ascendance.up&buff.ascendance.remains<3|fight_remains<5)&(buff.echoes_of_great_sundering_es.up|buff.echoes_of_great_sundering_eb.up|!talent.echoes_of_great_sundering&(!talent.elemental_blast|active_enemies>1+3*talent.tempest))&(cooldown.primordial_wave.remains>8|!(set_bonus.tww3_4pc&talent.ancestral_swiftness)|maelstrom>variable.mael_cap-20)
