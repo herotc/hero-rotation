@@ -215,6 +215,10 @@ local function CDs()
 end
 
 local function DRCleave()
+  -- bestial_wrath,if=buff.call_of_the_wild.remains
+  if CDsON() and S.BestialWrath:IsCastable() and (Player:BuffUp(S.CalloftheWildBuff)) then
+    if Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath dr_cleave 1"; end
+  end
   -- kill_shot
   if S.BlackArrow:IsReady() then
     if Cast(S.BlackArrow, nil, nil, not Target:IsSpellInRange(S.BlackArrow)) then return "kill_shot dr_cleave 2"; end
@@ -273,29 +277,28 @@ local function DRST()
   if S.BlackArrow:IsReady() then
     if Cast(S.BlackArrow, nil, nil, not Target:IsSpellInRange(S.BlackArrow)) then return "kill_shot dr_st 2"; end
   end
-  -- bestial_wrath,if=cooldown.call_of_the_wild.remains>25|!talent.call_of_the_wild
-  if S.BestialWrath:IsReady() and (S.CalloftheWild:CooldownRemains() > 25 or not S.CalloftheWild:IsAvailable()) then
+  -- bestial_wrath,if=cooldown.call_of_the_wild.remains>30|!talent.call_of_the_wild|time_to_die.remains<cooldown.call_of_the_wild.remains
+  if CDsON() and S.BestialWrath:IsCastable() and (S.CalloftheWild:CooldownRemains() > 30 or not S.CalloftheWild:IsAvailable() or Target:TimeToDie() < S.CalloftheWild:CooldownRemains()) then
     if Cast(S.BestialWrath, Settings.BeastMastery.GCDasOffGCD.BestialWrath) then return "bestial_wrath dr_st 4"; end
   end
-  -- barbed_shot,if=buff.thrill_of_the_hunt.remains<1.5*gcd|!talent.thrill_of_the_hunt
-  if S.BarbedShot:IsCastable() and (Player:BuffRemains(S.ThrilloftheHuntBuff) < Player:GCD() * 1.5 or not S.ThrilloftheHunt:IsAvailable()) then
+  -- barbed_shot,if=buff.thrill_of_the_hunt.remains<1.5*gcd
+  if S.BarbedShot:IsCastable() and (Player:BuffRemains(S.ThrilloftheHuntBuff) < Player:GCD() * 1.5) then
     if Cast(S.BarbedShot, nil, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot dr_st 6"; end
-  end
-  -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=buff.withering_fire.tick_time_remains>0.5&cooldown.black_arrow.remains>0.5&(full_recharge_time<gcd|cooldown.bestial_wrath.remains<12&buff.withering_fire.up)
-  -- Note: ST function, so only using Cast instead of CastTargetIf.
-  if S.BarbedShot:IsCastable() and (WFTTRCheck and (S.BarbedShot:FullRechargeTime() < Player:GCD() or S.BestialWrath:CooldownRemains() < 12 and Player:BuffUp(S.WitheringFireBuff))) then
-    if Cast(S.BarbedShot, nil, nil, not Target:IsSpellInRange(S.BarbedShot)) then return "barbed_shot dr_st 8"; end
   end
   -- bloodshed
   if S.Bloodshed:IsCastable() then
-    if Cast(S.Bloodshed, Settings.BeastMastery.GCDasOffGCD.Bloodshed, nil, not Target:IsSpellInRange(S.Bloodshed)) then return "bloodshed dr_st 10"; end
+    if Cast(S.Bloodshed, Settings.BeastMastery.GCDasOffGCD.Bloodshed, nil, not Target:IsSpellInRange(S.Bloodshed)) then return "bloodshed dr_st 8"; end
   end
   -- call_of_the_wild
   if CDsON() and S.CalloftheWild:IsCastable() then
-    if Cast(S.CalloftheWild, Settings.BeastMastery.GCDasOffGCD.CallOfTheWild) then return "call_of_the_wild dr_st 12"; end
+    if Cast(S.CalloftheWild, Settings.BeastMastery.GCDasOffGCD.CallOfTheWild) then return "call_of_the_wild dr_st 10"; end
   end
-  -- kill_command,if=buff.withering_fire.down|buff.withering_fire.tick_time_remains>gcd&cooldown.black_arrow.remains>0.5
-  if S.KillCommand:IsReady() and (Player:BuffDown(S.WitheringFireBuff) or WFTTR > Player:GCD() and S.BlackArrow:CooldownRemains() > 0.5) then
+  -- kill_command,if=buff.withering_fire.tick_time_remains>gcd&cooldown.black_arrow.remains>0.5
+  if S.KillCommand:IsReady() and (WFTTR > Player:GCD() and S.BlackArrow:CooldownRemains() > 0.5) then
+    if Cast(S.KillCommand, nil, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command dr_st 12"; end
+  end
+  -- kill_command,if=buff.withering_fire.down
+  if S.KillCommand:IsReady() and (Player:BuffDown(S.WitheringFireBuff)) then
     if Cast(S.KillCommand, nil, nil, not Target:IsSpellInRange(S.KillCommand)) then return "kill_command dr_st 14"; end
   end
   -- barbed_shot,target_if=min:dot.barbed_shot.remains,if=buff.withering_fire.tick_time_remains>0.5&cooldown.black_arrow.remains>0.5
