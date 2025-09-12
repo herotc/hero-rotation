@@ -62,7 +62,7 @@ local Settings = {
 }
 
 --- ===== Rotation Variables =====
-local VarTotMMaxStacks = 4
+local VarTotMMaxStacks = 8
 local VarSmallHotjsActive = false
 local DungeonSlice
 local CombatTime
@@ -201,15 +201,15 @@ local function Trinkets()
     local T1Check = Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1)
     local T2Check = Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2)
     -- use_item,slot=trinket1,if=trinket.1.has_use_buff&trinket.2.has_use_buff&pet.xuen_the_white_tiger.active&variable.invoke_xuen_count%%2|fight_remains<20
-    if T1Check and (Trinket1:HasUseBuff() and Trinket2:HasUseBuff() and Monk.Xuen.Active and VarInvokeXuenCount % 2 == 1 or BossFightRemains < 20) then
+    if T1Check and ((Trinket1:HasUseBuff() and Trinket2:HasUseBuff() and Monk.Xuen.Active and Monk.Xuen.Count % 2 == 1) or BossFightRemains < 20) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_items for " .. Trinket1:Name() .. " trinkets 2"; end
     end
     -- use_item,slot=trinket2,if=trinket.1.has_use_buff&trinket.2.has_use_buff&pet.xuen_the_white_tiger.active|fight_remains<20
-    if T2Check and (Trinket1:HasUseBuff() and Trinket2:HasUseBuff() and Monk.Xuen.Active or BossFightRemains < 20) then
+    if T2Check and ((Trinket1:HasUseBuff() and Trinket2:HasUseBuff() and Monk.Xuen.Active) or BossFightRemains < 20) then
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_items for " .. Trinket2:Name() .. " trinkets 4"; end
     end
     -- use_item,slot=trinket1,if=trinket.1.has_use_buff&!trinket.2.has_use_buff&pet.xuen_the_white_tiger.active|fight_remains<20
-    if T1Check and (Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() or Monk.Xuen.Active or BossFightRemains < 20) then
+    if T1Check and ((Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() and Monk.Xuen.Active) or BossFightRemains < 20) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_items for " .. Trinket1:Name() .. " trinkets 6"; end
     end
     -- use_item,slot=trinket2,if=trinket.1.has_use_buff&!trinket.2.has_use_buff&cooldown.invoke_xuen_the_white_tiger.remains>30|fight_remains<20
@@ -267,7 +267,7 @@ local function Cooldowns()
      if Cast(S.TigerPalm, nil, nil, not IsInMeleeRange) then return "tiger_palm cooldowns 4"; end
   end
   -- invoke_xuen_the_white_tiger,target_if=max:target.time_to_die,if=(target.time_to_die>12|!talent.xuens_bond&target.time_to_die>8)&set_bonus.tww3_2pc&talent.celestial_conduit&cooldown.strike_of_the_windlord.remains<3&(chi>2&talent.ordered_elements|chi>5|chi>3&energy<50|energy<50&active_enemies=1|prev.tiger_palm&!talent.ordered_elements&time<5)|(!set_bonus.tww3_2pc|!talent.celestial_conduit|!fight_style.patchwerk)&(variable.xuen_condition&!fight_style.dungeonslice&!fight_style.dungeonroute|variable.xuen_dungeonslice_condition&fight_style.Dungeonslice|variable.xuen_dungeonroute_condition&fight_style.dungeonroute)
-  if S.InvokeXuenTheWhiteTiger:IsCastable() and ((Target:TimeToDie() > 12 or not S.XuensBond:IsAvailable() and Target:TimeToDie() > 8) and TWW3_2pc and S.CelestialConduit:IsAvailable() and S.StrikeoftheWindlord:CooldownRemains() < 3 and (Chi > 2 and S.OrderedElements:IsAvailable() or Chi > 5 or Chi > 3 and Energy < 50 or Energy < 50 and EnemiesCount8y == 1 or Player:PrevGCD(1, S.TigerPalm) and not S.OrderedElements:IsAvailable() and CombatTime < 5) or (not TWW3_2pc or not S.CelestialConduit:IsAvailable() or DungeonSlice) and (VarXuenCondition and not DungeonSlice or VarXuenDungeonsliceCondition and DungeonSlice or VarXuenDungeonrouteCondition and DungeonSlice)) then
+  if S.InvokeXuenTheWhiteTiger:IsCastable() and ((Target:TimeToDie() > 12 or not S.XuensBond:IsAvailable() and Target:TimeToDie() > 8) and TWW3_2pc and S.CelestialConduit:IsAvailable() and S.StrikeoftheWindlord:CooldownRemains() < 3 and (Chi > 2 and S.OrderedElements:IsAvailable() or Chi > 5 or Chi > 3 and Energy < 50 or Energy < 50 and EnemiesCount8y == 1 or Player:PrevGCD(1, S.TigerPalm) and not S.OrderedElements:IsAvailable() and CombatTime < 5) or (not TWW3_2pc or not S.CelestialConduit:IsAvailable() or DungeonSlice) and (VarXuenCondition and not DungeonSlice and not DungeonSlice or VarXuenDungeonsliceCondition and DungeonSlice or VarXuenDungeonrouteCondition and DungeonSlice)) then
     if Everyone.CastTargetIf(S.InvokeXuenTheWhiteTiger, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsInRange(40), Settings.Windwalker.GCDasOffGCD.InvokeXuenTheWhiteTiger) then return "invoke_xuen_the_white_tiger cooldowns 6"; end
   end
   -- storm_earth_and_fire,target_if=max:target.time_to_die,if=talent.flurry_strikes&cooldown.invoke_xuen_the_white_tiger.remains&buff.bloodlust.up&cooldown.rising_sun_kick.remains|variable.sef_condition&!fight_style.dungeonroute|variable.sef_dungeonroute_condition&fight_style.dungeonroute|fight_style.patchwerk&active_enemies=1&talent.flurry_strikes&fight_remains<60&cooldown.invoke_xuen_the_white_tiger.remains>fight_remains&cooldown.rising_sun_kick.remains&buff.the_emperors_capacitor.stack>15
@@ -488,15 +488,15 @@ local function DefaultAoE()
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=combo_strike&buff.ordered_elements.up&talent.hit_combo
   if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and Player:BuffUp(S.OrderedElementsBuff) and S.HitCombo:IsAvailable()) then
-    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_aoe 76"; end
+    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_aoe 88"; end
   end
   -- blackout_kick,if=buff.ordered_elements.up&!talent.hit_combo&cooldown.fists_of_fury.remains
   if S.BlackoutKick:IsReady() and (Player:BuffUp(S.OrderedElementsBuff) and not S.HitCombo:IsAvailable() and S.FistsofFury:CooldownDown()) then
-    if Cast(S.BlackoutKick, nil, nil, not IsInMeleeRange) then return "blackout_kick default_aoe 78"; end
+    if Cast(S.BlackoutKick, nil, nil, not IsInMeleeRange) then return "blackout_kick default_aoe 90"; end
   end
   -- tiger_palm,if=prev.tiger_palm&chi<3&!cooldown.fists_of_fury.remains
   if S.TigerPalm:IsReady() and (Player:PrevGCD(1, S.TigerPalm) and Chi < 3 and S.FistsofFury:CooldownUp()) then
-    if Cast(S.TigerPalm, nil, nil, not IsInMeleeRange) then return "tiger_palm default_aoe 80"; end
+    if Cast(S.TigerPalm, nil, nil, not IsInMeleeRange) then return "tiger_palm default_aoe 92"; end
   end
   -- Manually added: tiger_palm,if=chi=0 (avoids a potential profile stall)
   if S.TigerPalm:IsReady() and (Chi == 0) then
@@ -787,8 +787,8 @@ local function DefaultST()
   if S.RisingSunKick:IsReady() and (ComboStrike(S.RisingSunKick) and (Player:BuffUp(S.StormEarthAndFireBuff) and S.OrderedElements:IsAvailable() or CombatTime < 5 and not Monk.Xuen.Active and Player:PrevGCD(1, S.TigerPalm))) then
     if Cast(S.RisingSunKick, nil, nil, not IsInMeleeRange) then return "rising_sun_kick default_st 30"; end
   end
-  -- strike_of_the_windlord,if=!buff.heart_of_the_jade_serpent_cdr_celestial.up&talent.celestial_conduit&!buff.invokers_delight.up&!buff.heart_of_the_jade_serpent_cdr_celestial.up&cooldown.fists_of_fury.remains<5&cooldown.invoke_xuen_the_white_tiger.remains>15&(cooldown.slicing_winds.remains<23|!set_bonus.tww3_2pc)|fight_remains<12
-  if S.StrikeoftheWindlord:IsReady() and (Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff) and S.CelestialConduit:IsAvailable() and Player:BuffDown(S.InvokersDelightBuff) and Player:BuffUp(S.HeartoftheJadeSerpentCDRBuff) and S.FistsofFury:CooldownRemains() < 5 and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 15 and (S.SlicingWinds:CooldownRemains() < 23 or not TWW3_2pc) or BossFightRemains < 12) then
+  -- strike_of_the_windlord,if=!buff.heart_of_the_jade_serpent_cdr_celestial.up&talent.celestial_conduit&!buff.invokers_delight.up&cooldown.fists_of_fury.remains<5&cooldown.invoke_xuen_the_white_tiger.remains>15&(cooldown.slicing_winds.remains<23|!set_bonus.tww3_2pc)|fight_remains<12
+  if S.StrikeoftheWindlord:IsReady() and (Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff) and S.CelestialConduit:IsAvailable() and Player:BuffDown(S.InvokersDelightBuff) and S.FistsofFury:CooldownRemains() < 5 and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 15 and (S.SlicingWinds:CooldownRemains() < 23 or not TWW3_2pc) or BossFightRemains < 12) then
     if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_st 32"; end
   end
   -- strike_of_the_windlord,if=talent.gale_force&cooldown.invoke_xuen_the_white_tiger.remains>10
@@ -852,7 +852,7 @@ local function DefaultST()
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_st 62"; end
   end
   -- blackout_kick,if=combo_strike&talent.energy_burst&buff.bok_proc.up&chi<5&(variable.small_hotjs_active|buff.heart_of_the_jade_serpent_cdr_celestial.up)
-  if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and S.EnergyBurst:IsAvailable() and Player:BuffUp(S.BlackoutKickBuff) and Chi < 5 and (VarSmallHotjsActive or Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff))) then
+  if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and S.EnergyBurst:IsAvailable() and Player:BuffUp(S.BlackoutKickBuff) and Chi < 5 and (VarSmallHotjsActive or Player:BuffUp(S.HeartoftheJadeSerpentCDRCelestialBuff))) then
     if Cast(S.BlackoutKick, nil, nil, not IsInMeleeRange) then return "blackout_kick default_st 64"; end
   end
   -- spinning_crane_kick,if=combo_strike&buff.bloodlust.up&variable.small_hotjs_active&buff.dance_of_chiji.up
@@ -1018,14 +1018,9 @@ local function APL()
     if Settings.Commons.Enabled.Potions then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
-        if S.InvokeXuenTheWhiteTiger:IsAvailable() and (
-          -- potion,if=talent.invoke_xuen_the_white_tiger&pet.xuen_the_white_tiger.active&buff.storm_earth_and_fire.up
-          (S.InvokeXuenTheWhiteTiger:IsAvailable() and Monk.Xuen.Active and Player:BuffUp(S.StormEarthAndFireBuff)) or
-          -- potion,if=!talent.invoke_xuen_the_white_tiger&buff.storm_earth_and_fire.up
-          (not S.InvokeXuenTheWhiteTiger:IsAvailable() and Player:BuffUp(S.StormEarthAndFireBuff)) or
-          -- potion,if=fight_remains<=30
-          (BossFightRemains <= 30)
-        ) then
+        if (S.InvokeXuenTheWhiteTiger:IsAvailable() and Monk.Xuen.Active and Player:BuffUp(S.StormEarthAndFireBuff)) or
+           (not S.InvokeXuenTheWhiteTiger:IsAvailable() and Player:BuffUp(S.StormEarthAndFireBuff)) or
+           (BossFightRemains <= 30) then
           if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 4"; end
         end
       end
@@ -1038,7 +1033,7 @@ local function APL()
     -- Note: Handled in Events.lua when we see Xuen being summoned. Reset in PLAYER_REGEN_ENABLED event registration.
     -- Other variables from APL's def function are only used in the Cooldowns function, so we're moving them there.
     -- call_action_list,name=trinkets
-    if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) then
+    if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) and CDsON() then
       local ShouldReturn = Trinkets(); if ShouldReturn then return ShouldReturn; end
     end
     -- call_action_list,name=normal_opener,if=time<4&active_enemies<3
