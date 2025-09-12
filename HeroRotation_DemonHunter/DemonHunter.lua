@@ -29,6 +29,7 @@ Spell.DemonHunter.Commons = {
   Glide                                 = Spell(131347),
   -- Talents
   AuraofPain                            = Spell(207347),
+  ChaosFragments                        = Spell(320412),
   ChaosNova                             = Spell(179057),
   CollectiveAnguish                     = Spell(390152),
   Demonic                               = Spell(213410),
@@ -118,6 +119,7 @@ Spell.DemonHunter.Havoc = MergeTableByKey(Spell.DemonHunter.Commons, {
   ChaosTheory                           = Spell(389687),
   ChaoticTransformation                 = Spell(388112),
   CycleofHatred                         = Spell(258887),
+  DancingWithFate                       = Spell(389978),
   DemonBlades                           = Spell(203555),
   EssenceBreak                          = Spell(258860),
   EyeBeam                               = Spell(198013),
@@ -218,6 +220,7 @@ Item.DemonHunter.Commons = {
   -- TWW Trinkets
   ArazsRitualForge                      = Item(242402, {13, 14}),
   Blastmaster3000                       = Item(234717, {13, 14}),
+  ChaoticNethergate                     = Item(246825, {13, 14}),
   CursedStoneIdol                       = Item(246344, {13, 14}),
   FunhouseLens                          = Item(234217, {13, 14}),
   GeargrindersSpareKeys                 = Item(230197, {13, 14}),
