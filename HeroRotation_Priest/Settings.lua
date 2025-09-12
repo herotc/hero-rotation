@@ -56,6 +56,7 @@ HR.GUISettings.APL.Priest = {
       DarkAscension = true,
       DesperatePrayer = false,
       DivineStar = true,
+      FlashHeal = true,
       Halo = false,
       HolyNova = true,
       Mindbender = true,
