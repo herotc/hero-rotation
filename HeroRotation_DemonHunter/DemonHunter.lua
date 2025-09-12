@@ -55,6 +55,7 @@ Spell.DemonHunter.Commons = {
   ExplosiveAdrenalineBuff               = Spell(1218713), -- Improvised Seaforium Pacemaker buff
   InnerResilienceBuff                   = Spell(450706),  -- Tome of Light's Devotion buff
   JunkmaestrosBuff                      = Spell(1219661), -- Junkmaestro's Mega Magnet buff
+  LatentEnergyBuff                      = Spell(1239675), -- Buff from Unyielding Netherprism
   -- Debuffs
   SigilofFlameDebuff                    = Spell(204598),
   SigilofMiseryDebuff                   = Spell(207685),
