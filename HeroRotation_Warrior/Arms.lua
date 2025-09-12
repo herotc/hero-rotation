@@ -163,7 +163,7 @@ local function ExecuteSwitch(SpellObj, Enemies, Condition, OutofRange, OffGCD, D
     local TargetGUID = Target:GUID()
     for _, CycleUnit in pairs(Enemies) do
       if CycleUnit:GUID() ~= TargetGUID and not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy()) and CycleUnit:HealthPercentage() < ExecuteThreshold and (not Condition or Condition and Condition(CycleUnit)) then
-        CastLeftNameplate(CycleUnit, SpellObj)
+        HR.CastLeftNameplate(CycleUnit, SpellObj)
       end
     end
   end
@@ -335,7 +335,7 @@ local function ColossusExecute()
     if Cast(S.SweepingStrikes, Settings.Arms.GCDasOffGCD.SweepingStrikes) then return "sweeping_strikes colossus_execute 2"; end
   end
   -- rend,if=dot.rend.remains<=gcd&!talent.bloodletting
-  if S.Rend:IsCastable() and (not S.Bloodletting:IsAvailable()) then
+  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and not S.Bloodletting:IsAvailable()) then
     if ExecuteSwitch(S.Rend, Enemies8y, ExecuteSwitchRendEnding, not TargetInMeleeRange) then return "rend colossus_execute 4"; end
   end
   -- thunderous_roar
@@ -371,7 +371,7 @@ local function ColossusExecute()
     if Cast(S.Skullsplitter, Settings.Arms.GCDasOffGCD.Skullsplitter, nil, not Target:IsInMeleeRange(8)) then return "skullsplitter colossus_execute 20"; end
   end
   -- demolish,if=debuff.colossus_smash.up&buff.colossal_might.stack=10
-  if S.Demolish:IsCastable() and (Player:BuffStack(S.ColossalMightBuff) == 10) then
+  if S.Demolish:IsCastable() and (Target:DebuffUp(S.ColossusSmashDebuff) and Player:BuffStack(S.ColossalMightBuff) == 10) then
     if ExecuteSwitch(S.Demolish, Enemies8y, ExecuteSwitchDemolishUp, not TargetInMeleeRange, nil, Settings.CommonsDS.DisplayStyle.Demolish) then return "demolish colossus_execute 22"; end
   end
   -- mortal_strike,if=debuff.executioners_precision.stack=2|!talent.executioners_precision|talent.battlelord
@@ -603,7 +603,7 @@ local function SlayerAoE()
     if Cast(S.Skullsplitter, Settings.Arms.GCDasOffGCD.Skullsplitter, nil, not Target:IsInMeleeRange(8)) then return "skullsplitter slayer_aoe 26"; end
   end
   -- overpower,if=buff.opportunist.up&talent.dreadnaught
-  if S.Overpower:IsCastable() and (Player:BuffUp(S.OpportunistBuff) or S.Dreadnaught:IsAvailable()) then
+  if S.Overpower:IsCastable() and (Player:BuffUp(S.OpportunistBuff) and S.Dreadnaught:IsAvailable()) then
     if Cast(S.Overpower, nil, nil, not TargetInMeleeRange) then return "overpower slayer_aoe 28"; end
   end
   -- mortal_strike,if=debuff.executioners_precision.stack=2
@@ -672,7 +672,7 @@ local function SlayerExecute()
     if Cast(S.SweepingStrikes, Settings.Arms.GCDasOffGCD.SweepingStrikes) then return "sweeping_strikes slayer_execute 4"; end
   end
   -- rend,if=dot.rend.remains<=gcd&!talent.bloodletting
-  if S.Rend:IsCastable() and (not S.Bloodletting:IsAvailable()) then
+  if S.Rend:IsCastable() and (Target:DebuffRemains(S.RendDebuff) <= Player:GCD() and not S.Bloodletting:IsAvailable()) then
     if ExecuteSwitch(S.Rend, Enemies8y, ExecuteSwitchRendEnding, not TargetInMeleeRange) then return "rend slayer_execute 6"; end
   end
   -- thunderous_roar
@@ -830,8 +830,8 @@ local function SlayerSweep()
     if Cast(S.StormBolt, nil, nil, not Target:IsInRange(20)) then return "storm_bolt slayer_sweep 2"; end
   end
   -- thunder_clap,if=!dot.rend.remains&!buff.sweeping_strikes.up
-  if CDsON() and S.ThunderousRoar:IsCastable() and (Target:DebuffDown(S.RendDebuff) and Player:BuffDown(S.SweepingStrikesBuff)) then
-    if Cast(S.ThunderousRoar, Settings.Arms.GCDasOffGCD.ThunderousRoar, nil, not Target:IsInMeleeRange(12)) then return "thunderous_roar slayer_sweep 4"; end
+  if S.ThunderClap:IsReady() and (Target:DebuffDown(S.RendDebuff) and Player:BuffDown(S.SweepingStrikesBuff)) then
+    if Cast(S.ThunderClap, nil, nil, not TargetInMeleeRange) then return "thunder_clap slayer_sweep 4"; end
   end
   -- thunderous_roar
   if CDsON() and S.ThunderousRoar:IsCastable() then
