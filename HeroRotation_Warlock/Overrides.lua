@@ -107,33 +107,6 @@ AffOldSpellIsAvailable = HL.AddCoreOverride ("Spell.IsAvailable",
   end
 , 265)
 
-local AffOldBuffUp
-AffOldBuffUp = HL.AddCoreOverride ("Player.BuffUp",
-  function (self, Spell, AnyCaster, BypassRecovery)
-    local BaseCheck = AffOldBuffUp(self, Spell, AnyCaster, BypassRecovery)
-    if Spell == SpellAffli.SoulRot then
-      return Warlock.SoulRotBuffUp
-    else
-      return BaseCheck
-    end
-  end
-, 265)
-
-local AffOldBuffRemains
-AffOldBuffRemains = HL.AddCoreOverride ("Player.BuffRemains",
-  function (self, Spell, AnyCaster, BypassRecovery)
-    local BaseCheck = AffOldBuffRemains(self, Spell, AnyCaster, BypassRecovery)
-    if Spell == SpellAffli.SoulRot then
-      if not Warlock.SoulRotBuffUp then return 0 end
-      local SoulRotBuffLength = 8
-      local Remains = SoulRotBuffLength - (GetTime() - Warlock.SoulRotAppliedTime)
-      return (Remains > 0) and Remains or 0
-    else
-      return BaseCheck
-    end
-  end
-, 265)
-
 local AffOldDebuffUp
 AffOldDebuffUp = HL.AddCoreOverride ("Target.DebuffUp",
   function (self, Spell, AnyCaster, BypassRecovery)
