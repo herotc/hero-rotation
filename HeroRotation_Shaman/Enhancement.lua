@@ -345,6 +345,10 @@ local function Single()
   if S.PrimordialStormAbility:IsCastable() and (MaelstromStacks >= 10 or Player:BuffRemains(S.PrimordialStormBuff) <= 4 and MaelstromStacks >= 5) then
     if Cast(S.PrimordialStormAbility, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsInRange(45)) then return "primordial_storm single 2"; end
   end
+  -- lava_burst,if=!talent.thorims_invocation.enabled&buff.maelstrom_weapon.stack>=10&buff.whirling_air.down
+  if S.LavaBurst:IsReady() and (not S.ThorimsInvocation:IsAvailable() and MaelstromStacks >= 10 and Player:BuffDown(S.WhirlingAirBuff)) then
+    if Cast(S.LavaBurst, nil, nil, not Target:IsSpellInRange(S.LavaBurst)) then return "lava_burst single 3"; end
+  end
   -- feral_spirit,if=(cooldown.doom_winds.remains>25|cooldown.doom_winds.remains<=5)
   if S.FeralSpirit:IsCastable() and (S.DoomWinds:CooldownRemains() > 25 or S.DoomWinds:CooldownRemains() <= 5) then
     if Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "feral_spirit single 4"; end
@@ -374,7 +378,7 @@ local function Single()
     if Cast(S.DoomWinds, Settings.Enhancement.GCDasOffGCD.DoomWinds, nil, not Target:IsInMeleeRange(5)) then return "doom_winds single 16"; end
   end
   -- primordial_wave,if=dot.flame_shock.ticking&(raid_event.adds.in>action.primordial_wave.cooldown|raid_event.adds.in<6)
-  if S.PrimordialWave:IsReady() and (Target:DebuffDown(S.FlameShockDebuff)) then
+  if S.PrimordialWave:IsReady() and (Target:DebuffUp(S.FlameShockDebuff)) then
     if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsInRange(45)) then return "primordial_wave single 18"; end
   end
   -- ice_strike,if=buff.tempest.up&tww3_procs_to_asc=1&buff.maelstrom_weapon.stack<=8
@@ -394,7 +398,7 @@ local function Single()
     if Cast(S.NaturesSwiftness, Settings.CommonsOGCD.GCDasOffGCD.NaturesSwiftness, nil, not Target:IsSpellInRange(S.NaturesSwiftness)) then return "natures_swiftness single 26"; end
   end
   -- tempest,if=(buff.maelstrom_weapon.stack>=5|buff.natures_swiftness.up)&(buff.tempest.up&tww3_procs_to_asc=1|buff.tempest.max_stack&cooldown.ascendance.remains<=2&talent.ascendance.enabled)&set_bonus.tww3_4pc
-  if S.TempestAbility:IsCastable() and ((MaelstromStacks >= 5 or Player:BuffUp(S.NaturesSwiftness)) and (Player:BuffUp(S.TempestBuff) and Shaman.TWW3ProcsToAsc == 1 or Player:BuffStack(S.TempestBuff) == MaxTempestStacks and S.Ascendance:CooldownRemains() <= 2 and S.Ascendance:IsAvailable())) then
+  if S.TempestAbility:IsCastable() and ((MaelstromStacks >= 5 or Player:BuffUp(S.NaturesSwiftness)) and (Player:BuffUp(S.TempestBuff) and Shaman.TWW3ProcsToAsc == 1 or Player:BuffStack(S.TempestBuff) == MaxTempestStacks and S.Ascendance:CooldownRemains() <= 2 and S.Ascendance:IsAvailable()) and TWW3_4pc) then
     if Cast(S.TempestAbility, nil, Settings.CommonsDS.DisplayStyle.Tempest, not Target:IsInRange(40)) then return "tempest single 28"; end
   end
   -- ascendance,if=(dot.flame_shock.ticking|!talent.primordial_wave.enabled|!talent.ashen_catalyst.enabled)
@@ -460,7 +464,7 @@ local function Single()
     if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInRange(8)) then return "crash_lightning single 58"; end
   end
   -- voltaic_blaze,if=dot.flame_shock.remains<=4
-  if S.VoltaicBlazeAbility:IsReady() and (S.FlameShockDebuff:AuraActiveCount() <= 4) then
+  if S.VoltaicBlazeAbility:IsReady() and (Target:DebuffRemains(S.FlameShockDebuff) <= 4) then
     if Cast(S.VoltaicBlazeAbility, nil, nil, not Target:IsSpellInRange(S.VoltaicBlazeAbility)) then return "voltaic_blaze single 60"; end
   end
   -- ice_strike
@@ -701,7 +705,7 @@ local function SingleTotemic()
     if Cast(S.Stormstrike, nil, nil, not Target:IsSpellInRange(S.Stormstrike)) then return "stormstrike single_totemic 44"; end
   end
   -- lava_lash
-  if S.LavaLash:IsReady() and (S.MoltenAssault:IsAvailable()) then
+  if S.LavaLash:IsReady() then
     if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single_totemic 46"; end
   end
   -- crash_lightning,if=set_bonus.tww2_4pc
@@ -1556,11 +1560,9 @@ local function APL()
     -- variable,name=target_nature_mod,value=(1+debuff.chaos_brand.up*debuff.chaos_brand.value)*(1+(debuff.hunters_mark.up*target.health.pct>=80)*debuff.hunters_mark.value)
     VarTargetNatureMod = (1 + num(Target:DebuffUp(S.ChaosBrandDebuff)) * 0.05) * (1 + num(Target:DebuffUp(S.HuntersMarkDebuff) and Target:HealthPercentage() >= 80) * 0.05)
     -- variable,name=expected_lb_funnel,value=action.lightning_bolt.damage*(1+debuff.lightning_rod.up*variable.target_nature_mod*(1+buff.primordial_wave.up*active_dot.flame_shock*buff.primordial_wave.value)*debuff.lightning_rod.value)
-    local PWValue = 1.75 * S.LightningBolt:Damage()
-    local LRValue = 0.2 * S.LightningBolt:Damage() * (Target:DebuffUp(S.LightningRodDebuff) and 1.75 or 1)
-    VarExpectedLBFunnel = S.LightningBolt:Damage() * (1 + num(Target:DebuffUp(S.LightningRodDebuff)) * VarTargetNatureMod * (1 + num(Player:BuffUp(S.PrimordialWaveBuff)) * S.FlameShockDebuff:AuraActiveCount() * PWValue) * LRValue)
+    VarExpectedLBFunnel = S.LightningBolt:Damage() * (1 + num(Target:DebuffUp(S.LightningRodDebuff)) * VarTargetNatureMod * (1 + num(Player:BuffUp(S.PrimordialWaveBuff)) * S.FlameShockDebuff:AuraActiveCount() * 1.75) * 0.2)
     -- variable,name=expected_cl_funnel,value=action.chain_lightning.damage*(1+debuff.lightning_rod.up*variable.target_nature_mod*(active_enemies>?(3+2*talent.crashing_storms.enabled))*debuff.lightning_rod.value)
-    VarExpectedCLFunnel = S.ChainLightning:Damage() * (1 + num(Target:DebuffUp(S.LightningRodDebuff)) * VarTargetNatureMod * mathmin(EnemiesMeleeCount, 3 + 2 * num(S.CrashingStorms:IsAvailable())) * LRValue)
+    VarExpectedCLFunnel = S.ChainLightning:Damage() * (1 + num(Target:DebuffUp(S.LightningRodDebuff)) * VarTargetNatureMod * mathmin(EnemiesMeleeCount, 3 + 2 * num(S.CrashingStorms:IsAvailable())) * 0.2)
     -- variable,name=flame_shock_saturated,value=((active_dot.flame_shock=active_enemies)|(active_dot.flame_shock=6))
     VarFlameShockSaturated = S.FlameShockDebuff:AuraActiveCount() == EnemiesMeleeCount or S.FlameShockDebuff:AuraActiveCount() == 6
     -- bloodlust,line_cd=600
