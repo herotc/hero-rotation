@@ -764,7 +764,7 @@ local function FS()
   -- call_action_list,name=fs_cooldown
   local ShouldReturn = FSCooldown(); if ShouldReturn then return ShouldReturn; end
   -- run_action_list,name=fs_opener,if=(cooldown.eye_beam.up|cooldown.metamorphosis.up|cooldown.essence_break.up|buff.demonsurge.stack<3+talent.student_of_suffering+talent.a_fire_inside)&time<15&raid_event.adds.in>40-buff.cycle_of_hatred.stack*5
-  if (BeamAbility:CooldownUp() or S.Metamorphosis:CooldownUp() or S.EssenceBreak:CooldownUp() or Player:BuffStack(S.DemonsurgeBuff) < 3 + num(S.StudentofSuffering:IsAvailable()) + num(S.AFireInside:IsAvailable()) and CombatTime < 15) then
+  if (BeamAbility:CooldownUp() or S.Metamorphosis:CooldownUp() or S.EssenceBreak:CooldownUp() or Player:BuffStack(S.DemonsurgeBuff) < 3 + num(S.StudentofSuffering:IsAvailable()) + num(S.AFireInside:IsAvailable())) and CombatTime < 15 then
     local ShouldReturn = FSOpener(); if ShouldReturn then return ShouldReturn; end
     if HR.CastAnnotated(S.Pool, false, "WAIT") then return "Pool for FSOpener()"; end
   end
