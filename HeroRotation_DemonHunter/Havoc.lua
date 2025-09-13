@@ -989,7 +989,7 @@ local function ARCooldown()
   end
   -- the_hunt,target_if=max:debuff.reavers_mark.remains,if=debuff.essence_break.down&(active_enemies>=desired_targets+raid_event.adds.count|raid_event.adds.in>45)&(debuff.reavers_mark.up|raid_event.adds.remains>=15)&buff.reavers_glaive.down&(buff.metamorphosis.remains>5|buff.metamorphosis.down)&(!talent.initiative|buff.initiative.up|time>5)&time>5&(!talent.inertia&buff.unbound_chaos.down|buff.inertia_trigger.down)|fight_remains<=30
   if CDsON() and S.TheHunt:IsCastable() and (not S.ReaversGlaive:IsLearned() and (Player:BuffRemains(S.MetamorphosisBuff) > 5 or Player:BuffDown(S.MetamorphosisBuff)) and (not S.Initiative:IsAvailable() or Player:BuffUp(S.InitiativeBuff) or CombatTime > 5) and CombatTime > 5 and (not S.Inertia:IsAvailable() and Player:BuffDown(S.UnboundChaosBuff) or not InertiaTrigger()) or BossFightRemains <= 30) then
-    if Everyone.CastTargetIf(S.TheHunt, Enemies8y, "max", ETIFReaversMark, ETIEssenceBreakDown, not Target:IsInRange(50)) then return "the_hunt ar_cooldown 40"; end
+    if Everyone.CastTargetIf(S.TheHunt, Enemies8y, "max", ETIFReaversMark, ETIEssenceBreakDown, not Target:IsInRange(50), nil, Settings.CommonsDS.DisplayStyle.TheHunt) then return "the_hunt ar_cooldown 40"; end
   end
   -- sigil_of_spite,if=debuff.essence_break.down&(debuff.reavers_mark.remains>=2-talent.quickened_sigils)&cooldown.blade_dance.remains&time>15
   if CDsON() and S.SigilofSpite:IsReady() and (Target:DebuffDown(S.EssenceBreakDebuff) and (Target:DebuffRemains(S.ReaversMarkDebuff) >= 2 - num(S.QuickenedSigils:IsAvailable())) and S.BladeDance:CooldownDown() and CombatTime> 15) then
