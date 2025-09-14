@@ -145,13 +145,18 @@ HL:RegisterForSelfCombatEvent(function(...)
 
   -- Track Clearcasting procs
   if spellID == S.ClearcastingBuff:ID() then
-    if event == "SPELL_AURA_APPLIED" then
-      ClearcastingProcs = ClearcastingProcs + 1
+    if event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_APPLIED_DOSE" then
+      local auraData = C_UnitAuras.GetPlayerAuraBySpellID(S.ClearcastingBuff:ID())
+      if auraData then
+        ClearcastingProcs = auraData.applications or 1
+      else
+        ClearcastingProcs = 1
+      end
       EventInfo.ClearcastingProcs = ClearcastingProcs
       LastClearcastingTime = GetTime()
       EventInfo.LastClearcastingTime = LastClearcastingTime
     elseif event == "SPELL_AURA_REMOVED" then
-      ClearcastingProcs = math.max(0, ClearcastingProcs - 1)
+      ClearcastingProcs = 0
       EventInfo.ClearcastingProcs = ClearcastingProcs
     end
   end
