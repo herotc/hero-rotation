@@ -81,7 +81,8 @@ local CAIncCD = S.OrbitalStrike:IsAvailable() and 120 or (S.WhirlingStars:IsAvai
 local CAIncDuration = S.IncarnationTalent:IsAvailable() and 16 or (S.CelestialAlignment:IsAvailable() and 12 or 0)
 local ConvokeCD = S.ElunesGuidance:IsAvailable() and 60 or 120
 local ConvokeDuration = S.ElunesGuidance:IsAvailable() and 3 or 4
-local DryadDuration, DryadUp, DryadRemains -- For TWW S4 2pc
+local DryadDuration = 10
+local DryadUp, DryadRemains -- For TWW S4 2pc
 local IsInSpellRange = false
 local Enemies10ySplash, EnemiesCount10ySplash
 local BossFightRemains = 11111
