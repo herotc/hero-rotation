@@ -145,17 +145,23 @@ HL:RegisterForSelfCombatEvent(function(...)
 
   -- Track Clearcasting procs
   if spellID == S.ClearcastingBuff:ID() then
-    if event == "SPELL_AURA_APPLIED" then
-      ClearcastingProcs = ClearcastingProcs + 1
+    if event == "SPELL_AURA_APPLIED" or event == "SPELL_AURA_APPLIED_DOSE" then
+      local AuraData = Player:BuffInfo(S.ClearcastingBuff, nil, true)
+      if AuraData then
+        ClearcastingProcs = AuraData.applications or 1
+      else
+        ClearcastingProcs = 1
+      end
       EventInfo.ClearcastingProcs = ClearcastingProcs
       LastClearcastingTime = GetTime()
       EventInfo.LastClearcastingTime = LastClearcastingTime
+    elseif event == "SPELL_AURA_REMOVED_DOSE" then
+      EventInfo.ClearcastingProcs = EventInfo.ClearcastingProcs - 1
     elseif event == "SPELL_AURA_REMOVED" then
-      ClearcastingProcs = math.max(0, ClearcastingProcs - 1)
-      EventInfo.ClearcastingProcs = ClearcastingProcs
+      EventInfo.ClearcastingProcs = 0
     end
   end
-end, "SPELL_AURA_APPLIED_DOSE", "SPELL_AURA_APPLIED", "SPELL_AURA_REMOVED")
+end, "SPELL_AURA_APPLIED_DOSE", "SPELL_AURA_REMOVED_DOSE", "SPELL_AURA_APPLIED", "SPELL_AURA_REMOVED")
 
 --- Combat Exit Handler
 HL:RegisterForEvent(function()
