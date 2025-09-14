@@ -108,7 +108,6 @@ HR.GUISettings.APL.Monk = {
       -- Racials
       -- Abilities
       EnergizingElixir = true,
-      Serenity = true,
       StormEarthAndFire = true,
     }
   },

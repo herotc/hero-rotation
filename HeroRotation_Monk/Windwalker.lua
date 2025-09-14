@@ -488,19 +488,19 @@ local function DefaultAoE()
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=combo_strike&buff.ordered_elements.up&talent.hit_combo
   if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and Player:BuffUp(S.OrderedElementsBuff) and S.HitCombo:IsAvailable()) then
-    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_aoe 76"; end
+    if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_aoe 88"; end
   end
   -- blackout_kick,if=buff.ordered_elements.up&!talent.hit_combo&cooldown.fists_of_fury.remains
   if S.BlackoutKick:IsReady() and (Player:BuffUp(S.OrderedElementsBuff) and not S.HitCombo:IsAvailable() and S.FistsofFury:CooldownDown()) then
-    if Cast(S.BlackoutKick, nil, nil, not IsInMeleeRange) then return "blackout_kick default_aoe 78"; end
+    if Cast(S.BlackoutKick, nil, nil, not IsInMeleeRange) then return "blackout_kick default_aoe 90"; end
   end
   -- tiger_palm,if=prev.tiger_palm&chi<3&!cooldown.fists_of_fury.remains
   if S.TigerPalm:IsReady() and (Player:PrevGCD(1, S.TigerPalm) and Chi < 3 and S.FistsofFury:CooldownUp()) then
-    if Cast(S.TigerPalm, nil, nil, not IsInMeleeRange) then return "tiger_palm default_aoe 80"; end
+    if Cast(S.TigerPalm, nil, nil, not IsInMeleeRange) then return "tiger_palm default_aoe 92"; end
   end
   -- Manually added: tiger_palm,if=chi=0 (avoids a potential profile stall)
   if S.TigerPalm:IsReady() and (Chi == 0) then
-    if Cast(S.TigerPalm, nil, nil, not IsInMeleeRange) then return "tiger_palm default_aoe 82"; end
+    if Cast(S.TigerPalm, nil, nil, not IsInMeleeRange) then return "tiger_palm default_aoe 94"; end
   end
 end
 
@@ -852,7 +852,7 @@ local function DefaultST()
     if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick default_st 62"; end
   end
   -- blackout_kick,if=combo_strike&talent.energy_burst&buff.bok_proc.up&chi<5&(variable.small_hotjs_active|buff.heart_of_the_jade_serpent_cdr_celestial.up)
-  if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and S.EnergyBurst:IsAvailable() and Player:BuffUp(S.BlackoutKickBuff) and Chi < 5 and (VarSmallHotjsActive or Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff))) then
+  if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and S.EnergyBurst:IsAvailable() and Player:BuffUp(S.BlackoutKickBuff) and Chi < 5 and (VarSmallHotjsActive or Player:BuffUp(S.HeartoftheJadeSerpentCDRCelestialBuff))) then
     if Cast(S.BlackoutKick, nil, nil, not IsInMeleeRange) then return "blackout_kick default_st 64"; end
   end
   -- spinning_crane_kick,if=combo_strike&buff.bloodlust.up&variable.small_hotjs_active&buff.dance_of_chiji.up
