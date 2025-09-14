@@ -19,6 +19,7 @@ HR.Commons.Druid = {}
 local Druid = HR.Commons.Druid
 Druid.FullMoonLastCast = nil
 Druid.OrbitBreakerStacks = 0
+Druid.LastDryadSummon = 0
 
 --- ============================ CONTENT ============================
 -- Orbit Breaker Tracking
@@ -38,6 +39,29 @@ HL:RegisterForSelfCombatEvent(function(castTime, _, _, _, _, _, _, _, _, _, _, s
     Druid.FullMoonLastCast = castTime
   end
 end, "SPELL_CAST_SUCCESS")
+
+-- Dryad Tracking
+local DryadSpells = {
+  [390414] = true, -- Incarnation (Variante 1)
+  [102560] = true, -- Incarnation (Variante 2)
+  [383410] = true, -- Celestial Alignment (Variante 1)
+  [194223] = true, -- Celestial Alignment (Variante 2)
+}
+local DryadBuffs = {
+  [102560] = true, -- Buff-ID von Incarnation (Variante 1)
+  [390414] = true, -- Buff-ID von Incarnation (Variante 2)
+  [194223] = true, -- Buff-ID von Celestial Alignment (Variante 1)
+  [383410] = true, -- Buff-ID von Celestial Alignment (Variante 2)
+}
+
+HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, _, _, _, _, spellID)
+  if DryadSpells[spellID] then
+    Druid.LastDryadSummon = GetTime()
+  end
+  if DryadBuffs[spellID] then
+    Druid.LastDryadSummon = GetTime()
+  end
+end, "SPELL_CAST_SUCCESS", "SPELL_AURA_APPLIED")
 
 --- ======= NON-COMBATLOG =======
 

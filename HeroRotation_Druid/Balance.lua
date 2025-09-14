@@ -28,6 +28,7 @@ local mathmax     = math.max
 local mathmin     = math.min
 -- WoW API
 local Delay       = C_Timer.After
+local GetTime     = GetTime
 
 --- ============================ CONTENT ============================
 --- ======= APL LOCALS =======
@@ -80,7 +81,7 @@ local CAIncCD = S.OrbitalStrike:IsAvailable() and 120 or (S.WhirlingStars:IsAvai
 local CAIncDuration = S.IncarnationTalent:IsAvailable() and 16 or (S.CelestialAlignment:IsAvailable() and 12 or 0)
 local ConvokeCD = S.ElunesGuidance:IsAvailable() and 60 or 120
 local ConvokeDuration = S.ElunesGuidance:IsAvailable() and 3 or 4
-local DryadUp, DryadRemains -- For TWW S4 2pc
+local DryadDuration, DryadUp, DryadRemains -- For TWW S4 2pc
 local IsInSpellRange = false
 local Enemies10ySplash, EnemiesCount10ySplash
 local BossFightRemains = 11111
@@ -311,7 +312,7 @@ local function KOTGST()
     if Cast(S.Wrath, nil, nil, not Target:IsSpellInRange(S.Wrath)) then return "wrath kotg_st 4"; end
   end
   -- starfire,if=!variable.enter_lunar&eclipse.in_eclipse&variable.eclipse_remains<cast_time&!buff.dryads_favor.up&(!variable.kotg_ca_condition|!variable.kotg_inc_condition)
-  if S.Starfire:IsCastable() and (not VarEnterLunar and VarEclipse and VarEclipseRemains < S.Starfire:CastTime() and not VarDryadUp and (not VarKOTGCACondition or not VarKOTGIncCondition)) then
+  if S.Starfire:IsCastable() and (not VarEnterLunar and VarEclipse and VarEclipseRemains < S.Starfire:CastTime() and Player:BuffDown(S.DryadsFavorBuff) and (not VarKOTGCACondition or not VarKOTGIncCondition)) then
     if Cast(S.Starfire, nil, nil, not Target:IsSpellInRange(S.Starfire)) then return "starfire kotg_st 6"; end
   end
   -- moonfire,target_if=(remains<3&(!talent.treants_of_the_moon|cooldown.force_of_nature.remains>3&!buff.harmony_of_the_grove.up))|!dot.moonfire.ticking
@@ -346,7 +347,7 @@ local function KOTGST()
   end
   -- stellar_flare,if=remains<=buff.ca_inc.duration&variable.pool_for_cd|remains<=buff.ca_inc.up&!buff.dryads_favor.up
   -- Note: Assuming the 'buff.ca_inc.up' should be 'buff.ca_inc.remains', as comparing a bool doesn't make sense.
-  if S.StellarFlare:IsReady() and (Target:DebuffRemains(S.StellarFlareDebuff) <= CAIncDuration and VarPoolForCD or Target:DebuffRemains(S.StellarFlareDebuff) <= CAIncBuffRemains and not VarDryadUp) then
+  if S.StellarFlare:IsReady() and (Target:DebuffRemains(S.StellarFlareDebuff) <= CAIncDuration and VarPoolForCD or Target:DebuffRemains(S.StellarFlareDebuff) <= CAIncBuffRemains and Player:BuffDown(S.DryadsFavorBuff)) then
     if Cast(S.StellarFlare, Settings.Balance.GCDasOffGCD.StellarFlare) then return "stellar_flare kotg_st 22"; end
   end
   -- wrath,if=variable.pool_for_cd
@@ -774,8 +775,9 @@ local function APL()
     end
 
     -- Check Dryad Status
-    DryadUp = CAInc:TimeSinceLastCast() < 10
-    DryadRemains = DryadUp and 10 - CAInc:TimeSinceLastCast() or 0
+    local DryadTime = GetTime() - Druid.LastDryadSummon
+    DryadUp = DryadTime < DryadDuration
+    DryadRemains = mathmax(0, DryadDuration - DryadTime)
 
     -- We use Wrath to check range for a lot of spells, so let's make a variable for it.
     IsInSpellRange = Target:IsSpellInRange(S.Wrath)
