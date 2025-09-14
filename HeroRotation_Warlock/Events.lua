@@ -305,7 +305,7 @@ function Warlock.UpdatePetTable()
         Warlock.GuardiansTable.PitLordDuration = petTable.Duration
       elseif petTable.name == "Infernal" then
         Warlock.GuardiansTable.InfernalDuration = petTable.Duration
-      elseif petTable.name == "Blasphy" then
+      elseif petTable.name == "Blasphemy" then
         Warlock.GuardiansTable.BlasphemyDuration = petTable.Duration
       elseif petTable.name == "Overfiend" then
         Warlock.GuardiansTable.OverfiendDuration = petTable.Duration

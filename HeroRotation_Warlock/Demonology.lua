@@ -387,7 +387,7 @@ local function Items()
       -- use_item,use_off_gcd=1,slot=main_hand,name=neural_synapse_enhancer,if=(pet.demonic_tyrant.active|fight_remains<=15)&!variable.trinket_1_buffs&!variable.trinket_2_buffs
       ((DemonicTyrantActive() or BossFightRemains <= 15) and not VarTrinket1Buffs and not VarTrinket2Buffs) or
       -- use_item,use_off_gcd=1,slot=main_hand,name=neural_synapse_enhancer,if=(pet.demonic_tyrant.active|fight_remains<=15|trinket.2.cooldown.remains>cooldown.summon_demonic_tyrant.remains)&variable.trinket_2_buffs
-      ((DemonicTyrantActive() or BossFightRemains <= 15 or Trinket2:CooldownRemains() > S.SummonDemonicTyrant:CooldownRemains()) and VarTrinekt2Buffs) or
+      ((DemonicTyrantActive() or BossFightRemains <= 15 or Trinket2:CooldownRemains() > S.SummonDemonicTyrant:CooldownRemains()) and VarTrinket2Buffs) or
       -- use_item,use_off_gcd=1,slot=main_hand,name=neural_synapse_enhancer,if=(pet.demonic_tyrant.active|fight_remains<=15|trinket.1.cooldown.remains>cooldown.summon_demonic_tyrant.remains)&variable.trinket_1_buffs
       ((DemonicTyrantActive() or BossFightRemains <= 15 or Trinket1:CooldownRemains() > S.SummonDemonicTyrant:CooldownRemains()) and VarTrinket1Buffs)
     ) then
@@ -564,7 +564,7 @@ local function APL()
       if Cast(S.HandofGuldan, nil, nil, not Target:IsInRange(40)) then return "hand_of_guldan main 4"; end
     end
     -- summon_demonic_tyrant,if=(variable.imp_despawn&pet.vilefiend.active&pet.dreadstalker.active&(variable.imp_despawn<time+gcd.max+cast_time|buff.wild_imps.stack>=9-2*prev_gcd.1.hand_of_guldan))|(buff.grimoire_felguard.remains>cast_time&buff.grimoire_felguard.remains<action.hand_of_guldan.cast_time+cast_time+gcd.max)|(buff.dreadstalkers.remains>cast_time&((buff.dreadstalkers.remains<action.hand_of_guldan.cast_time+cast_time+gcd.max)|(variable.hog_after_ds&(time>10|buff.wild_imps.stack>=9-2*prev_gcd.1.hand_of_guldan))))
-    -- Note: Simc stores imp_despawn as an absolute time. We store is relative, so we don't need to add 'time'.
+    -- Note: Simc stores imp_despawn as an absolute time. We store as relative, so we don't need to add 'time'.
     if S.SummonDemonicTyrant:IsReady() and ((VarImpDespawn > 0 and VilefiendActive() and DreadstalkerActive() and (VarImpDespawn < Player:GCD() + S.SummonDemonicTyrant:CastTime() or WildImpsCount() >= 9 - 2 * num(Player:PrevGCDP(1, S.HandofGuldan)))) or (GrimoireFelguardTime() > S.SummonDemonicTyrant:CastTime() and GrimoireFelguardTime() < S.HandofGuldan:CastTime() + S.SummonDemonicTyrant:CastTime() + Player:GCD()) or (DreadstalkerTime() > S.SummonDemonicTyrant:CastTime() and ((DreadstalkerTime() < S.HandofGuldan:CastTime() + S.SummonDemonicTyrant:CastTime() + Player:GCD()) or (VarHoGAfterDS and (HL.CombatTime() > 10 or WildImpsCount() >= 9 - 2 * num(Player:PrevGCDP(1, S.HandofGuldan))))))) then
       if Cast(S.SummonDemonicTyrant, Settings.Demonology.GCDasOffGCD.SummonDemonicTyrant) then return "summon_demonic_tyrant main 6"; end
     end
