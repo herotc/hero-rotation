@@ -20,9 +20,10 @@ local Druid = HR.Commons.Druid
 Druid.FullMoonLastCast = nil
 Druid.OrbitBreakerStacks = 0
 Druid.LastDryadSummon = 0
+Druid.TreantsTable = {}
 
 --- ============================ CONTENT ============================
--- Orbit Breaker Tracking
+--- ===== Orbit Breaker Tracking =====
 HL:RegisterForSelfCombatEvent(function(dmgTime, _, _, _, _, _, _, _, _, _, _, spellID)
   if spellID == 202497 then
     Druid.OrbitBreakerStacks = Druid.OrbitBreakerStacks + 1
@@ -40,7 +41,7 @@ HL:RegisterForSelfCombatEvent(function(castTime, _, _, _, _, _, _, _, _, _, _, s
   end
 end, "SPELL_CAST_SUCCESS")
 
--- Dryad Tracking
+--- ===== Dryad Tracking =====
 local DryadSpells = {
   [390414] = true, -- Incarnation (Variante 1)
   [102560] = true, -- Incarnation (Variante 2)
@@ -58,10 +59,26 @@ HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, _, _, _, _, spellID)
   if DryadSpells[spellID] then
     Druid.LastDryadSummon = GetTime()
   end
+end, "SPELL_CAST_SUCCESS")
+
+HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, _, _, _, _, spellID)
   if DryadBuffs[spellID] then
     Druid.LastDryadSummon = GetTime()
   end
-end, "SPELL_CAST_SUCCESS", "SPELL_AURA_APPLIED")
+end, "SPELL_AURA_APPLIED")
+
+--- ===== Treant Tracking =====
+HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, DestGUID, _, _, _, spellID)
+  if spellID == 248280 then
+    Druid.TreantsTable[DestGUID] = true
+  end
+end, "SPELL_SUMMON")
+
+HL:RegisterForCombatEvent(function(_, _, _, SourceGUID, _, _, _, _, _, _, _, spellID)
+  if spellID == 205644 and Druid.TreantsTable[SourceGUID] then
+    Druid.TreantsTable[SourceGUID] = nil
+  end
+end, "SPELL_AURA_REMOVED")
 
 --- ======= NON-COMBATLOG =======
 
