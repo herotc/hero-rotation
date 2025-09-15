@@ -91,6 +91,7 @@ Spell.Druid.DruidoftheClaw = {
   -- Talents
   EmpoweredShapeshifting                = Spell(441689),
   FountofStrength                       = Spell(441675),
+  KillingStrikes                        = Spell(441824),
   Ravage                                = Spell(441583),
   WildpowerSurge                        = Spell(441691),
   -- Buffs
