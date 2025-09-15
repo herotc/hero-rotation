@@ -266,12 +266,12 @@ end
 
 local function EvaluateTargetIfFesteringStrikeCleave(TargetUnit)
   -- if=!buff.vampiric_strike.react&!variable.pop_wounds&debuff.festering_wound.stack<2|buff.festering_scythe.react
-  return not S.VampiricStrikeAction:IsReady() and not VarPopWounds and TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 2 or Player:BuffUp(S.FesteringScytheBuff)
+  return not S.VampiricStrikeAction:IsLearned() and not VarPopWounds and TargetUnit:DebuffStack(S.FesteringWoundDebuff) < 2 or Player:BuffUp(S.FesteringScytheBuff)
 end
 
 local function EvaluateTargetIfFesteringStrikeCleave2(TargetUnit)
   -- if=!buff.vampiric_strike.react&cooldown.apocalypse.remains<variable.apoc_timing&debuff.festering_wound.stack<1
-  return not S.VampiricStrikeAction:IsReady() and S.Apocalypse:CooldownRemains() < VarApocTiming and TargetUnit:DebuffDown(S.FesteringWoundDebuff)
+  return not S.VampiricStrikeAction:IsLearned() and S.Apocalypse:CooldownRemains() < VarApocTiming and TargetUnit:DebuffDown(S.FesteringWoundDebuff)
 end
 
 local function EvaluateTargetIfWoundSpenderAoE(TargetUnit)
