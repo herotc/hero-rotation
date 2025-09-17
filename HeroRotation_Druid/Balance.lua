@@ -73,6 +73,7 @@ local VarConvokeCondition
 local VarEclipse, VarEclipseRemains
 local VarEnterLunar, VarBoatStacks
 local VarTWW3Keeper4PC = Player:HeroTreeID() == 23 and Player:HasTier("TWW3", 4)
+local TWW3_4pc = VarTWW3Keeper4PC
 local VarKOTGSingleCACondition, VarKOTGDoubleCACondition
 local VarKOTGSecondCACondition, VarKOTGIncCondition
 local VarPoolForCD, VarPoolInCA
@@ -144,6 +145,7 @@ SetTrinketVariables()
 HL:RegisterForEvent(function()
   SetTrinketVariables()
   VarTWW3Keeper4PC = Player:HeroTreeID() == 23 and Player:HasTier("TWW3", 4)
+  TWW3_4pc = VarTWW3Keeper4PC
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
@@ -158,6 +160,7 @@ HL:RegisterForEvent(function()
   ConvokeCD = S.ElunesGuidance:IsAvailable() and 60 or 120
   ConvokeDuration = S.ElunesGuidance:IsAvailable() and 3 or 4
   VarTWW3Keeper4PC = Player:HeroTreeID() == 23 and Player:HasTier("TWW3", 4)
+  TWW3_4pc = VarTWW3Keeper4PC
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 --- ===== Helper Functions =====
@@ -174,12 +177,16 @@ local function EnergizeAmount(Spell)
     end
   elseif Spell == S.Starfire then
     -- Calculate Starfire AsP
-    TotalAsp = 10
+    TotalAsp = 8
     if S.WildSurges:IsAvailable() then
       TotalAsp = TotalAsp + 2
     end
+    -- Moon Guardian adds +2
+    if S.MoonGuardian:IsAvailable() then
+      TotalAsp = TotalAsp + 2
+    end
     if Player:BuffUp(S.WarriorofEluneBuff) then
-      TotalAsp = TotalAsp * 1.4
+      TotalAsp = TotalAsp * 1.3
     end
     if S.SouloftheForest:IsAvailable() and Player:BuffUp(S.EclipseLunar) then
       local SotFBonus = (1 + 0.2 * EnemiesCount10ySplash)
@@ -589,11 +596,11 @@ local function KOTGST()
     if Cast(S.NewMoon, nil, nil, not Target:IsSpellInRange(S.NewMoon)) then return "new_moon kotg_st 62"; end
   end
   -- half_moon,if=astral_power.deficit>variable.passive_asp+energize_amount&((buff.harmony_of_the_grove.up&!buff.ca_inc.up|buff.ca_inc.up&!cooldown.ca_inc.ready)|cooldown.new_moon.full_recharge_time<cooldown.convoke_the_spirits.remains)|fight_remains<20
-  if S.HalfMoon:IsReady() and (Player:AstralPowerDeficit() > VarPassiveAsp + EnergizeAmount(S.HalfMoon) and (Player:BuffUp(S.HarmonyoftheGroveBuff) and not CAIncBuffUp or CAIncBuffUp and S.CAInc:CooldownDown()) or S.NewMoon:FullRechargeTime() < S.ConvoketheSpirits:CooldownRemains()) or BossFightRemains < 20 then
+  if S.HalfMoon:IsReady() and (Player:AstralPowerDeficit() > VarPassiveAsp + EnergizeAmount(S.HalfMoon) and (Player:BuffUp(S.HarmonyoftheGroveBuff) and not CAIncBuffUp or CAIncBuffUp and CAInc:CooldownDown()) or S.NewMoon:FullRechargeTime() < S.ConvoketheSpirits:CooldownRemains()) or BossFightRemains < 20 then
     if Cast(S.HalfMoon, nil, nil, not Target:IsSpellInRange(S.HalfMoon)) then return "half_moon kotg_st 64"; end
   end
   -- full_moon,if=astral_power.deficit>variable.passive_asp+energize_amount&((buff.harmony_of_the_grove.up&!buff.ca_inc.up|buff.ca_inc.up&!cooldown.ca_inc.ready)|cooldown.new_moon.full_recharge_time<cooldown.convoke_the_spirits.remains)|fight_remains<20
-  if S.FullMoon:IsReady() and (Player:AstralPowerDeficit() > VarPassiveAsp + EnergizeAmount(S.FullMoon) and (Player:BuffUp(S.HarmonyoftheGroveBuff) and not CAIncBuffUp or CAIncBuffUp and S.CAInc:CooldownDown()) or S.NewMoon:FullRechargeTime() < S.ConvoketheSpirits:CooldownRemains()) or BossFightRemains < 20 then
+  if S.FullMoon:IsReady() and (Player:AstralPowerDeficit() > VarPassiveAsp + EnergizeAmount(S.FullMoon) and (Player:BuffUp(S.HarmonyoftheGroveBuff) and not CAIncBuffUp or CAIncBuffUp and CAInc:CooldownDown()) or S.NewMoon:FullRechargeTime() < S.ConvoketheSpirits:CooldownRemains()) or BossFightRemains < 20 then
     if Cast(S.FullMoon, nil, nil, not Target:IsSpellInRange(S.FullMoon)) then return "full_moon kotg_st 66"; end
   end
   -- starsurge,if=buff.starweavers_weft.up|buff.touch_the_cosmos.up
@@ -786,7 +793,7 @@ local function Variables()
   end
   VarKOTGDoubleCACondition = TWW3_4pc and not CAIncBuffUp and (VarOnUseTrinket == 1 and (Trinket1:CooldownUp() or T1ProcAnyDpsUp) or VarOnUseTrinket == 2 and (Trinket2:CooldownUp() or T2ProcAnyDpsUp) or VarOnUseTrinket == 0 or VarOnUseTrinket == 3 and (Trinket1:CooldownUp() or T1ProcAnyDpsUp or Trinket2:CooldownUp() or T2ProcAnyDpsUp)) and (S.ConvoketheSpirits:CooldownRemains() < Player:GCD() * 2 - 0.3 or not S.ConvoketheSpirits:IsAvailable()) and (CAIncFRT < 4 + Player:GCD() * 3 and (S.ForceofNature:CooldownUp() or Player:BuffUp(S.HarmonyoftheGroveBuff) or S.ForceofNature:CooldownRemains() < Player:GCD() * 3 - 0.5 and BossFightRemains < S.ForceofNature:CooldownRemains() + DryadDuration + 2 + 4 + Player:GCD() * 4) or mathmax(CAIncFRT - Player:GCD(), S.ForceofNature:CooldownRemains()) < DryadDuration and (BossFightRemains < S.ForceofNature:CooldownRemains() + DryadDuration + 2 + 4 + Player:GCD() * 2 or BossFightRemains < CAIncFRT + CAIncDuration + Player:GCD() and BossFightRemains < CAIncFRT - DryadDuration - Player:GCD())) and not (not PotionReady and BossFightRemains < CAIncFRT + CAIncCD * 2 + DryadDuration + 2 + Player:GCD() and FightRemains > mathmax(PotionCDR + DryadDuration + 2 + Player:GCD(), DryadDuration + 2 + 4 + Player:GCD() * 6) and (BossFightRemains < CAIncFRT + CAIncCD + DryadDuration + 2 + Player:GCD() or FightRemains > mathmax(mathmax(S.ConvoketheSpirits:CooldownRemains() + ConvokeCD - Player:GCD() * 5 * num(S.ControloftheDream:IsAvailable()), 105) + Player:GCD() * 6 + 4 + DryadDuration + 2, num(VarOnUseTrinket == 1) * VarTrinket1CD + num(VarOnUseTrinket == 2) * VarTrinket2CD + num(VarOnUseTrinket == 3) * mathmin(VarTrinket1CD, VarTrinket2CD) + 4 + DryadDuration + 2 + Player:GCD())))
   -- variable,name=kotg_second_ca_condition,value=variable.tww3_keeper_4pc&buff.ca_inc.up&((buff.harmony_of_the_grove.up&(cooldown.convoke_the_spirits.remains>30|buff.harmony_of_the_grove.remains<gcd.max*2|buff.dryads_favor.up)&!(!cooldown.potion.ready&fight_remains<cooldown.ca_inc.full_recharge_time+cooldown.ca_inc.duration+buff.dryad.duration+2+gcd.max&fight_remains>(cooldown.potion.remains+buff.dryad.duration+2+gcd.max<?cooldown.ca_inc.full_recharge_time+buff.dryad.duration+2+gcd.max)&(fight_remains<cooldown.ca_inc.full_recharge_time+buff.dryad.duration+2+gcd.max|fight_remains>((cooldown.convoke_the_spirits.remains-gcd.max*5*talent.control_of_the_dream<?105)+gcd.max*6+4+buff.dryad.duration+2<?(variable.on_use_trinket=1)*trinket.1.cooldown.remains+(variable.on_use_trinket=2)*trinket.2.cooldown.remains+(variable.on_use_trinket=3)*(trinket.1.cooldown.remains>?trinket.2.cooldown.remains)+4+buff.dryad.duration+2+gcd.max))))|fight_remains<buff.dryad.duration+2+gcd.max)
-  VarKOTGSecondCACondition = TWW3_4pc and CAIncBuffUp and ((Player:BuffUp(S.HarmonyoftheGroveBuff) and (S.ConvoketheSpirits:CooldownRemains() > 30 or Player:BuffRemains(S.HarmonyoftheGroveBuff) < Player:GCD() * 2 or Player:BuffUp(S.DryadsFavorBuff)) and not (not PotionReady and FightRemains < CAIncFRT + CAIncCD + DryadDuration + 2 + Player:GCD() and FightRemains > mathmax(PotionCDR + DryadDuration + 2 + Player:GCD(), CAIncFRT + DryadDuration + 2 + Player:GCD()) and (FightRemains < CAIncFRT + DryadDuration + 2 + Player:GCD() or FightRemains > mathmax(mathmax(S.ConvoketheSpirits:CooldownRemains() - Player:GCD() * 5 * num(S.ControloftheDream:IsAvailable()), 105) + Player:GCD() * 6 + 4 + DryadDuration + 2, num(VarOnUseTrinket == 1) * Trinket:CooldownRemains() + num(VarOnUseTrinket == 2) * Trinket2:CooldownRemains() + num(VarOnUseTrinket == 3) * mathmin(Trinket1:CooldownRemains(), Trinket2:CooldownRemains()) + 4 + DryadDuration + 2 + Player:GCD())))) or FightRemains < DryadDuration + 2 + Player:GCD())
+  VarKOTGSecondCACondition = TWW3_4pc and CAIncBuffUp and ((Player:BuffUp(S.HarmonyoftheGroveBuff) and (S.ConvoketheSpirits:CooldownRemains() > 30 or Player:BuffRemains(S.HarmonyoftheGroveBuff) < Player:GCD() * 2 or Player:BuffUp(S.DryadsFavorBuff)) and not (not PotionReady and FightRemains < CAIncFRT + CAIncCD + DryadDuration + 2 + Player:GCD() and FightRemains > mathmax(PotionCDR + DryadDuration + 2 + Player:GCD(), CAIncFRT + DryadDuration + 2 + Player:GCD()) and (FightRemains < CAIncFRT + DryadDuration + 2 + Player:GCD() or FightRemains > mathmax(mathmax(S.ConvoketheSpirits:CooldownRemains() - Player:GCD() * 5 * num(S.ControloftheDream:IsAvailable()), 105) + Player:GCD() * 6 + 4 + DryadDuration + 2, num(VarOnUseTrinket == 1) * Trinket1:CooldownRemains() + num(VarOnUseTrinket == 2) * Trinket2:CooldownRemains() + num(VarOnUseTrinket == 3) * mathmin(Trinket1:CooldownRemains(), Trinket2:CooldownRemains()) + 4 + DryadDuration + 2 + Player:GCD())))) or FightRemains < DryadDuration + 2 + Player:GCD())
   -- variable,name=kotg_inc_condition,value=variable.tww3_keeper_4pc&astral_power.deficit<=50&(variable.on_use_trinket=1&trinket.1.cooldown.ready|variable.on_use_trinket=2&trinket.2.cooldown.ready|variable.on_use_trinket=0|variable.on_use_trinket=3&(trinket.1.cooldown.ready|trinket.2.cooldown.ready)|(trinket.1.cooldown.remains>cooldown.force_of_nature.duration|trinket.2.cooldown.remains>cooldown.force_of_nature.duration)&cooldown.force_of_nature.remains<gcd.max*2)|fight_remains<(cooldown.ca_inc.full_recharge_time>?cooldown.force_of_nature.remains)
   VarKOTGIncCondition = TWW3_4pc and Player:AstralPowerDeficit() <= 50 and (VarOnUseTrinket == 1 and Trinket1:CooldownUp() or VarOnUseTrinket == 2 and Trinket2:CooldownUp() or VarOnUseTrinket == 0 or VarOnUseTrinket == 3 and (Trinket1:CooldownUp() or Trinket2:CooldownUp()) or (Trinket1:CooldownRemains() > 60 or Trinket2:CooldownRemains() > 60) and S.ForceofNature:CooldownRemains() < Player:GCD() * 2) or BossFightRemains < mathmin(CAIncFRT, S.ForceofNature:CooldownRemains())
   -- variable,name=pool_for_cd,value=astral_power<(variable.kotg_single_ca_condition*action.starsurge.cost*2<?variable.kotg_double_ca_condition*(action.starsurge.cost*2-action.force_of_nature.energize_amount)<?(!buff.ca_inc.up&fight_remains>cooldown.ca_inc.remains+2+gcd.max&fight_remains<(fight_remains-cooldown.ca_inc.remains>?buff.ca_inc.duration)+5)*action.starsurge.cost*3<?(!buff.ca_inc.up&fight_remains>cooldown.ca_inc.full_recharge_time+2+gcd.max&fight_remains<(fight_remains-cooldown.ca_inc.full_recharge_time>?buff.ca_inc.duration)+4+8)*(action.starsurge.cost*3-action.force_of_nature.energize_amount*(cooldown.force_of_nature.ready)))
