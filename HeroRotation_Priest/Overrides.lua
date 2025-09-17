@@ -12,7 +12,6 @@ local Item    = HL.Item
 local HR      = HeroRotation
 local num     = HR.Commons.Everyone.num
 -- Spells
-local SpellDisc    = Spell.Priest.Discipline
 local SpellShadow  = Spell.Priest.Shadow
 -- Lua
 -- WoW API
@@ -29,14 +28,18 @@ HL.AddCoreOverride ("Player.Insanity",
     else
       if Player:IsCasting(SpellShadow.MindBlast) then
         return Insanity + 6
-      elseif Player:IsCasting(SpellShadow.VampiricTouch) or Player:IsCasting(SpellShadow.MindSpike) then
+      elseif Player:IsCasting(SpellShadow.VampiricTouch) then
         return Insanity + 4
+      elseif Player:IsCasting(SpellShadow.MindSpike) or Player:IsCasting(SpellShadow.MindSpikeInsanity) then
+        return Insanity + 6
       elseif Player:IsCasting(SpellShadow.MindFlay) then
-        return Insanity + (12 / SpellShadow.MindFlay:BaseDuration())
+        return Insanity + (18 / SpellShadow.MindFlay:BaseDuration()) * Player:CastRemains()
+      elseif Player:IsCasting(SpellShadow.MindFlayInsanity) then
+        return Insanity + (8 / SpellShadow.MindFlayInsanity:BaseDuration()) * Player:CastRemains()
       elseif Player:IsCasting(SpellShadow.DarkAscension) then
         return Insanity + 30
       elseif Player:IsCasting(SpellShadow.VoidTorrent) then
-        return Insanity + (60 / SpellShadow.VoidTorrent:BaseDuration())
+        return Insanity + (24 / SpellShadow.VoidTorrent:BaseDuration()) * Player:CastRemains()
       else
         return Insanity
       end
@@ -65,7 +68,7 @@ OldShadowIsCastable = HL.AddCoreOverride("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     local BaseCheck = OldShadowIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellShadow.VampiricTouch then
-      return BaseCheck and (not SpellShadow.ShadowCrash:InFlight() or SpellShadow.ShadowCrash:TimeSinceLastCast() > Player:GCD()) and (not SpellShadow.ShadowCrashTarget:InFlight() or SpellShadow.ShadowCrashTarget:TimeSinceLastCast() > Player:GCD()) and (SpellShadow.UnfurlingDarkness:IsAvailable() or not Player:IsCasting(self))
+      return BaseCheck and (not SpellShadow.ShadowCrash:InFlight() or SpellShadow.ShadowCrash:TimeSinceLastCast() > Player:GCD()) and (not SpellShadow.ShadowCrashTarget:InFlight() or SpellShadow.ShadowCrashTarget:TimeSinceLastCast() > Player:GCD()) and (Player:BuffUp(SpellShadow.UnfurlingDarknessBuff) or not Player:IsCasting(self))
     elseif self == SpellShadow.MindBlast then
       return BaseCheck and not (self:Charges() == 1 and Player:IsCasting(self))
     elseif self == SpellShadow.VoidEruption or self == SpellShadow.DarkAscension then
