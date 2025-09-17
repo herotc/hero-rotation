@@ -40,6 +40,8 @@ HL.AddCoreOverride ("Player.Insanity",
         return Insanity + 30
       elseif Player:IsCasting(SpellShadow.VoidTorrent) then
         return Insanity + (24 / SpellShadow.VoidTorrent:BaseDuration()) * Player:CastRemains()
+      elseif Player:IsCasting(SpellShadow.VoidVolley) then
+        return Insanity + 10
       else
         return Insanity
       end
