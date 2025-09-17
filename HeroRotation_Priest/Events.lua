@@ -81,9 +81,8 @@ local SpellShadow = Spell.Priest.Shadow
 
 -- Archon 4pc Helper
 HL:RegisterForSelfCombatEvent(
-  function(...)
+  function(_, Event, _, SourceGUID, _, _, _, DestGUID, _, _, _, SpellID)
     if Player:HeroTreeID() == 19 then
-      local Event, _, SourceGUID, _, _, _, DestGUID, _, _, _, SpellID = select(2, ...)
       if Event == "SPELL_AURA_REMOVED" and SpellID == SpellShadow.PowerSurgeBuff:ID() then
         -- Power Surge removed, reset variable
         Priest.Archon4pcStacks = 0

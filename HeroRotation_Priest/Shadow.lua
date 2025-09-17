@@ -247,7 +247,7 @@ end
 --- ===== CastTargetIf Condition Functions =====
 local function EvaluateTargetIfDPMain(TargetUnit)
   -- if=active_dot.devouring_plague<=1&dot.devouring_plague.remains<=gcd.max&(!talent.void_eruption|cooldown.void_eruption.remains>=gcd.max*3)|insanity.deficit<=35|buff.mind_devourer.up|buff.entropic_rift.up|buff.power_surge.up&buff.tww3_archon_4pc_helper.stack<4&buff.ascension.up
-  return S.DevouringPlagueDebuff:AuraActiveCount() <= 1 and Target:DebuffRemains(S.DevouringPlagueDebuff) <= GCDMax and (not S.VoidEruption:IsAvailable() or S.VoidEruption:CooldownRemains() >= GCDMax * 3) or Player:InsanityDeficit() <= 35 or Player:BuffUp(S.MindDevourerBuff) or EntropicRiftUp or Player:BuffUp(S.PowerSurgeBuff) and TWW3Archon4pcHelper() < 4 and Player:BuffUp(S.AscensionBuff)
+  return S.DevouringPlagueDebuff:AuraActiveCount() <= 1 and TargetUnit:DebuffRemains(S.DevouringPlagueDebuff) <= GCDMax and (not S.VoidEruption:IsAvailable() or S.VoidEruption:CooldownRemains() >= GCDMax * 3) or Player:InsanityDeficit() <= 35 or Player:BuffUp(S.MindDevourerBuff) or EntropicRiftUp or Player:BuffUp(S.PowerSurgeBuff) and TWW3Archon4pcHelper() < 4 and Player:BuffUp(S.AscensionBuff)
 end
 
 local function EvaluateTargetIfVoidBlastMain(TargetUnit)
