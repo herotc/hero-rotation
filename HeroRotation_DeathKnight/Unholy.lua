@@ -360,9 +360,9 @@ local function AoE()
   if S.Epidemic:IsReady() and (Player:Rune() < 4 and ActiveEnemies > VarEpidemicTargets and Player:BuffUp(S.GiftoftheSanlaynBuff)) then
     if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic aoe 6"; end
   end
-  -- wound_spender,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack>=1&buff.death_and_decay.up&talent.bursting_sores&cooldown.apocalypse.remains>variable.apoc_timing
+  -- scourge_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack>=1&buff.death_and_decay.up&talent.bursting_sores&cooldown.apocalypse.remains>variable.apoc_timing
   if WoundSpender:IsReady() and (Player:BuffUp(S.DeathAndDecayBuff) and S.BurstingSores:IsAvailable() and S.Apocalypse:CooldownRemains() > VarApocTiming) then
-    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfWoundSpenderAoE, not Target:IsInMeleeRange(5)) then return "wound_spender aoe 8"; end
+    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfWoundSpenderAoE, not Target:IsInMeleeRange(5)) then return "scourge_strike aoe 8"; end
   end
   -- death_coil,target_if=min:debuff.rotten_touch.remains*(buff.sudden_doom.react&talent.rotten_touch),if=!variable.pooling_runic_power&active_enemies<variable.epidemic_targets
   if S.DeathCoil:IsReady() and (not VarPoolingRunicPower and ActiveEnemies < VarEpidemicTargets) then
@@ -372,9 +372,9 @@ local function AoE()
   if S.Epidemic:IsReady() and (not VarPoolingRunicPower) then
     if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic aoe 12"; end
   end
-  -- wound_spender,target_if=debuff.chains_of_ice_trollbane_slow.up
+  -- scourge_strike,target_if=debuff.chains_of_ice_trollbane_slow.up
   if WoundSpender:IsReady() then
-    if Everyone.CastCycle(WoundSpender, EnemiesMelee, EvaluateCycleTrollbaneSlow, not Target:IsInMeleeRange(5)) then return "wound_spender aoe 14"; end
+    if Everyone.CastCycle(WoundSpender, EnemiesMelee, EvaluateCycleTrollbaneSlow, not Target:IsInMeleeRange(5)) then return "scourge_strike aoe 14"; end
   end
   -- festering_strike,target_if=max:debuff.festering_wound.stack,if=cooldown.apocalypse.remains<variable.apoc_timing|buff.festering_scythe.react
   if FesteringAction:IsReady() and (S.Apocalypse:CooldownRemains() < VarApocTiming or Player:BuffUp(S.FesteringScytheBuff)) then
@@ -384,9 +384,9 @@ local function AoE()
   if FesteringAction:IsReady() then
     if Everyone.CastTargetIf(FesteringAction, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeAoE, not Target:IsInMeleeRange(FesteringRange)) then return "festering_strike aoe 18"; end
   end
-  -- wound_spender,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack>=1&cooldown.apocalypse.remains>gcd|buff.vampiric_strike.react&dot.virulent_plague.ticking
+  -- scourge_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack>=1&cooldown.apocalypse.remains>gcd|buff.vampiric_strike.react&dot.virulent_plague.ticking
   if WoundSpender:IsReady() then
-    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfWoundSpenderAoE2, not Target:IsInMeleeRange(5)) then return "wound_spender aoe 20"; end
+    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfWoundSpenderAoE2, not Target:IsInMeleeRange(5)) then return "scourge_strike aoe 20"; end
   end
 end
 
@@ -407,13 +407,13 @@ local function AoEBurst()
   if S.Epidemic:IsReady() and (not S.VampiricStrikeAction:IsLearned() and (not S.BurstingSores:IsAvailable() or S.BurstingSores:IsAvailable() and Player:BuffUp(S.SuddenDoomBuff) and FesterTargets < ActiveEnemies * 0.4 or Player:BuffUp(S.SuddenDoomBuff) and (Player:BuffUp(S.AFeastofSoulsBuff) or Target:DebuffRemains(S.DeathRotDebuff) < Player:GCD() or Target:DebuffStack(S.DeathRotDebuff) < 10) or Player:Rune() < 2) or (Player:Rune() < 4 or HL.AnyBossExists()) and ActiveEnemies >= VarEpidemicTargets and Player:BuffUp(S.GiftoftheSanlaynBuff)) then
     if Cast(S.Epidemic, Settings.Unholy.GCDasOffGCD.Epidemic, nil, not Target:IsInRange(40)) then return "epidemic aoe_burst 8"; end
   end
-  -- wound_spender,target_if=debuff.chains_of_ice_trollbane_slow.up
+  -- scourge_strike,target_if=debuff.chains_of_ice_trollbane_slow.up
   if WoundSpender:IsReady() then
-    if Everyone.CastCycle(WoundSpender, EnemiesMelee, EvaluateCycleTrollbaneSlow, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender aoe_burst 10"; end
+    if Everyone.CastCycle(WoundSpender, EnemiesMelee, EvaluateCycleTrollbaneSlow, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike aoe_burst 10"; end
   end
-  -- wound_spender,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack>=1|buff.vampiric_strike.react|buff.death_and_decay.up
+  -- scourge_strike,target_if=max:debuff.festering_wound.stack,if=debuff.festering_wound.stack>=1|buff.vampiric_strike.react|buff.death_and_decay.up
   if WoundSpender:IsReady() then
-    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfWoundSpenderAoEBurst, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender aoe_burst 12"; end
+    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfWoundSpenderAoEBurst, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike aoe_burst 12"; end
   end
   -- death_coil,target_if=min:debuff.rotten_touch.remains*(buff.sudden_doom.react&talent.rotten_touch),if=active_enemies<variable.epidemic_targets
   if S.DeathCoil:IsReady() and (ActiveEnemies < VarEpidemicTargets) then
@@ -427,9 +427,9 @@ local function AoEBurst()
   if FesteringAction:IsReady() then
     if Everyone.CastTargetIf(FesteringAction, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeAoEBurst, not Target:IsInMeleeRange(FesteringRange)) then return "festering_strike aoe_burst 18"; end
   end
-  -- wound_spender,target_if=max:debuff.festering_wound.stack
+  -- scourge_strike,target_if=max:debuff.festering_wound.stack
   if WoundSpender:IsReady() then
-    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender aoe_burst 20"; end
+    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, nil, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike aoe_burst 20"; end
   end
 end
 
@@ -446,9 +446,9 @@ local function AoESetup()
   if FesteringAction:IsReady() and (FesterTargets == 0 and S.Apocalypse:CooldownRemains() < Player:GCD() and (S.DarkTransformation:CooldownDown() and S.UnholyAssault:CooldownDown() or S.UnholyAssault:CooldownDown() or not S.UnholyAssault:IsAvailable())) then
     if Everyone.CastTargetIf(FesteringAction, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, nil, not Target:IsInMeleeRange(FesteringRange)) then return "festering_strike aoe_setup 6"; end
   end
-  -- wound_spender,target_if=debuff.chains_of_ice_trollbane_slow.up
+  -- scourge_strike,target_if=debuff.chains_of_ice_trollbane_slow.up
   if WoundSpender:IsReady() then
-    if Everyone.CastCycle(WoundSpender, EnemiesMelee, EvaluateCycleTrollbaneSlow, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender aoe_setup 8"; end
+    if Everyone.CastCycle(WoundSpender, EnemiesMelee, EvaluateCycleTrollbaneSlow, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike aoe_setup 8"; end
   end
   -- death_coil,target_if=min:debuff.rotten_touch.remains*(buff.sudden_doom.react&talent.rotten_touch),if=!variable.pooling_runic_power&active_enemies<variable.epidemic_targets&rune<4
   if S.DeathCoil:IsReady() and (not VarPoolingRunicPower and ActiveEnemies < VarEpidemicTargets and Player:Rune() < 4) then
@@ -482,9 +482,9 @@ local function AoESetup()
   if FesteringAction:IsReady() and (FesterTargets < 8 and FesterTargets ~= ActiveEnemies) then
     if Everyone.CastTargetIf(FesteringAction, EnemiesMelee, "min", EvaluateTargetIfFilterFWStack, nil, not Target:IsInMeleeRange(FesteringRange)) then return "festering_strike aoe_setup 24"; end
   end
-  -- wound_spender,target_if=max:debuff.festering_wound.stack,if=buff.vampiric_strike.react
+  -- scourge_strike,target_if=max:debuff.festering_wound.stack,if=buff.vampiric_strike.react
   if WoundSpender:IsReady() and (S.VampiricStrikeAction:IsLearned()) then
-    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, nil, not Target:IsInMeleeRange(5)) then return "wound_spender aoe_setup 26"; end
+    if Everyone.CastTargetIf(WoundSpender, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, nil, not Target:IsInMeleeRange(5)) then return "scourge_strike aoe_setup 26"; end
   end
 end
 
@@ -637,9 +637,9 @@ local function Cleave()
   if S.DeathCoil:IsReady() and (not VarPoolingRunicPower and S.ImprovedDeathCoil:IsAvailable()) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil cleave 4"; end
   end
-  -- wound_spender,if=buff.vampiric_strike.react
+  -- scourge_strike,if=buff.vampiric_strike.react
   if WoundSpender:IsReady() and (S.VampiricStrikeAction:IsLearned()) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender cleave 6"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike cleave 6"; end
   end
   -- death_coil,if=!variable.pooling_runic_power&!talent.improved_death_coil
   if S.DeathCoil:IsReady() and (not VarPoolingRunicPower and not S.ImprovedDeathCoil:IsAvailable()) then
@@ -653,9 +653,9 @@ local function Cleave()
   if FesteringAction:IsReady() then
     if Everyone.CastTargetIf(FesteringAction, EnemiesMelee, "max", EvaluateTargetIfFilterFWStack, EvaluateTargetIfFesteringStrikeCleave2, not Target:IsInMeleeRange(FesteringRange)) then return "festering_strike cleave 12"; end
   end
-  -- wound_spender,if=variable.pop_wounds
+  -- scourge_strike,if=variable.pop_wounds
   if WoundSpender:IsReady() and (VarPopWounds) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender cleave 14"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike cleave 14"; end
   end
 end
 
@@ -699,9 +699,9 @@ local function SanFishing()
   if S.AntiMagicShell:IsCastable() and Settings.Commons.UseAMSAMZOffensively and (Settings.Unholy.AMSAbsorbPercent > 0 and Player:RunicPower() < 40) then
     if Cast(S.AntiMagicShell, Settings.CommonsOGCD.GCDasOffGCD.AntiMagicShell) then return "antimagic_shell san_fishing 2"; end
   end
-  -- wound_spender,if=buff.infliction_of_sorrow.up
+  -- scourge_strike,if=buff.infliction_of_sorrow.up
   if WoundSpender:IsReady() and (Player:BuffUp(S.InflictionofSorrowBuff)) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender san_fishing 4"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike san_fishing 4"; end
   end
   -- any_dnd,if=!buff.death_and_decay.up&!buff.vampiric_strike.react
   if AnyDnD:IsReady() and (Player:BuffDown(S.DeathAndDecayBuff) and not S.VampiricStrikeAction:IsLearned()) then
@@ -719,9 +719,9 @@ local function SanFishing()
   if S.DeathCoil:IsReady() and (not S.VampiricStrikeAction:IsLearned()) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil san_fishing 12"; end
   end
-  -- wound_spender,if=(debuff.festering_wound.stack>=3-pet.abomination.active&cooldown.apocalypse.remains>variable.apoc_timing)|buff.vampiric_strike.react
+  -- scourge_strike,if=(debuff.festering_wound.stack>=3-pet.abomination.active&cooldown.apocalypse.remains>variable.apoc_timing)|buff.vampiric_strike.react
   if WoundSpender:IsReady() and ((FesterStacks >= 3 - num(VarAbomActive) and S.Apocalypse:CooldownRemains() > VarApocTiming) or S.VampiricStrikeAction:IsLearned()) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender san_fishing 14"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike san_fishing 14"; end
   end
   -- festering_strike,if=debuff.festering_wound.stack<3-pet.abomination.active
   if FesteringAction:IsReady() and (FesterStacks < 3 - num(VarAbomActive)) then
@@ -730,9 +730,9 @@ local function SanFishing()
 end
 
 local function SanST()
-  -- wound_spender,if=buff.infliction_of_sorrow.up
+  -- scourge_strike,if=buff.infliction_of_sorrow.up
   if WoundSpender:IsReady() and (Player:BuffUp(S.InflictionofSorrowBuff)) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender san_st 2"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike san_st 2"; end
   end
   -- festering_strike,if=buff.festering_scythe.react&(!raid_event.adds.exists|!raid_event.adds.in|raid_event.adds.in>11|raid_event.pull.has_boss&raid_event.adds.in>11)
   if S.FesteringScytheAction:IsReady() then
@@ -742,9 +742,9 @@ local function SanST()
   if S.DeathCoil:IsReady() and (Player:BuffUp(S.SuddenDoomBuff) and Player:BuffUp(S.GiftoftheSanlaynBuff) and (S.DoomedBidding:IsAvailable() or S.RottenTouch:IsAvailable()) or Player:Rune() < 3 and Player:BuffDown(S.RunicCorruptionBuff) or TWW2_4pc and Player:RunicPower() > 80 or Player:BuffUp(S.GiftoftheSanlaynBuff) and Player:BuffStack(S.EssenceoftheBloodQueenBuff) >= 5 and S.FrenziedBloodthirst:IsAvailable() and TWW2_4pc and Player:BuffStack(S.WinningStreakBuff) >= 6 and Player:Rune() <= 3 and Player:BuffRemains(S.EssenceoftheBloodQueenBuff) > 3) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil san_st 6"; end
   end
-  -- wound_spender,if=buff.vampiric_strike.react&debuff.festering_wound.stack>=1|buff.gift_of_the_sanlayn.up|talent.gift_of_the_sanlayn&buff.dark_transformation.up&buff.dark_transformation.remains<gcd
+  -- scourge_strike,if=buff.vampiric_strike.react&debuff.festering_wound.stack>=1|buff.gift_of_the_sanlayn.up|talent.gift_of_the_sanlayn&buff.dark_transformation.up&buff.dark_transformation.remains<gcd
   if WoundSpender:IsReady() and (S.VampiricStrikeAction:IsLearned() and FesterStacks >= 1 or Player:BuffUp(S.GiftoftheSanlaynBuff) or S.GiftoftheSanlayn:IsAvailable() and Pet:BuffUp(S.DarkTransformation) and Pet:BuffRemains(S.DarkTransformation) < Player:GCD()) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender san_st 8"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike san_st 8"; end
   end
   -- soul_reaper,if=target.health.pct<=35&!buff.gift_of_the_sanlayn.up&fight_remains>5
   if S.SoulReaper:IsReady() and (Target:HealthPercentage() <= 35 and Player:BuffDown(S.GiftoftheSanlaynBuff) and FightRemains > 5) then
@@ -754,25 +754,25 @@ local function SanST()
   if FesteringAction:IsReady() and ((FesterStacks == 0 and S.Apocalypse:CooldownRemains() < VarApocTiming) or Pet:BuffDown(S.DarkTransformation) and S.DarkTransformation:CooldownRemains() < 10 and FesterStacks <= 3 and (Player:Rune() > 4 or Player:RunicPower() < 80) or (S.GiftoftheSanlayn:IsAvailable() and Player:BuffDown(S.GiftoftheSanlaynBuff) or not S.GiftoftheSanlayn:IsAvailable()) and FesterStacks <= 1) then
     if Cast(FesteringAction, nil, nil, not Target:IsInMeleeRange(FesteringRange)) then return "festering_strike san_st 12"; end
   end
-  -- wound_spender,if=(!talent.apocalypse|cooldown.apocalypse.remains>variable.apoc_timing)&(cooldown.dark_transformation.remains>5&debuff.festering_wound.stack>=3-pet.abomination.active|buff.vampiric_strike.react)
+  -- scourge_strike,if=(!talent.apocalypse|cooldown.apocalypse.remains>variable.apoc_timing)&(cooldown.dark_transformation.remains>5&debuff.festering_wound.stack>=3-pet.abomination.active|buff.vampiric_strike.react)
   if WoundSpender:IsReady() and ((not S.Apocalypse:IsAvailable() or S.Apocalypse:CooldownRemains() > VarApocTiming) and (S.DarkTransformation:CooldownRemains() > 5 and FesterStacks >= 3 - num(VarAbomActive) or S.VampiricStrikeAction:IsLearned())) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender san_st 14"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike san_st 14"; end
   end
   -- death_coil,if=!variable.pooling_runic_power&debuff.death_rot.remains<gcd|(buff.sudden_doom.react&debuff.festering_wound.stack>=1|rune<2)
   if S.DeathCoil:IsReady() and (not VarPoolingRunicPower and Target:DebuffRemains(S.DeathRotDebuff) < Player:GCD() or (Player:BuffUp(S.SuddenDoomBuff) and FesterStacks >= 1 or Player:Rune() < 2)) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil san_st 16"; end
   end
-  -- wound_spender,if=debuff.festering_wound.stack>4
+  -- scourge_strike,if=debuff.festering_wound.stack>4
   if WoundSpender:IsReady() and (FesterStacks > 4) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender san_st 18"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike san_st 18"; end
   end
   -- death_coil,if=!variable.pooling_runic_power
   if S.DeathCoil:IsReady() and (not VarPoolingRunicPower) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil san_st 20"; end
   end
-  -- wound_spender,if=(!talent.apocalypse|cooldown.apocalypse.remains>variable.apoc_timing)&rune>=4
+  -- scourge_strike,if=(!talent.apocalypse|cooldown.apocalypse.remains>variable.apoc_timing)&rune>=4
   if WoundSpender:IsReady() and ((not S.Apocalypse:IsAvailable() or S.Apocalypse:CooldownRemains() > VarApocTiming) and Player:Rune() >= 4) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender san_st 22"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike san_st 22"; end
   end
 end
 
@@ -828,9 +828,9 @@ local function ST()
   if S.SoulReaper:IsReady() and (Target:HealthPercentage() <= 35 and FightRemains > 5) then
     if Cast(S.SoulReaper, nil, nil, not Target:IsInMeleeRange(5)) then return "soul_reaper st 2"; end
   end
-  -- wound_spender,if=debuff.chains_of_ice_trollbane_slow.up
+  -- scourge_strike,if=debuff.chains_of_ice_trollbane_slow.up
   if WoundSpender:IsReady() and (Target:DebuffUp(S.TrollbaneSlowDebuff)) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender st 4"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike st 4"; end
   end
   -- death_coil,if=!variable.pooling_runic_power&variable.spend_rp|fight_remains<10
   if S.DeathCoil:IsReady() and (not VarPoolingRunicPower and VarSpendRP or BossFightRemains < 10) then
@@ -840,17 +840,17 @@ local function ST()
   if FesteringAction:IsReady() and (FesterStacks < 4 and (not VarPopWounds or Player:BuffUp(S.FesteringScytheBuff))) then
     if Cast(FesteringAction, nil, nil, not Target:IsInMeleeRange(FesteringRange)) then return "festering_strike st 8"; end
   end
-  -- wound_spender,if=variable.pop_wounds
+  -- scourge_strike,if=variable.pop_wounds
   if WoundSpender:IsReady() and (VarPopWounds) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender st 10"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike st 10"; end
   end
   -- death_coil,if=!variable.pooling_runic_power
   if S.DeathCoil:IsReady() and (not VarPoolingRunicPower) then
     if Cast(S.DeathCoil, nil, nil, not Target:IsSpellInRange(S.DeathCoil)) then return "death_coil st 12"; end
   end
-  -- wound_spender,if=!variable.pop_wounds&debuff.festering_wound.stack>=4
+  -- scourge_strike,if=!variable.pop_wounds&debuff.festering_wound.stack>=4
   if WoundSpender:IsReady() and (not VarPopWounds and FesterStacks >= 4) then
-    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "wound_spender st 14"; end
+    if Cast(WoundSpender, nil, nil, not Target:IsSpellInRange(WoundSpender)) then return "scourge_strike st 14"; end
   end
 end
 
