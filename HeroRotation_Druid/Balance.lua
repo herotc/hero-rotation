@@ -219,7 +219,10 @@ local function EnergizeAmount(Spell)
 end
 
 local function TreantsUp()
-  return #Druid.TreantsTable > 0
+  for _ in pairs(Druid.TreantsTable) do
+    return true
+  end
+  return false
 end
 
 --- ===== CastCycle Functions =====
