@@ -175,8 +175,23 @@ HL:RegisterForCombatEvent(
 
 HL:RegisterForCombatEvent(
   function(...)
-    local DestGUID, _, _, _, SpellID, _, _, Amount = select(8, ...)
+    local args = {...}
+    local event = args[2]
+    local DestGUID = args[8]
+    
     if Cache.Persistent.Player.Spec[1] == 268 and DestGUID == Player:GUID() then
+      local SpellID, Amount
+      
+      if event == "SWING_DAMAGE" then
+        -- For SWING_DAMAGE: Amount is at position 12, no SpellID
+        Amount = args[12]
+        SpellID = nil
+      else
+        -- For SPELL_DAMAGE/SPELL_PERIODIC_DAMAGE: SpellID at 12, Amount at 15
+        SpellID = args[12]
+        Amount = args[15]
+      end
+      
       -- Damage is coming from our Stagger
       if SpellID == StaggerDoTID and Amount and Amount > 0 then
         -- Add to our table of Stagger damage taken
