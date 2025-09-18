@@ -297,7 +297,7 @@ local function APL()
       if Cast(S.RisingSunKick, nil, nil, not Target:IsInMeleeRange(5)) then return "rising_sun_kick main 16"; end
     end
     -- keg_smash,if=buff.weapons_of_order.up&(debuff.weapons_of_order_debuff.remains<1.8|debuff.weapons_of_order_debuff.stack<3-buff.blackout_combo.up|(buff.weapons_of_order.remains<3-buff.blackout_combo.up&buff.weapons_of_order.remains<1+cooldown.rising_sun_kick.remains))
-    if S.KegSmash:IsReady() and (Player:BuffUp(S.WeaponsofOrderBuff) and (Player:DebuffRemains(S.WeaponsofOrderDebuff) < 1.8 or Player:DebuffStack(S.WeaponsofOrderDebuff) < 3 - num(Player:BuffUp(S.BlackoutComboBuff)) or (Player:BuffRemains(S.WeaponsofOrderBuff) < 3 - num(Player:BuffUp(S.BlackoutComboBuff)) and Player:BuffRemains(S.WeaponsofOrderBuff) < 1 + S.RisingSunKick:CooldownRemains()))) then
+    if S.KegSmash:IsReady() and (Player:BuffUp(S.WeaponsofOrderBuff) and (Target:DebuffRemains(S.WeaponsofOrderDebuff) < 1.8 or Target:DebuffStack(S.WeaponsofOrderDebuff) < 3 - num(Player:BuffUp(S.BlackoutComboBuff)) or (Player:BuffRemains(S.WeaponsofOrderBuff) < 3 - num(Player:BuffUp(S.BlackoutComboBuff)) and Player:BuffRemains(S.WeaponsofOrderBuff) < 1 + S.RisingSunKick:CooldownRemains()))) then
       if Cast(S.KegSmash, nil, nil, not Target:IsInRange(15)) then return "keg_smash main 18"; end
     end
     -- tiger_palm,if=buff.blackout_combo.up
@@ -309,7 +309,7 @@ local function APL()
       if Cast(S.KegSmash, nil, nil, not Target:IsInRange(15)) then return "keg_smash main 22"; end
     end
     -- spinning_crane_kick,if=talent.charred_passions.enabled&talent.scalding_brew.enabled&buff.charred_passions.up&buff.charred_passions.remains<3&dot.breath_of_fire.remains<9&active_enemies>4
-    if S.SpinningCraneKick:IsReady() and (S.CharredPassions:IsAvailable() and S.ScaldingBrew:IsAvailable() and Player:BuffUp(S.CharredPassionsBuff) and Player:BuffRemains(S.CharredPassionsBuff) < 3 and Target:DebuffRemains(S.BreathofFire) < 9 and EnemiesCount5 > 4) then
+    if S.SpinningCraneKick:IsReady() and (S.CharredPassions:IsAvailable() and S.ScaldingBrew:IsAvailable() and Player:BuffUp(S.CharredPassionsBuff) and Player:BuffRemains(S.CharredPassionsBuff) < 3 and Target:DebuffRemains(S.BreathofFireDotDebuff) < 9 and EnemiesCount5 > 4) then
       if Cast(S.SpinningCraneKick, nil, nil, not Target:IsInMeleeRange(8)) then return "spinning_crane_kick main 24"; end
     end
     -- rising_sun_kick,if=talent.fluidity_of_motion.enabled
@@ -327,7 +327,7 @@ local function APL()
       if Cast(S.PurifyingBrew, nil, Settings.BrMDS.DisplayStyle.Purify) then return "purifying_brew main 28"; end
     end
     -- breath_of_fire,if=(buff.charred_passions.down&(!talent.scalding_brew.enabled|active_enemies<5))|!talent.charred_passions.enabled|(dot.breath_of_fire.remains<3&talent.scalding_brew.enabled)
-    if S.BreathofFire:IsCastable() and ((Player:BuffDown(S.CharredPassionsBuff) and (not S.ScaldingBrew:IsAvailable() or EnemiesCount5 < 5)) or not S.CharredPassions:IsAvailable() or (Target:DebuffRemains(S.BreathofFire) < 3 and S.ScaldingBrew:IsAvailable())) then
+    if S.BreathofFire:IsCastable() and ((Player:BuffDown(S.CharredPassionsBuff) and (not S.ScaldingBrew:IsAvailable() or EnemiesCount5 < 5)) or not S.CharredPassions:IsAvailable() or (Target:DebuffRemains(S.BreathofFireDotDebuff) < 3 and S.ScaldingBrew:IsAvailable())) then
       if Cast(S.BreathofFire, Settings.Brewmaster.GCDasOffGCD.BreathOfFire, nil, not Target:IsInMeleeRange(12)) then return "breath_of_fire main 30"; end
     end
     -- exploding_keg,if=!talent.rushing_jade_wind.enabled|buff.rushing_jade_wind.up
