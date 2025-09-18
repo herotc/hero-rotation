@@ -122,7 +122,7 @@ local function SetTrinketVariables()
   local T1BuffDuration = (Trinket1:BuffDuration() > 0) and Trinket1:BuffDuration() or 1
   local T2BuffDuration = (Trinket2:BuffDuration() > 0) and Trinket2:BuffDuration() or 1
   VarTrinketPriority = 1
-  if not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and ((VarTrinket2CD / T2BuffDuration) * (VarTrinket2Sync)) > ((VarTrinket1CD / T1BuffDuration) * (VarTrinket1Sync)) then
+  if not VarTrinket1Buffs and VarTrinket2Buffs or VarTrinket2Buffs and ((VarTrinket2CD % T2BuffDuration) * (VarTrinket2Sync)) > ((VarTrinket1CD % T1BuffDuration) * (VarTrinket1Sync)) then
     VarTrinketPriority = 2
   end
 
@@ -177,7 +177,7 @@ local function Precombat()
     if Cast(I.TreacherousTransmitter, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "treacherous_transmitter precombat 6"; end
   end
   -- recklessness,if=!equipped.fyralath_the_dreamrender
-  if CDsON() and S.Recklessness:IsCastable() then
+  if CDsON() and S.Recklessness:IsCastable() and not I.Fyralath:IsEquipped() then
     if Cast(S.Recklessness, Settings.Fury.GCDasOffGCD.Recklessness) then return "recklessness precombat 8"; end
   end
   -- avatar,if=!equipped.cursed_stone_idol

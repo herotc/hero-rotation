@@ -67,7 +67,7 @@ FuryOldSpellIsReady = HL.AddCoreOverride ("Spell.IsReady",
   function (self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     local BaseCheck = FuryOldSpellIsReady(self, Range, AoESpell, ThisUnit, BypassRecovery, Offset)
     if self == SpellFury.Rampage then
-      if Player:PrevGCDP(1, SpellFury.Bladestorm) then
+      if Player:PrevGCDP(1, SpellFury.Bladestorm) or Player:PrevGCDP(1, SpellFury.SlayerBladestorm) then
         return self:IsCastable() and Player:Rage() >= self:Cost()
       else
         return BaseCheck
