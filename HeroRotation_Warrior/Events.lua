@@ -28,9 +28,9 @@ HL:RegisterForSelfCombatEvent(
     local DestGUID, _, _, _, SpellID = select(8, ...)
     -- Ravager damage dealt
     if SpellID == 156287 then
-      -- If this is the first tick, remove the entry 12 seconds later (reduced by haste).
+      -- If this is the first tick, remove the entry 12 seconds later (Ravager's fixed duration).
       -- Note: Added an extra 0.5 second buffer to ensure the spell is finished before removing from the table.
-      local RavagerTimer = Player:SpellHaste() * 12 + 0.5
+      local RavagerTimer = 12 + 0.5
       if not Warrior.Ravager[DestGUID] then
         Delay(RavagerTimer, function()
             Warrior.Ravager[DestGUID] = nil
