@@ -21,11 +21,9 @@ Paladin.DivineHammerActive = false
 
 --- ============================ CONTENT ============================
 --- ===== HPGTo2Dawn Tracker =====
-local Spec = Cache.Persistent.Player.Spec[1]
-Paladin.HPGCount = 0
 HL:RegisterForSelfCombatEvent(
   function (...)
-    if Spec == 66 then
+    if Cache.Persistent.Player.Spec[1] == 66 then
       Paladin.HPGCount = Paladin.HPGCount + 1
     end
   end
