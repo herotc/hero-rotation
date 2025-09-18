@@ -231,8 +231,7 @@ local Stomp     = Spell(227291)
 Monk.NiuzaoGUID = 0
 Monk.LastNiuzaoStomp = 0
 HL:RegisterForCombatEvent(
-  function(...)
-    local SourceGUID, _, _, _, DestGUID, _, _, _, SpellID = select(4, ...)
+  function(_, _, _, SourceGUID, _, _, _, DestGUID, _, _, _, SpellID)
     if SourceGUID == Player:GUID() and SpellID == 132578 then
       Monk.NiuzaoGUID = DestGUID
     end
@@ -241,7 +240,7 @@ HL:RegisterForCombatEvent(
 )
 
 HL:RegisterForCombatEvent(
-  function(...)
+  function(_, _, _, SourceGUID, _, _, _, _, _, _, _, SpellID)
     local SourceGUID, _, _, _, _, _, _, _, SpellID = select(4, ...)
     if SourceGUID == Monk.NiuzaoGUID and SpellID == 227291 then
       Monk.LastNiuzaoStomp = GetTime()
@@ -251,8 +250,7 @@ HL:RegisterForCombatEvent(
 )
 
 HL:RegisterForCombatEvent(
-  function(...)
-    local DestGUID = select(8, ...)
+  function(_, _, _, _, _, _, _, DestGUID)
     if DestGUID == Monk.NiuzaoGUID then
       Monk.NiuzaoGUID = 0
     end
@@ -267,8 +265,7 @@ Monk.Xuen.Count = 0
 Monk.Xuen.GUID = 0
 Monk.Xuen.ExpireTime = 0
 HL:RegisterForSelfCombatEvent(
-  function(...)
-    local destGUID, _, _, _, spellID = select(8, ...)
+  function(_, _, _, _, _, _, _, destGUID, _, _, _, spellID)
     if spellID == 123904 then
       Monk.Xuen.Active = true
       Monk.Xuen.Count = Monk.Xuen.Count + 1
@@ -280,8 +277,7 @@ HL:RegisterForSelfCombatEvent(
 )
 
 HL:RegisterForCombatEvent(
-  function(...)
-    local destGUID = select(8, ...)
+  function(_, _, _, _, _, _, _, destGUID)
     if destGUID == Monk.Xuen.GUID then
       Monk.Xuen.Active = false
       Monk.Xuen.GUID = 0
