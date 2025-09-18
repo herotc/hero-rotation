@@ -241,7 +241,6 @@ HL:RegisterForCombatEvent(
 
 HL:RegisterForCombatEvent(
   function(_, _, _, SourceGUID, _, _, _, _, _, _, _, SpellID)
-    local SourceGUID, _, _, _, _, _, _, _, SpellID = select(4, ...)
     if SourceGUID == Monk.NiuzaoGUID and SpellID == 227291 then
       Monk.LastNiuzaoStomp = GetTime()
     end
