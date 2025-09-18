@@ -68,6 +68,7 @@ local VarDoTRefreshSoon
 local VarCCCapped, VarRegrowth, VarEasySwipe
 local ComboPoints, ComboPointsDeficit
 local BsInc = S.Incarnation:IsAvailable() and S.Incarnation or S.Berserk
+local BsIncCD = S.BerserkHeartoftheLion:IsAvailable() and 120 or 180
 local IsInMeleeRange, IsInAoERange
 local BossFightRemains = 11111
 local FightRemains = 11111
@@ -119,8 +120,8 @@ local function SetTrinketVariables()
   -- Note: Handled later in CDsVariable(). Put here to avoid nil errors.
   VarTrinket1CDRemains = VarTrinket1ID == I.UnyieldingNetherprism:ID() and BsInc:CooldownRemains() or Trinket1:CooldownRemains()
   VarTrinket2CDRemains = VarTrinket2ID == I.UnyieldingNetherprism:ID() and BsInc:CooldownRemains() or Trinket2:CooldownRemains()
-  VarTrinket1CDDuration = VarTrinket1ID == I.UnyieldingNetherprism:ID() and BsInc:CooldownDuration() or VarTrinket1CD
-  VarTrinket2CDDuration = VarTrinket2ID == I.UnyieldingNetherprism:ID() and BsInc:CooldownDuration() or VarTrinket2CD
+  VarTrinket1CDDuration = VarTrinket1ID == I.UnyieldingNetherprism:ID() and BsIncCD or VarTrinket1CD
+  VarTrinket2CDDuration = VarTrinket2ID == I.UnyieldingNetherprism:ID() and BsIncCD or VarTrinket2CD
 end
 SetTrinketVariables()
 
@@ -133,6 +134,9 @@ local InterruptStuns = {
 --- ===== Event Registration =====
 HL:RegisterForEvent(function()
   BsInc = S.Incarnation:IsAvailable() and S.Incarnation or S.Berserk
+  BsIncCD = S.BerserkHeartoftheLion:IsAvailable() and 120 or 180
+  VarTrinket1CDDuration = VarTrinket1ID == I.UnyieldingNetherprism:ID() and BsIncCD or VarTrinket1CD
+  VarTrinket2CDDuration = VarTrinket2ID == I.UnyieldingNetherprism:ID() and BsIncCD or VarTrinket2CD
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
@@ -508,7 +512,6 @@ local function CDsVariable()
   local ConvokeCD = S.AshamanesGuidance:IsAvailable() and 60 or 120
   VarConvokeCountRemaining = mathfloor(((FightRemains - VarConvokeCD) / ConvokeCD) + num(FightRemains > S.ConvoketheSpirits:CooldownRemains()))
   -- variable,name=zerkCountRemaining,value=floor(((fight_remains-variable.bs_inc_cd)%cooldown.bs_inc.duration)+(fight_remains>cooldown.bs_inc.remains))
-  local BsIncCD = S.BerserkHeartoftheLion:IsAvailable() and 120 or 180
   VarZerkCountRemaining = mathfloor(((FightRemains - VarBsIncCD) / BsIncCD) + num(FightRemains > BsInc:CooldownRemains()))
   -- variable,name=potCountRemaining,value=floor(((fight_remains-variable.pot_cd)%cooldown.potion.duration)+(fight_remains>cooldown.potion.remains))
   local PotionSelected = Everyone.PotionSelected()
