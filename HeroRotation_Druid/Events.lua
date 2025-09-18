@@ -74,9 +74,9 @@ HL:RegisterForSelfCombatEvent(function(_, _, _, _, _, _, _, DestGUID, _, _, _, s
   end
 end, "SPELL_SUMMON")
 
-HL:RegisterForCombatEvent(function(_, _, _, SourceGUID, _, _, _, _, _, _, _, spellID)
-  if spellID == 205644 and Druid.TreantsTable[SourceGUID] then
-    Druid.TreantsTable[SourceGUID] = nil
+HL:RegisterForCombatEvent(function(_, _, _, SourceGUID, _, _, _, DestGUID, _, _, _, spellID)
+  if spellID == 205644 and Druid.TreantsTable[DestGUID] then
+    Druid.TreantsTable[DestGUID] = nil
   end
 end, "SPELL_AURA_REMOVED")
 
