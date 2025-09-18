@@ -375,7 +375,7 @@ local function AoeBuilder()
   end
   -- shadowmeld,target_if=dot.rake.refreshable|dot.rake.pmultiplier<1.4,if=(!(variable.need_bt&buff.bt_rake.up)&action.rake.ready&!variable.stealth_bonus&!buff.clearcasting.at_max_stacks)&(!fight_style.dungeonroute&!fight_style.dungeonslice|!buff.killing_strikes_combat.up&!buff.incarnation_avatar_of_ashamane.up)
   -- Note: Skipping cycling and putting target_if into main condition.
-  if S.Shadowmeld:IsReady() and not Player:StealthUp(false, true) and (((not (VarNeedBT and BTBuffUp(S.Rake)) and S.Rake:IsReady() and not VarStealthBonus and not VarCCAtMaxStacks) and (not Player:IsInDungeonArea() or Player:BuffDown(S.KillinStrikesCombatBuff) and Player:BuffDown(S.Incarnation))) and (DebuffRefreshAny(EnemiesMelee, S.RakeDebuff) or Target:PMultiplier(S.Rake) < 1.4)) then
+  if S.Shadowmeld:IsReady() and not Player:StealthUp(false, true) and (((not (VarNeedBT and BTBuffUp(S.Rake)) and S.Rake:IsReady() and not VarStealthBonus and not VarCCAtMaxStacks) and (not Player:IsInDungeonArea() or Player:BuffDown(S.KillingStrikesCombatBuff) and Player:BuffDown(S.Incarnation))) and (DebuffRefreshAny(EnemiesMelee, S.RakeDebuff) or Target:PMultiplier(S.Rake) < 1.4)) then
     if Cast(S.Shadowmeld, Settings.CommonsOGCD.OffGCDasOffGCD.Racials) then return "shadowmeld aoe_builder 14"; end
   end
   -- rake,target_if=refreshable,if=talent.doubleclawed_rake&!(variable.need_bt&buff.bt_rake.up)&!buff.clearcasting.at_max_stacks

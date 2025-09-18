@@ -96,6 +96,7 @@ Spell.Druid.DruidoftheClaw = {
   WildpowerSurge                        = Spell(441691),
   -- Buffs
   FelinePotentialBuff                   = Spell(441701),
+  KillingStrikesCombatBuff              = Spell(441827),
   RavageBuffFeral                       = Spell(441585),
   RavageBuffGuardian                    = Spell(441602),
 }
