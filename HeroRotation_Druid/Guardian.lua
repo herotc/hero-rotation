@@ -94,7 +94,7 @@ HL:RegisterForEvent(function()
 end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
-  VarIFBuild = S.ThornsofIron:IsAvailable() and S.ReinforcedFur:IsAvailable()
+  VarIFBuild = S.ThornsofIron:IsAvailable() and S.UrsocsEndurance:IsAvailable()
   VarRipWeaving = S.PrimalFury:IsAvailable() and S.FluidForm:IsAvailable() and S.WildpowerSurge:IsAvailable()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
@@ -106,7 +106,7 @@ end
 
 local function EvaluateCycleThrash(TargetUnit)
   -- target_if=refreshable|(dot.thrash_bear.stack<5&talent.flashing_claws.rank=2|dot.thrash_bear.stack<4&talent.flashing_claws.rank=1|dot.thrash_bear.stack<3&!talent.flashing_claws.enabled)
-  return TargetUnit:DebuffRefreshable(S.ThrashBearDebuff) or (Target:DebuffStack(S.ThrashBearDebuff) < 5 and S.FlashingClaws:TalentRank() == 2 or TargetUnit:DebuffStack(S.ThrashBearDebuff) < 4 and S.FlashingClaws:TalentRank() == 1 or Target:DebuffStack(S.ThrashBearDebuff) < 3 and not S.FlashingClaws:IsAvailable())
+  return TargetUnit:DebuffRefreshable(S.ThrashBearDebuff) or (TargetUnit:DebuffStack(S.ThrashBearDebuff) < 5 and S.FlashingClaws:TalentRank() == 2 or TargetUnit:DebuffStack(S.ThrashBearDebuff) < 4 and S.FlashingClaws:TalentRank() == 1 or TargetUnit:DebuffStack(S.ThrashBearDebuff) < 3 and not S.FlashingClaws:IsAvailable())
 end
 
 --- ===== Rotation Functions =====
@@ -202,7 +202,7 @@ local function Bear()
       if Cast(S.LunarBeam, Settings.Guardian.GCDasOffGCD.LunarBeam) then return "lunar_beam bear 8"; end
     end
   -- convoke_the_spirits,if=(talent.wildpower_surge.enabled&buff.cat_form.up&buff.feline_potential.up)|!talent.wildpower_surge.enabled
-  if CDsON() and S.ConvoketheSpirits:IsCastable() then
+  if CDsON() and S.ConvoketheSpirits:IsCastable() and ((S.WildpowerSurge:IsAvailable() and Player:BuffUp(S.CatForm) and Player:BuffUp(S.FelinePotentialBuff)) or not S.WildpowerSurge:IsAvailable()) then
     if Cast(S.ConvoketheSpirits, nil, Settings.CommonsDS.DisplayStyle.ConvokeTheSpirits) then return "convoke_the_spirits bear 10"; end
   end
   -- berserk_bear
@@ -286,7 +286,7 @@ local function Bear()
     if Cast(S.ThrashBear, nil, nil, not IsInAoERange) then return "thrash bear 50"; end
   end
   -- mangle,if=(buff.incarnation.up&active_enemies<=4)|(buff.incarnation.up&talent.soul_of_the_forest.enabled&active_enemies<=5)|((rage<88)&active_enemies<11)|((rage<83)&active_enemies<11&talent.soul_of_the_forest.enabled)
-  if S.Mangle:IsCastable() and ((Player:BuffUp(S.Incarnation) and Enemies8yCount <= 4) or (Player:BuffUp(S.Incarnation) and S.SouloftheForest:IsAvailable() and Enemies8yCount <= 5) and ((Player:Rage() < 88) and Enemies8yCount < 11) or ((Player:Rage() < 83) and Enemies8yCount < 11 and S.SouloftheForest:IsAvailable())) then
+  if S.Mangle:IsCastable() and ((Player:BuffUp(S.Incarnation) and Enemies8yCount <= 4) or (Player:BuffUp(S.Incarnation) and S.SouloftheForest:IsAvailable() and Enemies8yCount <= 5) or ((Player:Rage() < 88) and Enemies8yCount < 11) or ((Player:Rage() < 83) and Enemies8yCount < 11 and S.SouloftheForest:IsAvailable())) then
     if Cast(S.Mangle, nil, nil, not IsInMeleeRange) then return "mangle bear 52"; end
   end
   -- rip,if=buff.cat_form.up&(!dot.rip.ticking|refreshable)&combo_points>=3&active_enemies<3&!talent.empowered_shapeshifting.enabled
