@@ -154,17 +154,16 @@ HL:RegisterForCombatEvent(
   function (...)
     local args = {...}
     -- Absorb is coming from a spell damage
-    -- TODO: Verify this is still the case
-    if #args == 23 then
-      local DestGUID, _, _, _, _, _, _, _, _, _, _, SpellID, _, _, Amount = select(8, ...)
+    if #args == 15 then
+      local _, _, _, _, _, _, _, DestGUID, _, _, _, SpellID, _, _, Amount = ...
       if DestGUID == Player:GUID() and SpellID == StaggerSpellID then
         -- Register the full amount of the current Stagger
         RegisterStaggerFullAbsorb(Amount)
       end
     -- Absorb is coming from a melee hit
     else
-      local DestGUID, _, _, _, _, _, _, _, SpellID, _, _, Amount = select(8, ...)
-      if DestGUID == Player:GUID() and SpellID == StaggerSpellID then
+      local _, _, _, _, _, _, _, DestGUID, _, _, _, Amount = ...
+      if DestGUID == Player:GUID() then
         -- Register the full amount of the current Stagger
         RegisterStaggerFullAbsorb(Amount)
       end
@@ -212,12 +211,12 @@ HL:RegisterForEvent(
   -- Reset our damage tables when we exit combat
   function()
     if #StaggerDamage > 0 then
-      for i=0, #StaggerDamage do
+      for i=1, #StaggerDamage do
         StaggerDamage[i]=nil
       end
     end
     if #IncomingDamage > 0 then
-      for i=0, #IncomingDamage do
+      for i=1, #IncomingDamage do
         IncomingDamage[i]=nil
       end
     end
@@ -240,8 +239,8 @@ HL:RegisterForCombatEvent(
 )
 
 HL:RegisterForCombatEvent(
-  function(_, _, _, SourceGUID, _, _, _, _, _, _, _, SpellID)
-    local SourceGUID, _, _, _, _, _, _, _, SpellID = select(4, ...)
+  function(...)
+    local _, _, _, SourceGUID, _, _, _, _, _, _, _, SpellID = ...
     if SourceGUID == Monk.NiuzaoGUID and SpellID == 227291 then
       Monk.LastNiuzaoStomp = GetTime()
     end
