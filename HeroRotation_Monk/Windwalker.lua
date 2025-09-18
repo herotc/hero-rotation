@@ -62,7 +62,7 @@ local Settings = {
 }
 
 --- ===== Rotation Variables =====
-local VarTotMMaxStacks = 4
+local VarTotMMaxStacks = S.KnowledgeoftheBrokenTemple:IsAvailable() and 8 or 4
 local VarSmallHotjsActive = false
 local DungeonSlice
 local CombatTime
@@ -135,6 +135,7 @@ HL:RegisterForEvent(function()
   if S.LegSweep:IsAvailable() then tinsert(Stuns, { S.LegSweep, "Cast Leg Sweep (Stun)", function () return true end }) end
   if S.RingofPeace:IsAvailable() then tinsert(Stuns, { S.RingofPeace, "Cast Ring Of Peace (Stun)", function () return true end }) end
   if S.Paralysis:IsAvailable() then tinsert(Stuns, { S.Paralysis, "Cast Paralysis (Stun)", function () return true end }) end
+  VarTotMMaxStacks = S.KnowledgeoftheBrokenTemple:IsAvailable() and 8 or 4
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 HL:RegisterForEvent(function()
@@ -201,7 +202,7 @@ local function Trinkets()
     local T1Check = Trinket1 and Trinket1:IsReady() and not VarTrinket1Ex and not Player:IsItemBlacklisted(Trinket1)
     local T2Check = Trinket2 and Trinket2:IsReady() and not VarTrinket2Ex and not Player:IsItemBlacklisted(Trinket2)
     -- use_item,slot=trinket1,if=trinket.1.has_use_buff&trinket.2.has_use_buff&pet.xuen_the_white_tiger.active&variable.invoke_xuen_count%%2|fight_remains<20
-    if T1Check and (Trinket1:HasUseBuff() and Trinket2:HasUseBuff() and Monk.Xuen.Active and VarInvokeXuenCount % 2 == 1 or BossFightRemains < 20) then
+    if T1Check and (Trinket1:HasUseBuff() and Trinket2:HasUseBuff() and Monk.Xuen.Active and Monk.Xuen.Count % 2 == 1 or BossFightRemains < 20) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_items for " .. Trinket1:Name() .. " trinkets 2"; end
     end
     -- use_item,slot=trinket2,if=trinket.1.has_use_buff&trinket.2.has_use_buff&pet.xuen_the_white_tiger.active|fight_remains<20
@@ -209,7 +210,7 @@ local function Trinkets()
       if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "Generic use_items for " .. Trinket2:Name() .. " trinkets 4"; end
     end
     -- use_item,slot=trinket1,if=trinket.1.has_use_buff&!trinket.2.has_use_buff&pet.xuen_the_white_tiger.active|fight_remains<20
-    if T1Check and (Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() or Monk.Xuen.Active or BossFightRemains < 20) then
+    if T1Check and (Trinket1:HasUseBuff() and not Trinket2:HasUseBuff() and Monk.Xuen.Active or BossFightRemains < 20) then
       if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "Generic use_items for " .. Trinket1:Name() .. " trinkets 6"; end
     end
     -- use_item,slot=trinket2,if=trinket.1.has_use_buff&!trinket.2.has_use_buff&cooldown.invoke_xuen_the_white_tiger.remains>30|fight_remains<20
