@@ -88,7 +88,7 @@ local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData(OnUseExcludes)
 
   -- If we don't have trinket items, try again in 5 seconds.
-  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or ((T1.SpellID > 0 and not T1.Usable) or (T2.SpellID > 0 and not T2.Usable))) then
+  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
     Delay(5, function()
         SetTrinketVariables()
       end
@@ -182,7 +182,7 @@ end
 
 local function CDOpener()
   -- touch_of_the_magi,use_off_gcd=1,if=prev_gcd.1.arcane_surge|(cooldown.arcane_surge.remains>30&cooldown.touch_of_the_magi.ready&((buff.arcane_charge.stack<4&!prev_gcd.1.arcane_barrage)|prev_gcd.1.arcane_barrage))|fight_remains<15
-  if S.TouchoftheMagi:IsReady() and (Player:PrevGCDP(1, S.ArcaneSurge) or (S.ArcaneSurge:CooldownRemains() > 30 and S.TouchoftheMagi:CooldownUp() and ((Player:ArcaneCharges() < 4 and not Player:PrevGCDP(1, S.ArcaneBarrage)) or Player:PrevGCDP(1, S.ArcaneBarrage))) or BossFightRemains < 15) then
+  if S.TouchoftheMagi:IsReady() and (Player:PrevGCDP(1, S.ArcaneSurge) or (S.ArcaneSurge:CooldownRemains() > 30 and S.TouchoftheMagi:CooldownUp() and (Player:ArcaneCharges() < 4 and not Player:PrevGCDP(1, S.ArcaneBarrage) or Player:PrevGCDP(1, S.ArcaneBarrage))) or BossFightRemains < 15) then
     if Cast(S.TouchoftheMagi, Settings.Arcane.GCDasOffGCD.TouchOfTheMagi, nil, not Target:IsSpellInRange(S.TouchoftheMagi)) then return "touch_of_the_magi cd_opener 2"; end
   end
   -- wait,sec=0.05,if=prev_gcd.1.arcane_surge&time-action.touch_of_the_magi.last_used<0.015,line_cd=15
@@ -221,7 +221,7 @@ local function CDOpenerSoul()
     if Cast(S.ArcaneSurge, Settings.Arcane.GCDasOffGCD.ArcaneSurge) then return "arcane_surge cd_opener_soul 2"; end
   end
   -- evocation,if=buff.arcane_surge.up&(buff.arcane_surge.remains<=8.5|((buff.glorious_incandescence.up|buff.intuition.react)&buff.arcane_surge.remains<=10))
-  if S.Evocation:IsCastable() and (Player:BuffUp(S.ArcaneSurgeBuff) and (Player:BuffRemains(S.ArcaneSurgeBuff) <= 8.5 or ((Player:BuffUp(S.GloriousIncandescenceBuff) or Player:BuffUp(S.IntuitionBuff)) and Player:BuffRemains(S.ArcaneSurgeBuff) <= 10))) then
+  if S.Evocation:IsCastable() and (Player:BuffUp(S.ArcaneSurgeBuff) and (Player:BuffRemains(S.ArcaneSurgeBuff) <= 8.5 or (Player:BuffUp(S.GloriousIncandescenceBuff) or Player:BuffUp(S.IntuitionBuff)) and Player:BuffRemains(S.ArcaneSurgeBuff) <= 10)) then
     if Cast(S.Evocation, Settings.Arcane.GCDasOffGCD.Evocation) then return "evocation cd_opener_soul 4"; end
   end
   -- touch_of_the_magi,if=(buff.arcane_surge.remains<=2.5&prev_gcd.1.arcane_barrage)|(cooldown.evocation.remains>40&cooldown.evocation.remains<60&prev_gcd.1.arcane_barrage)
@@ -274,7 +274,7 @@ local function Spellslinger()
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage spellslinger 18"; end
   end
   -- arcane_missiles,if=(buff.clearcasting.react&buff.nether_precision.down&((cooldown.touch_of_the_magi.remains>gcd.max*7&cooldown.arcane_surge.remains>gcd.max*7)|buff.clearcasting.react>1|!talent.magis_spark|(cooldown.touch_of_the_magi.remains<gcd.max*4&buff.aether_attunement.react=0)|set_bonus.thewarwithin_season_2_4pc))|(fight_remains<5&buff.clearcasting.react),interrupt_if=tick_time>gcd.remains&(buff.aether_attunement.react=0|(active_enemies>3&(!talent.time_loop|talent.resonance))),interrupt_immediate=1,interrupt_global=1,chain=1
-  if S.ArcaneMissiles:IsReady() and ((Player:BuffUp(S.ClearcastingBuff) and Player:BuffDown(S.NetherPrecisionBuff) and ((S.TouchoftheMagi:CooldownRemains() > Player:GCD() * 7 and S.ArcaneSurge:CooldownRemains() > Player:GCD() * 7) or Player:BuffStack(S.ClearcastingBuff) > 1 or not S.MagisSpark:IsAvailable() or (S.TouchoftheMagi:CooldownRemains() < Player:GCD() * 4 and Player:BuffDown(S.AetherAttunementBuff)) or TWW2_4pc)) or (FightRemains < 5 and Player:BuffUp(S.ClearcastingBuff))) then
+  if S.ArcaneMissiles:IsReady() and ((Player:BuffUp(S.ClearcastingBuff) and Player:BuffDown(S.NetherPrecisionBuff) and (S.TouchoftheMagi:CooldownRemains() > Player:GCD() * 7 and S.ArcaneSurge:CooldownRemains() > Player:GCD() * 7 or Player:BuffStack(S.ClearcastingBuff) > 1 or not S.MagisSpark:IsAvailable() or (S.TouchoftheMagi:CooldownRemains() < Player:GCD() * 4 and Player:BuffDown(S.AetherAttunementBuff)) or TWW2_4pc)) or (FightRemains < 5 and Player:BuffUp(S.ClearcastingBuff))) then
     LastSSAM = 1
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles spellslinger 20"; end
   end
@@ -304,7 +304,7 @@ local function Spellslinger()
     if Cast(S.ArcaneOrb, nil, nil, not Target:IsInRange(40)) then return "arcane_orb spellslinger 32"; end
   end
   -- arcane_barrage,if=active_enemies>=2&buff.arcane_charge.stack=4&cooldown.arcane_orb.remains<gcd.max&(buff.arcane_harmony.stack<=(8+(10*!set_bonus.thewarwithin_season_3_4pc)))&(((prev_gcd.1.arcane_barrage|prev_gcd.1.arcane_orb)&buff.nether_precision.stack=1)|buff.nether_precision.stack=2|buff.nether_precision.down)
-  if S.ArcaneBarrage:IsCastable() and (EnemiesCount8ySplash >= 2 and Player:ArcaneCharges() == 4 and S.ArcaneOrb:CooldownRemains() < Player:GCD() and Player:BuffStack(S.ArcaneHarmonyBuff) <= 8 + (10 * num(not TWW3_4pc)) and (((Player:PrevGCDP(1, S.ArcaneBarrage) or Player:PrevGCDP(1, S.ArcaneOrb)) and Player:BuffStack(S.NetherPrecisionBuff) == 1) or Player:BuffStack(S.NetherPrecisionBuff) == 2 or Player:BuffDown(S.NetherPrecisionBuff))) then
+  if S.ArcaneBarrage:IsCastable() and (EnemiesCount8ySplash >= 2 and Player:ArcaneCharges() == 4 and S.ArcaneOrb:CooldownRemains() < Player:GCD() and Player:BuffStack(S.ArcaneHarmonyBuff) <= 8 + (10 * num(not TWW3_4pc)) and ((Player:PrevGCDP(1, S.ArcaneBarrage) or Player:PrevGCDP(1, S.ArcaneOrb)) and Player:BuffStack(S.NetherPrecisionBuff) == 1 or Player:BuffStack(S.NetherPrecisionBuff) == 2 or Player:BuffDown(S.NetherPrecisionBuff))) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage spellslinger 34"; end
   end
   -- arcane_barrage,if=active_enemies>2&(buff.arcane_charge.stack=4&!set_bonus.thewarwithin_season_3_4pc)
@@ -332,7 +332,7 @@ local function Spellslinger()
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage spellslinger 46"; end
   end
   -- arcane_barrage,if=(active_enemies=1&(talent.orb_barrage|(target.health.pct<35&talent.arcane_bombardment))&(cooldown.arcane_orb.remains<gcd.max)&buff.arcane_charge.stack=4&(cooldown.touch_of_the_magi.remains>gcd.max*6|!talent.magis_spark)&(buff.nether_precision.down|(buff.nether_precision.stack=1&buff.clearcasting.stack=0)))&!set_bonus.thewarwithin_season_3_4pc
-  if S.ArcaneBarrage:IsCastable() and ((EnemiesCount8ySplash == 1 and (S.OrbBarrage:IsAvailable() or (Target:HealthPercentage() < 35 and S.ArcaneBombardment:IsAvailable())) and S.ArcaneOrb:CooldownRemains() < Player:GCD() and Player:ArcaneCharges() == 4 and (S.TouchoftheMagi:CooldownRemains() > Player:GCD() * 6 or not S.MagisSpark:IsAvailable()) and (Player:BuffDown(S.NetherPrecisionBuff) or (Player:BuffStack(S.NetherPrecisionBuff) == 1 and Player:BuffDown(S.ClearcastingBuff)))) and not TWW3_4pc) then
+  if S.ArcaneBarrage:IsCastable() and (EnemiesCount8ySplash == 1 and (S.OrbBarrage:IsAvailable() or (Target:HealthPercentage() < 35 and S.ArcaneBombardment:IsAvailable())) and S.ArcaneOrb:CooldownRemains() < Player:GCD() and Player:ArcaneCharges() == 4 and (S.TouchoftheMagi:CooldownRemains() > Player:GCD() * 6 or not S.MagisSpark:IsAvailable()) and (Player:BuffDown(S.NetherPrecisionBuff) or (Player:BuffStack(S.NetherPrecisionBuff) == 1 and Player:BuffDown(S.ClearcastingBuff))) and not TWW3_4pc) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage spellslinger 48"; end
   end
   -- arcane_explosion,if=active_enemies>1&((buff.arcane_charge.stack<1&!talent.high_voltage)|(buff.arcane_charge.stack<3&(buff.clearcasting.react=0|talent.reverberate)))
