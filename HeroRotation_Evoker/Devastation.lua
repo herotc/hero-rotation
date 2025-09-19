@@ -27,8 +27,8 @@ local Evoker        = HR.Commons.Evoker
 local num           = HR.Commons.Everyone.num
 local bool          = HR.Commons.Everyone.bool
 -- lua
-local mathmax       = math.max
-local mathmin       = math.min
+local max = math.max
+local min = math.min
 -- WoW API
 local Delay       = C_Timer.After
 
@@ -154,8 +154,8 @@ local function SetTrinketVariables()
   end
 
   -- Note: Hopefully nobody is using Belor'relos or Nymue's in 11.1...
-  VarTrinket1Manual = VarTrinket1ID == I.SpymastersWeb:ID()
-  VarTrinket2Manual = VarTrinket2ID == I.SpymastersWeb:ID()
+  VarTrinket1Manual = VarTrinket1ID == I.SpymastersWeb:ID() or VarTrinket1ID == I.BelorrelostheSuncaller:ID() or VarTrinket1ID == I.NymuesUnravelingSpindle:ID()
+  VarTrinket2Manual = VarTrinket2ID == I.SpymastersWeb:ID() or VarTrinket2ID == I.BelorrelostheSuncaller:ID() or VarTrinket2ID == I.NymuesUnravelingSpindle:ID()
 
   -- Note: Hopefully nobody is using Ruby Whelp Shell or Whispering Incarnate Icon in 11.1...
   VarTrinket1Exclude = false
@@ -168,7 +168,7 @@ local function SetTrinketVariables()
   end
   -- variable,name=trinket_priority,op=setif,if=variable.weapon_buffs,value=3,value_else=variable.trinket_priority,condition=!variable.trinket_1_buffs&!variable.trinket_2_buffs|variable.weapon_stat_value*variable.weapon_sync>(((trinket.2.proc.any_dps.duration)*(variable.trinket_2_sync)*trinket.2.proc.any_dps.default_value)<?((trinket.1.proc.any_dps.duration)*(variable.trinket_1_sync)*trinket.1.proc.any_dps.default_value))
   if VarWeaponBuffs then
-    if not VarTrinket1Buffs and not VarTrinket2Buffs or VarWeaponStatValue * VarWeaponSync > mathmax(VarTrinket2Sync, VarTrinket1Sync) then
+    if not VarTrinket1Buffs and not VarTrinket2Buffs or VarWeaponStatValue * VarWeaponSync > max(VarTrinket2Sync, VarTrinket1Sync) then
       VarTrinketPriority = 3
     end
   end
@@ -278,7 +278,7 @@ end
 local function EvaluateCycleEngulf(TargetUnit)
   -- target_if=(dot.fire_breath_damage.remains>travel_time)&(dot.enkindle.remains>travel_time|!talent.enkindle)&(!talent.scorching_embers|dot.fire_breath_damage.duration<=6|fight_remains<=30)&(cooldown.dragonrage.remains>=cooldown.engulf.duration+full_recharge_time|!talent.dragonrage|buff.tip_the_scales.up&cooldown.fire_breath.up|buff.dragonrage.up|full_recharge_time<=cooldown.fire_breath.duration_expected)
   local EngulfTravel = S.Engulf:TravelTime()
-  local EngulfCD = S.Engulf:Cooldown() or 27 * Player:SpellHaste()
+  local EngulfCD = S.Engulf:Cooldown() or 27
   return (TargetUnit:DebuffRemains(S.FireBreathDebuff) > EngulfTravel) and (TargetUnit:DebuffRemains(S.EnkindleDebuff) > EngulfTravel or not S.Enkindle:IsAvailable()) and (not S.ScorchingEmbers:IsAvailable() or TargetUnit:DebuffRemains(S.FireBreathDebuff) <= 6 or BossFightRemains <= 30) and (S.Dragonrage:CooldownRemains() >= EngulfCD + S.Engulf:FullRechargeTime() or not S.Dragonrage:IsAvailable() or Player:BuffUp(S.TipTheScalesBuff) and S.FireBreath:CooldownUp() or VarDragonrageUp or S.Engulf:FullRechargeTime() <= S.FireBreath:CooldownRemains())
 end
 
@@ -371,22 +371,22 @@ local function FB()
   local FBEmpower = 0
   local FBRemains = Target:DebuffRemains(S.FireBreath)
   -- fire_breath,empower_to=2,target_if=max:target.health.pct,if=talent.scorching_embers&(cooldown.engulf.remains<=duration+0.5|cooldown.engulf.up)&talent.engulf&release.dot_duration<=target.time_to_die
-  if S.ScorchingEmbers:IsAvailable() and (S.Engulf:CooldownRemains() <= 14.5 or S.Engulf:CooldownUp()) and S.Engulf:IsAvailable() and 14 <= Target:TimeToDie() then
+  if S.ScorchingEmbers:IsAvailable() and (S.Engulf:CooldownRemains() <= (14 / (S.BlastFurnace:IsAvailable() and 2 or 1)) + 0.5 or S.Engulf:CooldownUp()) and S.Engulf:IsAvailable() and (14 / (S.BlastFurnace:IsAvailable() and 2 or 1)) <= Target:TimeToDie() then
     FBEmpower = 2
   -- fire_breath,empower_to=3,target_if=max:target.health.pct,if=talent.scorching_embers&(cooldown.engulf.remains<=duration+0.5|cooldown.engulf.up)&talent.engulf&(release.dot_duration<=target.time_to_die|!talent.font_of_magic)
-  elseif S.ScorchingEmbers:IsAvailable() and (S.Engulf:CooldownRemains() <= 8.5 or S.Engulf:CooldownUp()) and S.Engulf:IsAvailable() and (8 <= Target:TimeToDie() or not S.FontofMagic:IsAvailable()) then
+  elseif S.ScorchingEmbers:IsAvailable() and (S.Engulf:CooldownRemains() <= (8 / (S.BlastFurnace:IsAvailable() and 2 or 1)) + 0.5 or S.Engulf:CooldownUp()) and S.Engulf:IsAvailable() and ((8 / (S.BlastFurnace:IsAvailable() and 2 or 1)) <= Target:TimeToDie() or not S.FontofMagic:IsAvailable()) then
     FBEmpower = 3
   -- fire_breath,empower_to=4,target_if=max:target.health.pct,if=talent.scorching_embers&(cooldown.engulf.remains<=duration+0.5|cooldown.engulf.up)&talent.engulf&talent.font_of_magic
-  elseif S.ScorchingEmbers:IsAvailable() and (S.Engulf:CooldownRemains() <= 4.5 or S.Engulf:CooldownUp()) and S.Engulf:IsAvailable() and S.FontofMagic:IsAvailable() then
+  elseif S.ScorchingEmbers:IsAvailable() and (S.Engulf:CooldownRemains() <= (4 / (S.BlastFurnace:IsAvailable() and 2 or 1)) + 0.5 or S.Engulf:CooldownUp()) and S.Engulf:IsAvailable() and S.FontofMagic:IsAvailable() then
     FBEmpower = 4
   -- fire_breath,empower_to=1,target_if=max:target.health.pct,if=((buff.dragonrage.remains<1.75*spell_haste&buff.dragonrage.remains>=1*spell_haste)&talent.animosity&variable.can_extend_dr|active_enemies=1)&release.dot_duration<=target.time_to_die
-  elseif ((VarDragonrageRemains < 1.75 * PlayerHaste and VarDragonrageRemains >= PlayerHaste) and S.Animosity:IsAvailable() and VarCanExtendDR or EnemiesCount8ySplash == 1) and 20 <= Target:TimeToDie() then
+  elseif ((VarDragonrageRemains < 1.75 * PlayerHaste and VarDragonrageRemains >= PlayerHaste) and S.Animosity:IsAvailable() and VarCanExtendDR or EnemiesCount8ySplash == 1) and (20 / (S.BlastFurnace:IsAvailable() and 2 or 1)) <= Target:TimeToDie() then
     FBEmpower = 1
   -- fire_breath,empower_to=2,target_if=max:target.health.pct,if=((buff.dragonrage.remains<2.5*spell_haste&buff.dragonrage.remains>=1.75*spell_haste)&talent.animosity&variable.can_extend_dr|talent.scorching_embers|active_enemies>=2)&release.dot_duration<=target.time_to_die
-  elseif ((VarDragonrageRemains < 2.5 * PlayerHaste and VarDragonrageRemains >= 1.75 * PlayerHaste) and S.Animosity:IsAvailable() and VarCanExtendDR or S.ScorchingEmbers:IsAvailable() or EnemiesCount8ySplash >= 2) and 14 <= Target:TimeToDie() then
+  elseif ((VarDragonrageRemains < 2.5 * PlayerHaste and VarDragonrageRemains >= 1.75 * PlayerHaste) and S.Animosity:IsAvailable() and VarCanExtendDR or S.ScorchingEmbers:IsAvailable() or EnemiesCount8ySplash >= 2) and (14 / (S.BlastFurnace:IsAvailable() and 2 or 1)) <= Target:TimeToDie() then
     FBEmpower = 2
   -- fire_breath,empower_to=3,target_if=max:target.health.pct,if=!talent.font_of_magic|((buff.dragonrage.remains<=3.25*spell_haste&buff.dragonrage.remains>=2.5*spell_haste)&talent.animosity&variable.can_extend_dr|talent.scorching_embers)&release.dot_duration<=target.time_to_die
-  elseif not S.FontofMagic:IsAvailable() or ((VarDragonrageRemains <= 3.25 * PlayerHaste and VarDragonrageRemains >= 2.5 * PlayerHaste) and S.Animosity:IsAvailable() and VarCanExtendDR or S.ScorchingEmbers:IsAvailable()) and 8 <= Target:TimeToDie() then
+  elseif not S.FontofMagic:IsAvailable() or ((VarDragonrageRemains <= 3.25 * PlayerHaste and VarDragonrageRemains >= 2.5 * PlayerHaste) and S.Animosity:IsAvailable() and VarCanExtendDR or S.ScorchingEmbers:IsAvailable()) and (8 / (S.BlastFurnace:IsAvailable() and 2 or 1)) <= Target:TimeToDie() then
     FBEmpower = 3
   -- fire_breath,empower_to=4,target_if=max:target.health.pct
   else
@@ -436,15 +436,16 @@ local function Aoe()
   -- fire_breath,target_if=max:target.health.pct,empower_to=4,if=talent.scorching_embers&variable.can_use_empower&target.time_to_die>=duration
   -- Note: fire_breath hits all targets, so ignoring target_if.
   -- Note: empower_to=4 requires Font of Magic.
-  if S.FireBreath:IsReady() and S.FontofMagic:IsAvailable() and (S.ScorchingEmbers:IsAvailable() and VarCanUseEmpower and Target:TimeToDie() >= 2 + 4 * num(S.BlastFurnace:IsAvailable())) then
+  if S.FireBreath:IsReady() and S.FontofMagic:IsAvailable() and (S.ScorchingEmbers:IsAvailable() and VarCanUseEmpower and Target:TimeToDie() >= (4 / (S.BlastFurnace:IsAvailable() and 2 or 1))) then
     if CastAnnotated(S.FireBreath, false, "4", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 4 aoe 10"; end
   end
   -- fire_breath,target_if=max:target.health.pct,empower_to=2,if=variable.can_use_empower&target.time_to_die>=duration
-  if S.FireBreath:IsReady() and (VarCanUseEmpower and Target:TimeToDie() >= 14 + 4 * num(S.BlastFurnace:IsAvailable())) then
+  if S.FireBreath:IsReady() and (VarCanUseEmpower and Target:TimeToDie() >= (14 / (S.BlastFurnace:IsAvailable() and 2 or 1))) then
     if CastAnnotated(S.FireBreath, false, "2", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 2 aoe 12"; end
   end
   -- dragonrage,target_if=max:target.time_to_die,if=target.time_to_die>=15|!raid_event.adds.exists
-  if S.Dragonrage:IsReady() then
+  -- Note: raid_event.adds.exists, cannot track add waves in-game
+  if S.Dragonrage:IsReady() and (Target:TimeToDie() >= 15) then
     if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage) then return "dragonrage aoe 14"; end
   end
   -- call_action_list,name=es,if=(!talent.dragonrage|buff.dragonrage.up|cooldown.dragonrage.remains>variable.dr_prep_time_aoe|!talent.animosity)&(!buff.jackpot.up|!set_bonus.tww2_4pc|talent.mass_disintegrate)
@@ -511,6 +512,7 @@ local function ST()
     if Cast(DeepBreathAbility, Settings.Devastation.GCDasOffGCD.DeepBreath, nil, not Target:IsInRange(50)) then return "deep_breath st 2"; end
   end
   -- dragonrage,if=target.time_to_die>=30&raid_event.adds.in>=60|!raid_event.adds.exists
+  -- Note: raid_event.adds.in>=60, cannot track add waves in-game
   if S.Dragonrage:IsReady() and (Target:TimeToDie() >= 30) then
     if Cast(S.Dragonrage, Settings.Devastation.GCDasOffGCD.Dragonrage) then return "dragonrage st 4"; end
   end
@@ -529,11 +531,14 @@ local function ST()
     if Cast(S.TipTheScales, Settings.CommonsOGCD.GCDasOffGCD.TipTheScales) then return "tip_the_scales st 10"; end
   end
   -- shattering_star,if=(!buff.essence_burst.at_max_stacks|!talent.arcane_vigor|talent.engulf)&(set_bonus.tww2_2pc|!talent.scorching_embers|!talent.engulf|dot.fire_breath_damage.ticking&dot.fire_breath_damage.duration<=6|(action.engulf.usable_in<?cooldown.fire_breath.remains_expected+4)>=15)
-  if S.ShatteringStar:IsCastable() and ((not Player:EssenceBurstAtMaxStacks() or not S.ArcaneVigor:IsAvailable() or S.Engulf:IsAvailable()) and (TWW2_2pc or not S.ScorchingEmbers:IsAvailable() or not S.Engulf:IsAvailable() or Target:DebuffRemains(S.FireBreathDebuff) <= 6 or mathmax(S.Engulf:CooldownRemains(), S.FireBreath:CooldownRemains() + 4) >= 15)) then
+  if S.ShatteringStar:IsCastable() and ((not Player:EssenceBurstAtMaxStacks() or not S.ArcaneVigor:IsAvailable() or S.Engulf:IsAvailable()) and (TWW2_2pc or not S.ScorchingEmbers:IsAvailable() or not S.Engulf:IsAvailable() or Target:DebuffRemains(S.FireBreathDebuff) <= 6 or max(S.Engulf:CooldownRemains(), S.FireBreath:CooldownRemains() + 4) >= 15)) then
     if Cast(S.ShatteringStar, nil, nil, not Target:IsInRange(25)) then return "shattering_star st 12"; end
   end
+  -- Call dynamic Fire Breath function for optimal empower levels
+  local ShouldReturn = FB(); if ShouldReturn then return ShouldReturn; end
   -- fire_breath,target_if=max:target.health.pct,empower_to=4,if=(talent.scorching_embers&talent.engulf&action.engulf.usable_in<=duration+0.5)&variable.can_use_empower&(cooldown.shattering_star.remains<=duration+0.5+6-gcd.max|!talent.shattering_star|cooldown.engulf.full_recharge_time<=cooldown.fire_breath.duration_expected+4)
-  if S.FireBreath:IsCastable() and ((S.ScorchingEmbers:IsAvailable() and S.Engulf:IsAvailable() and S.Engulf:CooldownRemains() <= 2 + 4 * num(S.BlastFurnace:IsAvailable()) + 0.5) and VarCanUseEmpower and (S.ShatteringStar:CooldownRemains() <= 2 + 4 * num(S.BlastFurnace:IsAvailable()) + 0.5 + 6 - Player:GCD() or not S.ShatteringStar:IsAvailable() or S.Engulf:FullRechargeTime() <= 34)) then
+  local FB4Duration = 4 / (S.BlastFurnace:IsAvailable() and 2 or 1)
+  if S.FireBreath:IsCastable() and S.FontofMagic:IsAvailable() and (S.ScorchingEmbers:IsAvailable() and S.Engulf:IsAvailable() and S.Engulf:CooldownRemains() <= FB4Duration + 0.5) and VarCanUseEmpower and (S.ShatteringStar:CooldownRemains() <= FB4Duration + 0.5 + 6 - Player:GCD() or not S.ShatteringStar:IsAvailable() or S.Engulf:FullRechargeTime() <= FB4Duration + 4) then
     if CastAnnotated(S.FireBreath, false, "4", not Target:IsInRange(25), Settings.Commons.EmpoweredFontSize) then return "fire_breath empower 4 st 14"; end
   end
   -- fire_breath,target_if=max:target.health.pct,empower_to=2,if=variable.can_use_empower&!buff.dragonrage.up&talent.mass_disintegrate
@@ -546,7 +551,7 @@ local function ST()
   end
   -- engulf,if=(dot.fire_breath_damage.remains>travel_time)&(dot.living_flame_damage.remains>travel_time|!talent.ruby_embers)&(dot.enkindle.remains>travel_time|!talent.enkindle)&(!talent.iridescence|buff.iridescence_red.up)&(!talent.scorching_embers|dot.fire_breath_damage.duration<=6|fight_remains<=30)&(debuff.shattering_star_debuff.remains>travel_time|full_recharge_time<action.shattering_star.usable_in|talent.scorching_embers)&(cooldown.dragonrage.remains>=cooldown.engulf.duration+full_recharge_time|raid_event.adds.in<=60&raid_event.adds.in>duration+full_recharge_time|!talent.dragonrage|buff.tip_the_scales.up&cooldown.fire_breath.up|buff.dragonrage.up|full_recharge_time<=cooldown.fire_breath.duration_expected)
   local EngulfTravel = S.Engulf:TravelTime()
-  local EngulfCD = S.Engulf:Cooldown() or 27 * Player:SpellHaste()
+  local EngulfCD = S.Engulf:Cooldown() or 27
   if S.Engulf:IsReady() and ((Target:DebuffRemains(S.FireBreathDebuff) > EngulfTravel) and (Target:DebuffRemains(S.LivingFlameDebuff) > EngulfTravel or not S.RubyEmbers:IsAvailable()) and (Target:DebuffRemains(S.EnkindleDebuff) > EngulfTravel or not S.Enkindle:IsAvailable()) and (not S.Iridescence:IsAvailable() or Player:BuffUp(S.IridescenceRedBuff)) and (not S.ScorchingEmbers:IsAvailable() or Target:DebuffRemains(S.FireBreathDebuff) <= 6 or BossFightRemains <= 30) and (Target:DebuffRemains(S.ShatteringStarDebuff) > EngulfTravel or S.Engulf:FullRechargeTime() < S.ShatteringStar:CooldownRemains() or S.ScorchingEmbers:IsAvailable()) and (S.Dragonrage:CooldownRemains() >= EngulfCD + S.Engulf:FullRechargeTime() or not S.Dragonrage:IsAvailable() or Player:BuffUp(S.TipTheScalesBuff) and S.FireBreath:CooldownUp() or VarDragonrageUp or S.Engulf:FullRechargeTime() <= 30)) then
     if Cast(S.Engulf, nil, nil, not Target:IsInRange(25)) then return "engulf st 20"; end
   end
@@ -707,19 +712,22 @@ local function APL()
       end
     end
     -- variable,name=next_dragonrage,value=cooldown.dragonrage.remains<?((cooldown.eternity_surge.remains-8)>?(cooldown.fire_breath.remains-8))
-    VarNextDragonrage = mathmax(S.Dragonrage:CooldownRemains(), mathmin((S.EternitySurge:CooldownRemains() - 8), (S.FireBreath:CooldownRemains() - 8)))
+    VarNextDragonrage = max(S.Dragonrage:CooldownRemains(), min((S.EternitySurge:CooldownRemains() - 8), (S.FireBreath:CooldownRemains() - 8)))
     -- invoke_external_buff,name=power_infusion,if=buff.dragonrage.up&(!cooldown.shattering_star.up|debuff.shattering_star_debuff.up|active_enemies>=2)|fight_remains<35
     -- Note: Not handling external buffs.
     -- variable,name=pool_for_id,if=talent.imminent_destruction,default=0,op=set,value=cooldown.deep_breath.remains<7&essence.deficit>=1&!buff.essence_burst.up&(raid_event.adds.in>=action.deep_breath.cooldown*0.4|talent.melt_armor&talent.maneuverability|active_enemies>=3)
+    -- Note: removed raid_event.adds.in as it cannot be tracked in-game
     VarPoolForID = false
     if S.ImminentDestruction:IsAvailable() then
-      VarPoolForID = S.DeepBreath:CooldownRemains() < 7 and Player:EssenceDeficit() >= 1 and Player:BuffDown(S.EssenceBurstBuff)
+      VarPoolForID = S.DeepBreath:CooldownRemains() < 7 and Player:EssenceDeficit() >= 1 and Player:BuffDown(S.EssenceBurstBuff) and (S.MeltArmor:IsAvailable() and S.Maneuverability:IsAvailable() or EnemiesCount8ySplash >= 3)
     end
     -- variable,name=can_extend_dr,if=talent.animosity,op=set,value=buff.dragonrage.up&(buff.dragonrage.duration+dbc.effect.1160688.base_value%1000-buff.dragonrage.elapsed-buff.dragonrage.remains)>0
     -- Note: As of 11.2.0.62801, dbc.effect.1160688.base_value is 20000, found via the command: simc spell_query=effect.id=1160688
     VarCanExtendDR = VarDragonrageUp and (18 + 20 - S.Dragonrage:TimeSinceLastCast() - VarDragonrageRemains) > 0
     -- variable,name=can_use_empower,op=set,value=cooldown.dragonrage.remains>=gcd.max*variable.dr_prep_time,if=talent.animosity&talent.dragonrage
-    VarCanUseEmpower = (S.Animosity:IsAvailable() and S.Dragonrage:IsAvailable()) and (S.Dragonrage:CooldownRemains() >= Player:GCD() * VarDRPrepTime) or false
+    if S.Animosity:IsAvailable() and S.Dragonrage:IsAvailable() then
+      VarCanUseEmpower = S.Dragonrage:CooldownRemains() >= Player:GCD() * VarDRPrepTime
+    end
     -- quell,use_off_gcd=1,if=target.debuff.casting.react
     local ShouldReturn = Everyone.Interrupt(S.Quell, Settings.CommonsDS.DisplayStyle.Interrupts, StunInterrupts); if ShouldReturn then return ShouldReturn; end
     -- Manually added: Unravel if enemy has an absorb shield
