@@ -88,7 +88,7 @@ local function SetTrinketVariables()
   local T1, T2 = Player:GetTrinketData(OnUseExcludes)
 
   -- If we don't have trinket items, try again in 5 seconds.
-  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or (T1.SpellID > 0 and not T1.Usable or T2.SpellID > 0 and not T2.Usable)) then
+  if VarTrinketFailures < 5 and ((T1.ID == 0 or T2.ID == 0) or ((T1.SpellID > 0 and not T1.Usable) or (T2.SpellID > 0 and not T2.Usable))) then
     Delay(5, function()
         SetTrinketVariables()
       end
@@ -265,9 +265,8 @@ local function Spellslinger()
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles spellslinger 14"; end
   end
   -- arcane_barrage,if=(cooldown.touch_of_the_magi.ready|cooldown.touch_of_the_magi.remains<((travel_time+0.05)>?gcd.max))&(cooldown.arcane_surge.remains>30&cooldown.arcane_surge.remains<75)
-  -- Note: Intent seems to be to dump charges before TotM, so added >0 check.
-  -- Note: Removed cooldown.touch_of_the_magi.ready, since that would be equivalent to remains=0, which is less than gcd.max.
-  if S.ArcaneBarrage:IsCastable() and Player:ArcaneCharges() > 0 and ((S.TouchoftheMagi:CooldownRemains() + 0.05) < Player:GCD() and (S.ArcaneSurge:CooldownRemains() > 30 and S.ArcaneSurge:CooldownRemains() < 75)) then
+  -- Note: Intent is to dump charges before TotM, accounting for Barrage travel time to ensure proper timing.
+  if S.ArcaneBarrage:IsCastable() and Player:ArcaneCharges() > 0 and ((S.TouchoftheMagi:CooldownUp() or S.TouchoftheMagi:CooldownRemains() < mathmax(S.ArcaneBarrage:TravelTime() + 0.05, Player:GCD())) and (S.ArcaneSurge:CooldownRemains() > 30 and S.ArcaneSurge:CooldownRemains() < 75)) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage spellslinger 16"; end
   end
   -- arcane_barrage,if=buff.arcane_charge.stack=4&buff.arcane_harmony.stack>=20&set_bonus.thewarwithin_season_3_4pc
@@ -405,12 +404,11 @@ local function Sunfury()
     if Cast(S.ArcaneMissiles, nil, nil, not Target:IsSpellInRange(S.ArcaneMissiles)) then return "arcane_missiles sunfury 20"; end
   end
   -- arcane_barrage,if=buff.arcane_charge.stack=4&((cooldown.touch_of_the_magi.ready)|cooldown.touch_of_the_magi.remains<((travel_time+50)>?gcd.max))&!variable.soul_cd
-  -- Note: travel_time+0.05 was used previously.
-  if S.ArcaneBarrage:IsReady() and (Player:ArcaneCharges() == 4 and (S.TouchoftheMagi:CooldownUp() or S.TouchoftheMagi:CooldownRemains() < mathmin(S.ArcaneBarrage:TravelTime() + 0.05, Player:GCD())) and not VarSoulCD) then
+  if S.ArcaneBarrage:IsReady() and (Player:ArcaneCharges() == 4 and (S.TouchoftheMagi:CooldownUp() or S.TouchoftheMagi:CooldownRemains() < mathmax(S.ArcaneBarrage:TravelTime() + 0.05, Player:GCD())) and not VarSoulCD) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 22"; end
   end
   -- arcane_barrage,if=(cooldown.touch_of_the_magi.ready|(cooldown.touch_of_the_magi.remains<((travel_time+50)>?gcd.max)))&(buff.arcane_surge.down|(buff.arcane_surge.up&buff.arcane_surge.remains<=2.5))&variable.soul_cd
-  if S.ArcaneBarrage:IsReady() and ((S.TouchoftheMagi:CooldownUp() or (S.TouchoftheMagi:CooldownRemains() < mathmin(S.ArcaneBarrage:TravelTime() + 0.05, Player:GCD()))) and (Player:BuffDown(S.ArcaneSurgeBuff) or (Player:BuffUp(S.ArcaneSurgeBuff) and Player:BuffRemains(S.ArcaneSurgeBuff) <= 2.5)) and VarSoulCD) then
+  if S.ArcaneBarrage:IsReady() and ((S.TouchoftheMagi:CooldownUp() or (S.TouchoftheMagi:CooldownRemains() < mathmax(S.ArcaneBarrage:TravelTime() + 0.05, Player:GCD()))) and (Player:BuffDown(S.ArcaneSurgeBuff) or (Player:BuffUp(S.ArcaneSurgeBuff) and Player:BuffRemains(S.ArcaneSurgeBuff) <= 2.5)) and VarSoulCD) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage sunfury 24"; end
   end
   -- arcane_blast,if=debuff.magis_spark_arcane_blast.up&buff.arcane_charge.stack=4,line_cd=2
@@ -486,7 +484,7 @@ local function APL()
 
     -- VarSoulCD from Precombat, since we can't check active_enemies until here.
     --variable,name=soul_cd,op=set,value=1,if=set_bonus.thewarwithin_season_3_4pc&talent.spellfire_spheres&talent.resonance&!talent.magis_spark&(active_enemies>=3)&variable.soul_burst
-    VarSoulCD = VarSoulBurst and TWW3_4pc and Player:HeroTreeID() == 39 and S.Resonance:IsAvailable() and not S.MagisSpark:IsAvailable() and EnemiesCount8ySplash >= 3
+    VarSoulCD = VarSoulBurst and TWW3_4pc and S.SpellfireSpheres:IsAvailable() and S.Resonance:IsAvailable() and not S.MagisSpark:IsAvailable() and EnemiesCount8ySplash >= 3
   end
 
   if Everyone.TargetIsValid() then

@@ -124,7 +124,7 @@ ArcanePlayerBuffDown = HL.AddCoreOverride("Player.BuffDown",
     if Spell == SpellArcane.ArcaneSurgeBuff then
       return BaseCheck and not Player:IsCasting(SpellArcane.ArcaneSurge)
     elseif Spell == SpellArcane.NetherPrecisionBuff then
-      if Player:BuffInfo(Spell) == 1 and Player:IsCasting(SpellArcane.ArcaneBlast) then
+      if Player:BuffStack(Spell) == 1 and Player:IsCasting(SpellArcane.ArcaneBlast) then
         return true
       else
         return BaseCheck
@@ -138,9 +138,9 @@ ArcanePlayerBuffDown = HL.AddCoreOverride("Player.BuffDown",
 -- Fire, ID: 63
 local function IsSKBCastSafe(spell)
   if not spell then return false end
-  local auraData = C_UnitAuras.GetPlayerAuraBySpellID(SpellFire.FuryoftheSunKingBuff:ID())
+  local auraData = C_UnitAuras.GetPlayerAuraBySpellID(spell:ID())
   if auraData and auraData.expirationTime then
-    local currentTime = GetTimePreciseSec()
+    local currentTime = GetTime()
     local remainingTime = auraData.expirationTime - currentTime
     local castTime = spell:CastTime()
     return remainingTime > (castTime * (auraData.timeMod or 1) + 0.2)

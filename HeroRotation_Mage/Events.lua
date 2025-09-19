@@ -157,8 +157,10 @@ HL:RegisterForSelfCombatEvent(function(...)
       EventInfo.LastClearcastingTime = LastClearcastingTime
     elseif event == "SPELL_AURA_REMOVED_DOSE" then
       EventInfo.ClearcastingProcs = EventInfo.ClearcastingProcs - 1
+      ClearcastingProcs = EventInfo.ClearcastingProcs
     elseif event == "SPELL_AURA_REMOVED" then
       EventInfo.ClearcastingProcs = 0
+      ClearcastingProcs = 0
     end
   end
 end, "SPELL_AURA_APPLIED_DOSE", "SPELL_AURA_REMOVED_DOSE", "SPELL_AURA_APPLIED", "SPELL_AURA_REMOVED")
