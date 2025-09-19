@@ -231,4 +231,7 @@ Item.Evoker.Devastation = MergeTableByKey(Item.Evoker.Commons, {
   KharnalexTheFirstLight                = Item(195519, {16}),
   -- TWW Trinkets
   SignetofthePriory                     = Item(219308, {13, 14}),
+  -- Other Trinkets
+  BelorrelostheSuncaller                = Item(207172, {13, 14}),
+  NymuesUnravelingSpindle               = Item(208615, {13, 14}),
 })
