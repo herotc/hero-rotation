@@ -66,7 +66,7 @@ HL.AddCoreOverride("Player.BonestormTicking",
 
 HL.AddCoreOverride("Player.DRWBPTicking",
   function (self)
-    return Player:BuffUp(SpellBlood.DancingRuneWeaponBuff) and SpellBlood.BloodBoil:TimeSinceLastCast() < SpellBlood.DancingRuneWeapon:TimeSinceLastCast()
+    return Player:BuffUp(SpellBlood.DancingRuneWeaponBuff) and (SpellBlood.BloodBoil:TimeSinceLastCast() < SpellBlood.DancingRuneWeapon:TimeSinceLastCast() or SpellBlood.DeathsCaress:TimeSinceLastCast() < SpellBlood.DancingRuneWeapon:TimeSinceLastCast())
   end
 , 250)
 
