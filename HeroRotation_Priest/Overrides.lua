@@ -68,7 +68,7 @@ OldShadowIsCastable = HL.AddCoreOverride("Spell.IsCastable",
   function (self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     local BaseCheck = OldShadowIsCastable(self, BypassRecovery, Range, AoESpell, ThisUnit, Offset)
     if self == SpellShadow.VampiricTouch then
-      return BaseCheck and (not SpellShadow.ShadowCrash:InFlight() or SpellShadow.ShadowCrash:TimeSinceLastCast() > Player:GCD()) and (not SpellShadow.ShadowCrashTarget:InFlight() or SpellShadow.ShadowCrashTarget:TimeSinceLastCast() > Player:GCD()) and (Player:BuffUp(SpellShadow.UnfurlingDarknessBuff) or not Player:IsCasting(self))
+      return BaseCheck and not SpellShadow.ShadowCrash:InFlight() and not SpellShadow.ShadowCrashTarget:InFlight() and (Player:BuffUp(SpellShadow.UnfurlingDarknessBuff) or not Player:IsCasting(self))
     elseif self == SpellShadow.MindBlast then
       return BaseCheck and not (self:Charges() == 1 and Player:IsCasting(self))
     elseif self == SpellShadow.VoidEruption or self == SpellShadow.DarkAscension then
@@ -100,11 +100,10 @@ OldShadowBuffUp = HL.AddCoreOverride("Player.BuffUp",
 local OldShadowInFlight
 OldShadowInFlight = HL.AddCoreOverride("Spell.InFlight",
   function(self)
-    local BaseCheck = OldShadowInFlight(self)
     if self == SpellShadow.ShadowCrash or self == SpellShadow.ShadowCrashTarget then
-      return self:TimeSinceLastCast() < 2
+      return self:TimeSinceLastCast() < 1.5
     else
-      return BaseCheck
+      return OldShadowInFlight(self)
     end
   end
 , 258)
