@@ -238,19 +238,19 @@ local function Bear()
     if Cast(S.Ironfur, nil, Settings.Guardian.DisplayStyle.Defensives) then return "ironfur bear 26"; end
   end
   -- ironfur,if=!buff.ravage.up&((rage>40&variable.If_build=1|rage>90&variable.If_build=1&!talent.fount_of_strength.enabled|rage>110&variable.If_build=1&talent.fount_of_strength.enabled|(buff.incarnation.up|buff.berserk_bear.up)&rage>20&variable.If_build=1&buff.rage_of_the_sleeper.up&talent.rage_of_the_sleeper.enabled))
-  if S.Ironfur:IsReady() and (Player:BuffDown(S.RavageBuffGuardian) and ((Player:Rage() > 40 and VarIFBuild or Player:Rage() > 90 and VarIFBuild and not S.FountofStrength:IsAvailable() or Player:Rage() > 110 and VarIFBuild and S.FountofStrength:IsAvailable() or (Player:BuffUp(S.Incarnation) or Player:BuffUp(S.Berserk)) and Player:Rage() > 20 and VarIFBuild and Player:BuffUp(S.RageoftheSleeper) and S.RageoftheSleeper:IsAvailable()))) then
+  if S.Ironfur:IsReady() and (Player:BuffDown(S.RavageBuffGuardian) and ((Player:Rage() > 40 and VarIFBuild or Player:Rage() > 90 and VarIFBuild and not S.FountofStrength:IsAvailable() or Player:Rage() > 110 and VarIFBuild and S.FountofStrength:IsAvailable() or (Player:BuffUp(S.Incarnation) or Player:BuffUp(S.Berserk)) and Player:Rage() > 20 and VarIFBuild and Player:BuffUp(S.RageoftheSleeper) and S.RageoftheSleeper:IsAvailable())) and Settings.Guardian.UseIronfurOffensively) then
     if Cast(S.Ironfur, nil, Settings.Guardian.DisplayStyle.Defensives) then return "ironfur defensive 28"; end
   end
   -- ironfur,if=!buff.ravage.up&(buff.incarnation.up|buff.berserk_bear.up)&rage>20&variable.If_build=1
-  if S.Ironfur:IsReady() and (Player:BuffDown(S.RavageBuffGuardian) and (Player:BuffUp(S.Incarnation) or Player:BuffUp(S.Berserk)) and Player:Rage() > 20 and VarIFBuild) then
+  if S.Ironfur:IsReady() and (Player:BuffDown(S.RavageBuffGuardian) and (Player:BuffUp(S.Incarnation) or Player:BuffUp(S.Berserk)) and Player:Rage() > 20 and VarIFBuild and Settings.Guardian.UseIronfurOffensively) then
     if Cast(S.Ironfur, nil, Settings.Guardian.DisplayStyle.Defensives) then return "ironfur defensive 30"; end
   end
   -- ferocious_bite,if=(buff.cat_form.up&buff.feline_potential.up&(buff.incarnation.up|buff.berserk_bear.up)&!dot.rip.refreshable)
-  if S.FerociousBite:IsReady() and (Player:BuffUp(S.CatForm) and Player:BuffUp(S.FelinePotentialBuff) and (Player:BuffUp(S.Incarnation) or Player:BuffUp(S.Berserk)) and not Target:DebuffRefreshable(S.RipDebuff)) then
+  if S.FerociousBite:IsReady() and (Player:BuffUp(S.CatForm) and Player:BuffUp(S.FelinePotentialBuff) and (Player:BuffUp(S.Incarnation) or Player:BuffUp(S.Berserk)) and not Target:DebuffRefreshable(S.RipDebuff) and VarRipWeaving) then
     if Cast(S.FerociousBite, nil, nil, not IsInMeleeRange) then return "ferocious_bite defensive 32"; end
   end
   -- rip,if=(buff.cat_form.up&buff.feline_potential.up)
-  if S.Rip:IsReady() and (Player:BuffUp(S.CatForm) and Player:BuffUp(S.FelinePotentialBuff)) then
+  if S.Rip:IsReady() and (Player:BuffUp(S.CatForm) and Player:BuffUp(S.FelinePotentialBuff) and VarRipWeaving) then
     if Cast(S.Rip, nil, nil, not IsInMeleeRange) then return "rip defensive 34"; end
   end
   -- mangle,if=buff.gore.up&active_enemies<11|buff.incarnation_guardian_of_ursoc.up&buff.feline_potential_counter.stack<6&talent.wildpower_surge.enabled
@@ -258,15 +258,15 @@ local function Bear()
     if Cast(S.Mangle, nil, nil, not IsInMeleeRange) then return "mangle bear 36"; end
   end
   -- shred,if=cooldown.rage_of_the_sleeper.remains<=52&buff.feline_potential_counter.stack=6&!buff.cat_form.up&!dot.rake.refreshable&talent.fluid_form.enabled
-  if S.Shred:IsReady() and (S.RageoftheSleeper:CooldownRemains() <= 52 and Player:BuffStack(S.FelinePotentialBuff) == 6 and Player:BuffDown(S.CatForm) and not Target:DebuffRefreshable(S.RakeDebuff) and S.FluidForm:IsAvailable()) then
+  if S.Shred:IsReady() and (S.RageoftheSleeper:CooldownRemains() <= 52 and Player:BuffStack(S.FelinePotentialBuff) == 6 and Player:BuffDown(S.CatForm) and not Target:DebuffRefreshable(S.RakeDebuff) and S.FluidForm:IsAvailable() and VarRipWeaving) then
     if Cast(S.Shred, nil, nil, not IsInMeleeRange) then return "shred bear 38"; end
   end
   -- rake,if=cooldown.rage_of_the_sleeper.remains<=52&buff.feline_potential_counter.stack=6&!buff.cat_form.up&talent.fluid_form.enabled
-  if S.Rake:IsReady() and (S.RageoftheSleeper:CooldownRemains() <= 52 and Player:BuffStack(S.FelinePotentialBuff) == 6 and Player:BuffDown(S.CatForm) and S.FluidForm:IsAvailable()) then
+  if S.Rake:IsReady() and (S.RageoftheSleeper:CooldownRemains() <= 52 and Player:BuffStack(S.FelinePotentialBuff) == 6 and Player:BuffDown(S.CatForm) and S.FluidForm:IsAvailable() and VarRipWeaving) then
     if Cast(S.Rake, nil, nil, not IsInMeleeRange) then return "rake bear 40"; end
   end
   -- mangle,if=buff.cat_form.up&talent.fluid_form.enabled
-  if S.Mangle:IsCastable() and (Player:BuffUp(S.CatForm) and S.FluidForm:IsAvailable()) then
+  if S.Mangle:IsCastable() and (Player:BuffUp(S.CatForm) and S.FluidForm:IsAvailable() and VarRipWeaving) then
     if Cast(S.Mangle, nil, nil, not IsInMeleeRange) then return "mangle bear 42"; end
   end
   -- maul,if=variable.If_build=1&(((buff.tooth_and_claw.stack>1|buff.tooth_and_claw.up&buff.tooth_and_claw.remains<1+gcd)&active_enemies<=5&!talent.raze.enabled)|((buff.tooth_and_claw.stack>1|buff.tooth_and_claw.up&buff.tooth_and_claw.remains<1+gcd)&active_enemies=1&talent.raze.enabled)|((buff.tooth_and_claw.stack>1|buff.tooth_and_claw.up&buff.tooth_and_claw.remains<1+gcd)&active_enemies<=5&!talent.raze.enabled))
@@ -290,15 +290,15 @@ local function Bear()
     if Cast(S.Mangle, nil, nil, not IsInMeleeRange) then return "mangle bear 52"; end
   end
   -- rip,if=buff.cat_form.up&(!dot.rip.ticking|refreshable)&combo_points>=3&active_enemies<3&!talent.empowered_shapeshifting.enabled
-  if S.Rip:IsReady() and (Player:BuffUp(S.CatForm) and (Target:DebuffDown(S.RipDebuff) or Target:DebuffRefreshable(S.RipDebuff)) and Player:ComboPoints() >= 3 and Enemies8yCount < 3 and not S.EmpoweredShapeshifting:IsAvailable()) then
+  if S.Rip:IsReady() and (Player:BuffUp(S.CatForm) and (Target:DebuffDown(S.RipDebuff) or Target:DebuffRefreshable(S.RipDebuff)) and Player:ComboPoints() >= 3 and Enemies8yCount < 3 and not S.EmpoweredShapeshifting:IsAvailable() and VarRipWeaving) then
     if Cast(S.Rip, nil, nil, not IsInMeleeRange) then return "rip bear 54"; end
   end
   -- ferocious_bite,if=buff.cat_form.up&dot.rip.ticking&combo_points>4&active_enemies<3&!talent.empowered_shapeshifting.enabled
-  if S.FerociousBite:IsReady() and (Player:BuffUp(S.CatForm) and Target:DebuffUp(S.RipDebuff) and Player:ComboPoints() > 4 and Enemies8yCount < 3 and not S.EmpoweredShapeshifting:IsAvailable()) then
+  if S.FerociousBite:IsReady() and (Player:BuffUp(S.CatForm) and Target:DebuffUp(S.RipDebuff) and Player:ComboPoints() > 4 and Enemies8yCount < 3 and not S.EmpoweredShapeshifting:IsAvailable() and VarRipWeaving) then
     if Cast(S.FerociousBite, nil, nil, not IsInMeleeRange) then return "ferocious_bite bear 56"; end
   end
   -- rake,if=talent.fluid_form.enabled&buff.bear_form.up&!buff.incarnation_guardian_of_ursoc.up&(refreshable|!dot.rake.ticking)&active_enemies<3&!talent.lunar_insight.enabled&energy>70&!talent.empowered_shapeshifting.enabled|buff.cat_form.up&active_enemies<3&!talent.lunar_insight.enabled&talent.fluid_form.enabled&energy>70&(refreshable|!dot.rake.ticking)&!talent.empowered_shapeshifting.enabled
-  if S.Rake:IsReady() and not IsTanking and (S.FluidForm:IsAvailable() and Player:BuffUp(S.BearForm) and Player:BuffDown(S.Incarnation) and (Target:DebuffRefreshable(S.RakeDebuff) or Target:DebuffDown(S.RakeDebuff)) and Enemies8yCount < 3 and not S.LunarInsight:IsAvailable() and Player:Energy() > 70 and not S.EmpoweredShapeshifting:IsAvailable() or Player:BuffUp(S.CatForm) and Enemies8yCount < 3 and not S.LunarInsight:IsAvailable() and S.FluidForm:IsAvailable() and Player:Energy() > 70 and (Target:DebuffRefreshable(S.RakeDebuff) or Target:DebuffDown(S.RakeDebuff)) and not S.EmpoweredShapeshifting:IsAvailable()) then
+  if S.Rake:IsReady() and not IsTanking and (S.FluidForm:IsAvailable() and Player:BuffUp(S.BearForm) and Player:BuffDown(S.Incarnation) and (Target:DebuffRefreshable(S.RakeDebuff) or Target:DebuffDown(S.RakeDebuff)) and Enemies8yCount < 3 and not S.LunarInsight:IsAvailable() and Player:Energy() > 70 and not S.EmpoweredShapeshifting:IsAvailable() or Player:BuffUp(S.CatForm) and Enemies8yCount < 3 and not S.LunarInsight:IsAvailable() and S.FluidForm:IsAvailable() and Player:Energy() > 70 and (Target:DebuffRefreshable(S.RakeDebuff) or Target:DebuffDown(S.RakeDebuff)) and not S.EmpoweredShapeshifting:IsAvailable()) and VarRipWeaving then
     if Cast(S.Rake, nil, nil, not IsInMeleeRange) then return "rake bear 58"; end
   end
   -- thrash_bear,if=active_enemies>1
@@ -314,11 +314,11 @@ local function Bear()
     if Cast(S.ThrashBear, nil, nil, not IsInAoERange) then return "thrash bear 64"; end
   end
   -- rake,if=talent.fluid_form.enabled&buff.bear_form.up&!buff.incarnation_guardian_of_ursoc.up&(refreshable|!dot.rake.ticking)&active_enemies>3&!talent.lunar_insight.enabled&cooldown.mangle.remains<gcd&!talent.empowered_shapeshifting.enabled
-  if S.Rake:IsReady() and not IsTanking and (S.FluidForm:IsAvailable() and Player:BuffUp(S.BearForm) and Player:BuffDown(S.Incarnation) and (Target:DebuffRefreshable(S.RakeDebuff) or Target:DebuffDown(S.RakeDebuff)) and Enemies8yCount > 3 and not S.LunarInsight:IsAvailable() and S.Mangle:CooldownRemains() < Player:GCD() and not S.EmpoweredShapeshifting:IsAvailable()) then
+  if S.Rake:IsReady() and not IsTanking and (S.FluidForm:IsAvailable() and Player:BuffUp(S.BearForm) and Player:BuffDown(S.Incarnation) and (Target:DebuffRefreshable(S.RakeDebuff) or Target:DebuffDown(S.RakeDebuff)) and Enemies8yCount > 3 and not S.LunarInsight:IsAvailable() and S.Mangle:CooldownRemains() < Player:GCD() and not S.EmpoweredShapeshifting:IsAvailable() and VarRipWeaving) then
     if Cast(S.Rake, nil, nil, not IsInMeleeRange) then return "rake bear 66"; end
   end
   -- shred,if=talent.fluid_form.enabled&buff.bear_form.up&!buff.incarnation_guardian_of_ursoc.up&dot.rake.ticking&active_enemies<3&!talent.lunar_insight.enabled&energy>70&!talent.empowered_shapeshifting.enabled|buff.cat_form.up&active_enemies<3&!talent.lunar_insight.enabled&talent.fluid_form.enabled&energy>70&!talent.empowered_shapeshifting.enabled
-  if S.Shred:IsReady() and not IsTanking and (S.FluidForm:IsAvailable() and Player:BuffUp(S.BearForm) and Player:BuffDown(S.Incarnation) and Target:DebuffUp(S.RakeDebuff) and Enemies8yCount < 3 and not S.LunarInsight:IsAvailable() and Player:Energy() > 70 and not S.EmpoweredShapeshifting:IsAvailable() or Player:BuffUp(S.CatForm) and Enemies8yCount < 3 and not S.LunarInsight:IsAvailable() and S.FluidForm:IsAvailable() and Player:Energy() > 70 and not S.EmpoweredShapeshifting:IsAvailable()) then
+  if S.Shred:IsReady() and not IsTanking and (S.FluidForm:IsAvailable() and Player:BuffUp(S.BearForm) and Player:BuffDown(S.Incarnation) and Target:DebuffUp(S.RakeDebuff) and Enemies8yCount < 3 and not S.LunarInsight:IsAvailable() and Player:Energy() > 70 and not S.EmpoweredShapeshifting:IsAvailable() or Player:BuffUp(S.CatForm) and Enemies8yCount < 3 and not S.LunarInsight:IsAvailable() and S.FluidForm:IsAvailable() and Player:Energy() > 70 and not S.EmpoweredShapeshifting:IsAvailable()) and VarRipWeaving then
     if Cast(S.Shred, nil, nil, not IsInMeleeRange) then return "shred bear 68"; end
   end
   -- moonfire,if=buff.galactic_guardian.up&buff.bear_form.up&talent.boundless_moonlight.enabled
