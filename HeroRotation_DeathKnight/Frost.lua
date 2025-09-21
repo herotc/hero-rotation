@@ -442,7 +442,7 @@ end
 local function Trinkets()
   if Settings.Commons.Enabled.Trinkets then
     -- use_item,name=unyielding_netherprism,if=buff.latent_energy.stack>8&buff.pillar_of_frost.remains&(!talent.breath_of_sindragosa|buff.breath_of_sindragosa.remains)
-    if I.UnyieldingNetherprism:IsEquippedAndReady() and (Player:BuffStack(S.LatentEnergyBuff) > 8 and S.PillarofFrost:CooldownDown() and (not S.BreathofSindragosa:IsAvailable() or Player:BuffUp(S.BreathofSindragosa))) then
+    if I.UnyieldingNetherprism:IsEquippedAndReady() and (Player:BuffStack(S.LatentEnergyBuff) > 8 and Player:BuffUp(S.PillarofFrostBuff) and (not S.BreathofSindragosa:IsAvailable() or Player:BuffUp(S.BreathofSindragosa))) then
       if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "unyielding_netherprism trinkets 2"; end
     end
     -- use_item,slot=trinket1,if=!trinket.1.cast_time>0&variable.trinket_1_buffs&!variable.trinket_1_manual&buff.pillar_of_frost.remains&(!trinket.2.has_cooldown|trinket.2.cooldown.remains|variable.trinket_priority=1)
