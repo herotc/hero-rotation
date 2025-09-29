@@ -99,6 +99,8 @@ Spell.Hunter.DarkRanger = {
   WitheringFireReady                    = Spell(468075),
   -- Debuffs
   BlackArrowDebuff                      = Spell(468572),
+  -- Tier Set Buffs
+  BlightedQuiverBuff                    = Spell(1236975),
 }
 
 Spell.Hunter.PackLeader = {
@@ -341,6 +343,7 @@ Item.Hunter.Commons = {
 }
 
 Item.Hunter.BeastMastery = MergeTableByKey(Item.Hunter.Commons, {
+  ArazsRitualForge                       = Item(242402, {13, 14}),
 })
 
 Item.Hunter.Marksmanship = MergeTableByKey(Item.Hunter.Commons, {
