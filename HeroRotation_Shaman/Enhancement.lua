@@ -1420,7 +1420,7 @@ local function Funnel()
   end
   -- flame_shock,target_if=min:dot.flame_shock.remains,if=(talent.fire_nova.enabled|talent.primordial_wave.enabled)&(active_dot.flame_shock<active_enemies)&active_dot.flame_shock<6
   if S.FlameShock:IsReady() and ((S.FireNova:IsAvailable() or S.PrimordialWave:IsAvailable()) and (S.FlameShockDebuff:AuraActiveCount() < EnemiesMeleeCount) and S.FlameShockDebuff:AuraActiveCount() < 6) then
-    if Cast(S.FlameShock, nil, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock funnel 52"; end
+    if Everyone.CastTargetIf(S.FlameShock, EnemiesMelee, "min", EvaluateTargetIfFilterFlameShock, nil, not Target:IsSpellInRange(S.FlameShock)) then return "flame_shock funnel 52"; end
   end
   -- fire_nova,if=active_dot.flame_shock>=3
   if S.FireNova:IsReady() and (S.FlameShockDebuff:AuraActiveCount() >= 3) then
@@ -1507,6 +1507,10 @@ local function APL()
 
     -- Check our Maelstrom Weapon buff stacks
     MaelstromStacks = Player:BuffStack(S.MaelstromWeaponBuff)
+
+    -- Update Searing Totem state
+    local _, totemName, _, _, _, _, spellID = GetTotemInfo(1) -- Fire slot
+    Shaman.SearingTotemActive = (spellID == 458101 and totemName ~= "")
   end
 
   -- Update Thorim's Invocation
@@ -1552,7 +1556,7 @@ local function APL()
       if Cast(S.HealingSurge, Settings.Enhancement.GCDasOffGCD.HealingSurge) then return "self healing required"; end
     end
     -- variable,name=min_talented_cd_remains,value=((cooldown.feral_spirit.remains%(4*talent.witch_doctors_ancestry.enabled))+1000*!talent.feral_spirit.enabled)>?(cooldown.doom_winds.remains+1000*!talent.doom_winds.enabled)>?(cooldown.ascendance.remains+1000*!talent.ascendance.enabled)
-    VarMinTalentedCDRemains = mathmin(((S.FeralSpirit:CooldownRemains() / (4 * num(S.WitchDoctorsAncestry:IsAvailable()))) + 1000 * num(not S.FeralSpirit:IsAvailable())), (S.DoomWinds:CooldownRemains() + 1000 * num(not S.DoomWinds:IsAvailable())), (S.Ascendance:CooldownRemains() + 1000 * num(not S.Ascendance:IsAvailable())))
+    VarMinTalentedCDRemains = mathmin(((S.FeralSpirit:CooldownRemains() % (4 * num(S.WitchDoctorsAncestry:IsAvailable()))) + 1000 * num(not S.FeralSpirit:IsAvailable())), (S.DoomWinds:CooldownRemains() + 1000 * num(not S.DoomWinds:IsAvailable())), (S.Ascendance:CooldownRemains() + 1000 * num(not S.Ascendance:IsAvailable())))
     -- variable,name=target_nature_mod,value=(1+debuff.chaos_brand.up*debuff.chaos_brand.value)*(1+(debuff.hunters_mark.up*target.health.pct>=80)*debuff.hunters_mark.value)
     VarTargetNatureMod = (1 + num(Target:DebuffUp(S.ChaosBrandDebuff)) * 0.05) * (1 + num(Target:DebuffUp(S.HuntersMarkDebuff) and Target:HealthPercentage() >= 80) * 0.05)
     -- variable,name=expected_lb_funnel,value=action.lightning_bolt.damage*(1+debuff.lightning_rod.up*variable.target_nature_mod*(1+buff.primordial_wave.up*active_dot.flame_shock*buff.primordial_wave.value)*debuff.lightning_rod.value)

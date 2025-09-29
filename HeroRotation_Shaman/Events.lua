@@ -11,6 +11,7 @@ local Player = Unit.Player
 local Target = Unit.Target
 local Spell = HL.Spell
 local Item = HL.Item
+local SpellEnh = Spell.Shaman.Enhancement
 -- Lua
 local GetTime = GetTime
 local C_Timer = C_Timer
@@ -28,6 +29,7 @@ Shaman.CracklingSurgeStacks = 0
 Shaman.IcyEdgeStacks = 0
 Shaman.MoltenWeaponStacks = 0
 Shaman.TempestMaelstrom = 0
+Shaman.LastMaelstromWeaponStacks = 0
 Shaman.SearingTotemActive = false
 Shaman.SearingTotemGUID = 0
 Shaman.TWW3ProcsToAsc = 8
@@ -84,33 +86,19 @@ HL:RegisterForSelfCombatEvent(
 HL:RegisterForCombatEvent(
   function (...)
     local DestGUID, _, _, _, SpellID = select(8, ...)
-    if DestGUID == Player:GUID() then
-      if SpellID == 224125 then -- Molten Weapon Buff
-        Shaman.MoltenWeaponStacks = Shaman.MoltenWeaponStacks + 1
-      elseif SpellID == 224126 then -- Icy Edge Buff
-        Shaman.IcyEdgeStacks = Shaman.IcyEdgeStacks + 1
-      elseif SpellID == 224127 then -- Crackling Surge Buff
-        Shaman.CracklingSurgeStacks = Shaman.CracklingSurgeStacks + 1
-      end
+    if DestGUID ~= Player:GUID() then return end
+    if SpellID == SpellEnh.MoltenWeaponBuff:ID() then
+      local AuraData = Player:BuffInfo(SpellEnh.MoltenWeaponBuff, nil, true)
+      Shaman.MoltenWeaponStacks = AuraData and (AuraData.applications or 1) or 0
+    elseif SpellID == SpellEnh.IcyEdgeBuff:ID() then
+      local AuraData = Player:BuffInfo(SpellEnh.IcyEdgeBuff, nil, true)
+      Shaman.IcyEdgeStacks = AuraData and (AuraData.applications or 1) or 0
+    elseif SpellID == SpellEnh.CracklingSurgeBuff:ID() then
+      local AuraData = Player:BuffInfo(SpellEnh.CracklingSurgeBuff, nil, true)
+      Shaman.CracklingSurgeStacks = AuraData and (AuraData.applications or 1) or 0
     end
   end
-  , "SPELL_AURA_APPLIED"
-)
-
-HL:RegisterForCombatEvent(
-  function (...)
-    local DestGUID, _, _, _, SpellID = select(8, ...)
-    if DestGUID == Player:GUID() then
-      if SpellID == 224125 then -- Molten Weapon Buff
-        Shaman.MoltenWeaponStacks = Shaman.MoltenWeaponStacks - 1
-      elseif SpellID == 224126 then -- Icy Edge Buff
-        Shaman.IcyEdgeStacks = Shaman.IcyEdgeStacks - 1
-      elseif SpellID == 224127 then -- Crackling Surge Buff
-        Shaman.CracklingSurgeStacks = Shaman.CracklingSurgeStacks - 1
-      end
-    end
-  end
-  , "SPELL_AURA_REMOVED"
+  , "SPELL_AURA_APPLIED", "SPELL_AURA_APPLIED_DOSE", "SPELL_AURA_REMOVED", "SPELL_AURA_REMOVED_DOSE"
 )
 
 --- ===== Fire Elemental Tracker =====
@@ -156,22 +144,36 @@ HL:RegisterForSelfCombatEvent(
 --- ===== Tempest Maelstrom Counter =====
 HL:RegisterForSelfCombatEvent(
   function (...)
+    local SubEvent = select(2, ...)
     local SpellID = select(12, ...)
-    if SpellID == 344179 then
-      Shaman.TempestMaelstrom = Shaman.TempestMaelstrom + 1
-      if Shaman.TempestMaelstrom >= 40 then
-        Shaman.TempestMaelstrom = Shaman.TempestMaelstrom - 40
+    if SpellID == SpellEnh.MaelstromWeaponBuff:ID() then
+      local StackAmount
+      if SubEvent == "SPELL_AURA_REMOVED" then
+        StackAmount = 0
+      else
+        StackAmount = select(16, ...)
+        if StackAmount == nil then
+          StackAmount = Player:BuffStack(SpellEnh.MaelstromWeaponBuff)
+        end
       end
+      StackAmount = StackAmount or 0
+      if StackAmount > Shaman.LastMaelstromWeaponStacks then
+        Shaman.TempestMaelstrom = Shaman.TempestMaelstrom + (StackAmount - Shaman.LastMaelstromWeaponStacks)
+        if Shaman.TempestMaelstrom >= 40 then
+          Shaman.TempestMaelstrom = Shaman.TempestMaelstrom % 40
+        end
+      end
+      Shaman.LastMaelstromWeaponStacks = StackAmount
     end
   end
-  , "SPELL_AURA_APPLIED", "SPELL_AURA_APPLIED_DOSE"
+  , "SPELL_AURA_APPLIED", "SPELL_AURA_APPLIED_DOSE", "SPELL_AURA_REMOVED", "SPELL_AURA_REMOVED_DOSE"
 )
 
 -- ===== Searing Totem Tracker =====
 HL:RegisterForSelfCombatEvent(
   function (...)
-    local DestGUID, DestName, _, _, SpellID = select(8, ...)
-    if SpellID == 458101 and DestName == "Searing Totem" then
+    local DestGUID, _, _, _, SpellID = select(8, ...)
+    if SpellID == 458101 then
       Shaman.SearingTotemActive = true
       Shaman.SearingTotemGUID = DestGUID
     end
