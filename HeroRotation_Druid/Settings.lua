@@ -100,7 +100,6 @@ HR.GUISettings.APL.Druid = {
     FrenziedRegenHP = 70,
     RenewalHP = 60,
     SurvivalInstinctsHP = 30,
-    UseIronfurOffensively = true,
     UseRageDefensively = true,
     PotionType = {
       Selected = "Tempered",
@@ -152,7 +151,6 @@ CreateARPanelOptions(CP_Feral, "APL.Druid.Feral")
 
 -- Guardian
 CreateARPanelOptions(CP_Guardian, "APL.Druid.Guardian")
-CreatePanelOption("CheckButton", CP_Guardian, "APL.Druid.Guardian.UseIronfurOffensively", "Use Ironfur Offensively", "Enable this if you want offensive Ironfur suggestions (e.g. with Thorns of Iron).")
 CreatePanelOption("CheckButton", CP_Guardian, "APL.Druid.Guardian.UseRageDefensively", "Use Rage Defensively", "Enable this if you want to save rage for defensive use, disabling Maul suggestions.")
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.RenewalHP", {0, 100, 1}, "Renewal HP", "Set the HP percentage threshold of when you want the addon to suggest defensive usgae of Renewal, if talented. (Set to 0 to disable)")
 CreatePanelOption("Slider", CP_Guardian, "APL.Druid.Guardian.DoCRegrowthWithPoPHP", {0, 100, 1}, "DoC Regrowth With PoP HP", "Set the HP percentage threshold of when you want the addon to suggest defensive usage of a Dream of Cenarius buffed Regrowth with the Protector of the Pack buff active. (Set to 0 to disable)")

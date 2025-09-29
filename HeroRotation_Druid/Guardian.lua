@@ -54,7 +54,6 @@ local Settings = {
 
 --- ===== Rotation Variables =====
 local VarIFBuild = S.ThornsofIron:IsAvailable() and S.UrsocsEndurance:IsAvailable()
-local VarRipWeaving = S.PrimalFury:IsAvailable() and S.FluidForm:IsAvailable() and S.WildpowerSurge:IsAvailable()
 local MeleeRange, AoERange
 local IsInMeleeRange, IsInAoERange
 local ActiveMitigationNeeded
@@ -95,7 +94,6 @@ end, "PLAYER_EQUIPMENT_CHANGED")
 
 HL:RegisterForEvent(function()
   VarIFBuild = S.ThornsofIron:IsAvailable() and S.UrsocsEndurance:IsAvailable()
-  VarRipWeaving = S.PrimalFury:IsAvailable() and S.FluidForm:IsAvailable() and S.WildpowerSurge:IsAvailable()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 
 --- ===== CastCycle Functions =====
