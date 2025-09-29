@@ -15,7 +15,6 @@ local SpellEnh = Spell.Shaman.Enhancement
 -- Lua
 local GetTime = GetTime
 local C_Timer = C_Timer
-local select = select
 -- WoW Locals
 local Delay = C_Timer.After
 -- File Locals
@@ -36,8 +35,7 @@ Shaman.TWW3ProcsToAsc = 8
 
 --- ============================ CONTENT ============================
 HL:RegisterForSelfCombatEvent(
-  function (...)
-    local SourceGUID, _, _, _, _, _, _, _, SpellID = select(4, ...)
+  function (_, _, _, SourceGUID, _, _, _, _, _, _, _, SpellID)
     if SourceGUID == Player:GUID() and SpellID == 191634 then
       Shaman.LastSKCast = GetTime()
     end
@@ -46,8 +44,7 @@ HL:RegisterForSelfCombatEvent(
 )
 
 HL:RegisterForSelfCombatEvent(
-  function (...)
-    local DestGUID, _, _, _, SpellID = select(8, ...)
+  function (_, _, _, _, _, _, _, DestGUID, _, _, _, SpellID)
     if DestGUID == Player:GUID() and SpellID == 191634 then
       Shaman.LastSKBuff = GetTime()
       Delay(0.1, function()
@@ -62,8 +59,7 @@ HL:RegisterForSelfCombatEvent(
 
 --- ===== Wolf and Wolf Buffs Tracker =====
 HL:RegisterForSelfCombatEvent(
-  function (...)
-    local SpellID = select(12, ...)
+  function (_, _, _, _, _, _, _, _, _, _, _, SpellID)
     if SpellID == 262627 or SpellID == 426516 then
       -- Note: 262627 is the spell ID for Feral Spirit
       -- Note: 426516 is the spell ID for the extra wolf from Rolling Thunder or TWW S1 4pc
@@ -84,8 +80,7 @@ HL:RegisterForSelfCombatEvent(
 )
 
 HL:RegisterForCombatEvent(
-  function (...)
-    local DestGUID, _, _, _, SpellID = select(8, ...)
+  function (_, _, _, _, _, _, _, DestGUID, _, _, _, SpellID)
     if DestGUID ~= Player:GUID() then return end
     if SpellID == SpellEnh.MoltenWeaponBuff:ID() then
       local AuraData = Player:BuffInfo(SpellEnh.MoltenWeaponBuff, nil, true)
@@ -112,8 +107,7 @@ Shaman.StormElemental = {
 }
 
 HL:RegisterForSelfCombatEvent(
-  function (...)
-    local DestGUID, _, _, _, SpellID = select(8, ...)
+  function (_, _, _, _, _, _, _, DestGUID, _, _, _, SpellID)
     -- Fire Elemental. SpellIDs are without and with Primal Elementalist
     if SpellID == 188592 or SpellID == 118291 then
       Shaman.FireElemental.GreaterActive = true
@@ -143,15 +137,12 @@ HL:RegisterForSelfCombatEvent(
 
 --- ===== Tempest Maelstrom Counter =====
 HL:RegisterForSelfCombatEvent(
-  function (...)
-    local SubEvent = select(2, ...)
-    local SpellID = select(12, ...)
+  function (_, SubEvent, _, _, _, _, _, _, _, _, _, SpellID, _, _, _, StackAmount)
     if SpellID == SpellEnh.MaelstromWeaponBuff:ID() then
       local StackAmount
       if SubEvent == "SPELL_AURA_REMOVED" then
         StackAmount = 0
       else
-        StackAmount = select(16, ...)
         if StackAmount == nil then
           StackAmount = Player:BuffStack(SpellEnh.MaelstromWeaponBuff)
         end
@@ -171,8 +162,7 @@ HL:RegisterForSelfCombatEvent(
 
 -- ===== Searing Totem Tracker =====
 HL:RegisterForSelfCombatEvent(
-  function (...)
-    local DestGUID, _, _, _, SpellID = select(8, ...)
+  function (_, _, _, _, _, _, _, DestGUID, _, _, _, SpellID)
     if SpellID == 458101 then
       Shaman.SearingTotemActive = true
       Shaman.SearingTotemGUID = DestGUID
@@ -182,8 +172,7 @@ HL:RegisterForSelfCombatEvent(
 )
 
 HL:RegisterForCombatEvent(
-  function (...)
-    local DestGUID = select(8, ...)
+  function (_, _, _, _, _, _, _, DestGUID)
     if DestGUID == Shaman.SearingTotemGUID then
       Shaman.SearingTotemActive = false
       Shaman.SearingTotemGUID = 0
@@ -194,8 +183,7 @@ HL:RegisterForCombatEvent(
 
 --- ===== TWW S3 2pc Proc Tracker =====
 HL:RegisterForSelfCombatEvent(
-  function (...)
-    local SpellID, _, _, _, StackCount = select(12, ...)
+  function (_, _, _, _, _, _, _, _, _, _, _, SpellID, _, _, _, StackCount)
     if Player:HasTier("TWW3", 2) and SpellID == 455130 then
       Shaman.TWW3ProcsToAsc = 8 - StackCount
     end
@@ -204,8 +192,7 @@ HL:RegisterForSelfCombatEvent(
 )
 
 HL:RegisterForSelfCombatEvent(
-  function (...)
-    local SpellID = select(12, ...)
+  function (_, _, _, _, _, _, _, _, _, _, _, SpellID)
     if SpellID == 455130 then
       Shaman.TWW3ProcsToAsc = 0
     end
