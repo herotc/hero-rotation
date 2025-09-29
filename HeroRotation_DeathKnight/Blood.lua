@@ -148,11 +148,6 @@ local function UnitsWithoutBP(enemies)
   return WithoutBPCount
 end
 
-local function DRWBPTicking()
-  -- DRW will apply BP if we've casted Blood Boil or Death's Caress since it was summoned.
-  return Player:BuffUp(S.DancingRuneWeaponBuff) and (S.BloodBoil:TimeSinceLastCast() < S.DancingRuneWeapon:TimeSinceLastCast() or S.DeathsCaress:TimeSinceLastCast() < S.DancingRuneWeapon:TimeSinceLastCast())
-end
-
 --- ===== Rotation Functions =====
 local function Precombat()
   -- snapshot_stats
@@ -276,14 +271,14 @@ local function Deathbringer()
   end
   -- heart_strike,if=buff.coagulopathy.stack<5
   if HSAction:IsReady() and (Player:BuffStack(S.CoagulopathyBuff) < 5) then
-    if Cast(S.HeartStrike, nil, nil, not TargetInMeleeRange) then return "heart_strike deathbringer 26"; end
+    if Cast(HSAction, nil, nil, not TargetInMeleeRange) then return "heart_strike deathbringer 26"; end
   end
   -- heart_strike
   if HSAction:IsReady() then
-    if Cast(S.HeartStrike, nil, nil, not TargetInMeleeRange) then return "heart_strike deathbringer 28"; end
+    if Cast(HSAction, nil, nil, not TargetInMeleeRange) then return "heart_strike deathbringer 28"; end
   end
   -- soul_reaper,if=buff.reaper_of_souls.up
-  if S.SoulReaper:IsReady() and (Player:BuffUp(S.ReaperofSoulsBuff) and S.DancingRuneWeapon:CooldownDown()) then
+  if S.SoulReaper:IsReady() and Player:BuffUp(S.ReaperofSoulsBuff) then
     if Cast(S.SoulReaper, nil, nil, not TargetInMeleeRange) then return "soul_reaper deathbringer 30"; end
   end
   -- arcane_torrent,if=runic_power.deficit>20
@@ -341,7 +336,7 @@ local function Sanlayn()
     if Cast(S.DeathsCaress, Settings.Blood.GCDasOffGCD.DeathsCaress) then return "deaths_caress sanlayn 4"; end
   end
   -- blood_boil,if=dot.blood_plague.remains<3
-  if S.BloodBoil:IsReady() and (Player:BuffRemains(S.BloodPlagueDebuff) < 3) then
+  if S.BloodBoil:IsReady() and (Target:DebuffRemains(S.BloodPlagueDebuff) < 3) then
     if Cast(S.BloodBoil, Settings.Blood.GCDasOffGCD.BloodBoil) then return "blood_boil sanlayn 6"; end
   end
   -- heart_strike,if=(buff.essence_of_the_blood_queen.remains<1.5&buff.essence_of_the_blood_queen.remains&buff.vampiric_strike.remains)
@@ -393,8 +388,8 @@ local function Sanlayn()
     if Cast(S.Blooddrinker, nil, nil, not Target:IsSpellInRange(S.Blooddrinker)) then return "blooddrinker sanlayn 30"; end
   end
   -- heart_strike,if=buff.vampiric_strike.up
-  if S.VampiricStrikeAction:IsReady() then
-    if Cast(S.VampiricStrikeAction, nil, nil, not TargetInMeleeRange) then return "heart_strike sanlayn 32"; end
+  if HSAction:IsReady() and Player:BuffUp(S.VampiricStrikeBuff) then
+    if Cast(HSAction, nil, nil, not TargetInMeleeRange) then return "heart_strike sanlayn 32"; end
   end
   -- death_strike
   if S.DeathStrike:IsReady() then
@@ -515,7 +510,9 @@ local function APL()
       end
     end
     -- vampiric_blood,if=!buff.vampiric_blood.up
-    -- Note: Handled in Defensives()
+    if S.VampiricBlood:IsCastable() and Player:BuffDown(S.VampiricBloodBuff) then
+      if Cast(S.VampiricBlood, Settings.Blood.GCDasOffGCD.VampiricBlood) then return "vampiric_blood main 18"; end
+    end
     -- call_action_list,name=high_prio_actions
     local ShouldReturn = HighPrioActions(); if ShouldReturn then return ShouldReturn; end
     -- run_action_list,name=deathbringer,if=hero_tree.deathbringer
