@@ -510,9 +510,7 @@ local function APL()
       end
     end
     -- vampiric_blood,if=!buff.vampiric_blood.up
-    if S.VampiricBlood:IsCastable() and Player:BuffDown(S.VampiricBloodBuff) then
-      if Cast(S.VampiricBlood, Settings.Blood.GCDasOffGCD.VampiricBlood) then return "vampiric_blood main 18"; end
-    end
+    -- Note: Handled in Defensives().
     -- call_action_list,name=high_prio_actions
     local ShouldReturn = HighPrioActions(); if ShouldReturn then return ShouldReturn; end
     -- run_action_list,name=deathbringer,if=hero_tree.deathbringer
