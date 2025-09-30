@@ -625,8 +625,8 @@ local function KOTGST()
 end
 
 local function ST()
-  -- warrior_of_elune,if=talent.lunar_calling|!talent.lunar_calling&variable.eclipse_remains<=7
-  if S.WarriorofElune:IsCastable() and (S.LunarCalling:IsAvailable() or not S.LunarCalling:IsAvailable() and VarEclipseRemains <= 7) then
+  -- warrior_of_elune,if=hero_tree.elunes_chosen
+  if S.WarriorofElune:IsCastable() and (Player:HeroTreeID() == 24) then
     if Cast(S.WarriorofElune, Settings.Balance.GCDasOffGCD.WarriorOfElune) then return "warrior_of_elune st 2"; end
   end
   -- wrath,if=variable.enter_lunar&eclipse.in_eclipse&variable.eclipse_remains<cast_time&!variable.cd_condition
@@ -737,8 +737,8 @@ local function ST()
   if S.WildMushroom:IsCastable() and (not Player:PrevGCD(1, S.WildMushroom) and Target:DebuffRemains(S.FungalGrowthDebuff) < 2) then
     if Cast(S.WildMushroom, Settings.Balance.GCDasOffGCD.WildMushroom, nil, not IsInSpellRange) then return "wild_mushroom st 54"; end
   end
-  -- starfire,if=talent.lunar_calling
-  if S.Starfire:IsCastable() and (S.LunarCalling:IsAvailable()) then
+  -- starfire,if=hero_tree.elunes_chosen
+  if S.Starfire:IsCastable() and (Player:HeroTreeID() == 24) then
     if Cast(S.Starfire, nil, nil, not IsInSpellRange) then return "starfire st 56"; end
   end
   -- wrath
