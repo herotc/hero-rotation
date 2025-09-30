@@ -90,7 +90,6 @@ local EventInfo = HR.Commons.Mage.EventInfo
 -- Tracks Arcane Harmony buff stacks for optimal Arcane Barrage timing
 local ArcaneHarmonyLastStack = 0
 EventInfo.ArcaneHarmonyLastStack = 0
-local ArcaneHarmonyThresholdNotified = false
 
 --- Arcane Surge Tracking
 -- Tracks Arcane Surge state for optimal burst windows
@@ -115,19 +114,12 @@ HL:RegisterForSelfCombatEvent(function(...)
     if auraData then
       ArcaneHarmonyLastStack = auraData.applications or 1
       EventInfo.ArcaneHarmonyLastStack = ArcaneHarmonyLastStack
-      local threshold = (18 - (6 * num(S.HighVoltage:IsAvailable())))
-      if ArcaneHarmonyLastStack >= (threshold - 2) and not ArcaneHarmonyThresholdNotified then
-        ArcaneHarmonyThresholdNotified = true
-      elseif ArcaneHarmonyLastStack < (threshold - 2) then
-        ArcaneHarmonyThresholdNotified = false
-      end
     end
   end
   
   if event == "SPELL_AURA_REMOVED" and spellID == S.ArcaneHarmonyBuff:ID() then
     ArcaneHarmonyLastStack = 0
     EventInfo.ArcaneHarmonyLastStack = 0
-    ArcaneHarmonyThresholdNotified = false
   end
 
   -- Track Arcane Surge state
@@ -167,7 +159,6 @@ end, "SPELL_AURA_APPLIED_DOSE", "SPELL_AURA_REMOVED_DOSE", "SPELL_AURA_APPLIED",
 HL:RegisterForEvent(function()
   ArcaneHarmonyLastStack = 0
   EventInfo.ArcaneHarmonyLastStack = 0
-  ArcaneHarmonyThresholdNotified = false
   ArcaneSurgeStartTime = 0
   EventInfo.ArcaneSurgeStartTime = 0
   ArcaneSurgeActive = false

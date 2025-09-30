@@ -267,7 +267,7 @@ local function Spellslinger()
   -- arcane_barrage,if=(cooldown.touch_of_the_magi.ready|cooldown.touch_of_the_magi.remains<((travel_time+0.05)>?gcd.max))&(cooldown.arcane_surge.remains>30&cooldown.arcane_surge.remains<75)
   -- Note: Intent seems to be to dump charges before TotM, so added >0 check.
   -- Note: Removed cooldown.touch_of_the_magi.ready, since that would be equivalent to remains=0, which is less than gcd.max.
-  if S.ArcaneBarrage:IsCastable() and Player:ArcaneCharges() > 0 and ((S.TouchoftheMagi:CooldownRemains() + 0.05) < Player:GCD() and (S.ArcaneSurge:CooldownRemains() > 30 and S.ArcaneSurge:CooldownRemains() < 75)) then
+  if S.ArcaneBarrage:IsCastable() and Player:ArcaneCharges() > 0 and (S.TouchoftheMagi:CooldownRemains() < mathmin(S.ArcaneBarrage:TravelTime() + 0.05, Player:GCD()) and (S.ArcaneSurge:CooldownRemains() > 30 and S.ArcaneSurge:CooldownRemains() < 75)) then
     if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage spellslinger 16"; end
   end
   -- arcane_barrage,if=buff.arcane_charge.stack=4&buff.arcane_harmony.stack>=20&set_bonus.thewarwithin_season_3_4pc
@@ -502,7 +502,7 @@ local function APL()
     -- counterspell
     local ShouldReturn = Everyone.Interrupt(S.Counterspell, Settings.CommonsDS.DisplayStyle.Interrupts); if ShouldReturn then return ShouldReturn; end
     -- potion,if=(buff.siphon_storm.up|(!talent.evocation&cooldown.arcane_surge.ready)|((cooldown.arcane_surge.ready|buff.arcane_surge.up)&variable.soul_cd))|fight_remains<30
-    if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.SiphonStormBuff) or (not S.Evocation:IsAvailable() and S.ArcaneSurge:CooldownUp()) or ((S.ArcaneSurge:CooldownUp() or Player:BuffUp(S.ArcaneSurgeBuff)) and VarSoulCD)) then
+    if Settings.Commons.Enabled.Potions and (Player:BuffUp(S.SiphonStormBuff) or (not S.Evocation:IsAvailable() and S.ArcaneSurge:CooldownUp()) or ((S.ArcaneSurge:CooldownUp() or Player:BuffUp(S.ArcaneSurgeBuff)) and VarSoulCD) or BossFightRemains < 30) then
       local PotionSelected = Everyone.PotionSelected()
       if PotionSelected and PotionSelected:IsReady() then
         if Cast(PotionSelected, nil, Settings.CommonsDS.DisplayStyle.Potions) then return "potion main 2"; end
@@ -538,10 +538,7 @@ local function APL()
     -- use_items,if=(((!variable.soul_cd&prev_gcd.1.arcane_surge)|(variable.soul_cd&buff.siphon_storm.up&debuff.touch_of_the_magi.up))&(variable.steroid_trinket_equipped|(!variable.steroid_trinket_equipped&!variable.nonsteroid_trinket_equipped)))|(!variable.steroid_trinket_equipped&variable.nonsteroid_trinket_equipped)|(variable.nonsteroid_trinket_equipped&buff.siphon_storm.remains<10&(cooldown.evocation.remains>17|trinket.cooldown.remains>20))|fight_remains<20
     if Settings.Commons.Enabled.Items or Settings.Commons.Enabled.Trinkets then
       local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
-      local OtherTrinketCDRemains = 0
-      if ItemToUse and ItemSlot == 13 then OtherTrinketCDRemains = Trinket2:CooldownRemains(); end
-      if ItemToUse and ItemSlot == 14 then OtherTrinketCDRemains = Trinket1:CooldownRemains(); end
-      if ItemToUse and ((((not VarSoulCD and Player:PrevGCDP(1, S.ArcaneSurge)) or (VarSoulCD and Player:BuffUp(S.SiphonStormBuff) and Target:DebuffUp(S.TouchoftheMagiDebuff))) and (VarSteroidTrinketEquipped or (not VarSteroidTrinketEquipped and not VarNonsteroidTrinketEquipped))) or (not VarSteroidTrinketEquipped and VarNonsteroidTrinketEquipped) or (VarNonsteroidTrinketEquipped and Player:BuffRemains(S.SiphonStormBuff) < 10 and (S.Evocation:CooldownRemains() > 17 or OtherTrinketCDRemains > 20)) or BossFightRemains < 20) then
+      if ItemToUse and ((((not VarSoulCD and Player:PrevGCDP(1, S.ArcaneSurge)) or (VarSoulCD and Player:BuffUp(S.SiphonStormBuff) and Target:DebuffUp(S.TouchoftheMagiDebuff))) and (VarSteroidTrinketEquipped or (not VarSteroidTrinketEquipped and not VarNonsteroidTrinketEquipped))) or (not VarSteroidTrinketEquipped and VarNonsteroidTrinketEquipped) or (VarNonsteroidTrinketEquipped and Player:BuffRemains(S.SiphonStormBuff) < 10 and (S.Evocation:CooldownRemains() > 17 or ItemToUse:CooldownRemains() > 20)) or BossFightRemains < 20) then
         local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
         if ItemSlot ~= 13 and ItemSlot ~= 14 then DisplayStyle = Settings.CommonsDS.DisplayStyle.Items end
         if ((ItemSlot == 13 or ItemSlot == 14) and Settings.Commons.Enabled.Trinkets) or (ItemSlot ~= 13 and ItemSlot ~= 14 and Settings.Commons.Enabled.Items) then
@@ -555,7 +552,7 @@ local function APL()
       VarOpener = false
     end
     -- arcane_barrage,if=fight_remains<2
-    if S.ArcaneBarrage:IsReady() and (FightRemains < 2) then
+    if S.ArcaneBarrage:IsReady() and (BossFightRemains < 2) then
       if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage main 18"; end
     end
     -- call_action_list,name=cd_opener,if=!variable.soul_cd
