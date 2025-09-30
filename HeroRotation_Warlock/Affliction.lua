@@ -545,7 +545,7 @@ local function AoE()
     if Cast(S.DrainSoul, nil, nil, not Target:IsInRange(40)) then return "drain_soul aoe 40"; end
   end
   -- shadow_bolt,if=(debuff.shadow_embrace.stack+action.shadow_bolt.in_flight_to_target_count)<debuff.shadow_embrace.max_stack|debuff.shadow_embrace.remains<3
-  if S.ShadowBolt:IsReady() and (Target:DebuffStack(ShadowEmbraceDebuff) + num(S.ShadowBolt:InFlight()) < 2 or Target:DebuffRemains(ShadowEmbraceDebuff) < 3) then
+  if S.ShadowBolt:IsReady() and (Target:DebuffStack(ShadowEmbraceDebuff) + num(S.ShadowBolt:InFlight()) < ShadowEmbraceMaxStack or Target:DebuffRemains(ShadowEmbraceDebuff) < 3) then
     if Cast(S.ShadowBolt, nil, nil, not Target:IsSpellInRange(S.ShadowBolt)) then return "shadow_bolt aoe 42"; end
   end
 end
@@ -818,7 +818,7 @@ local function APL()
       if Cast(S.VileTaint, Settings.Affliction.GCDasOffGCD.VileTaint, nil, not Target:IsInRange(40)) then return "vile_taint main 18"; end
     end
     -- phantom_singularity,if=(!talent.soul_rot|cooldown.soul_rot.remains<=execute_time+gcd.max|fight_remains<cooldown.soul_rot.remains+8)&dot.agony.remains&(dot.corruption.remains|dot.wither.remains)&dot.unstable_affliction.remains
-    if S.PhantomSingularity:IsReady() and ((not S.SoulRot:IsAvailable() or S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() + Player:GCD() or BossFightRemains < S.SoulRot:CooldownRemains() + 8) and VarDoTsUp) then
+    if S.PhantomSingularity:IsReady() and ((not S.SoulRot:IsAvailable() or S.SoulRot:CooldownRemains() <= S.PhantomSingularity:ExecuteTime() + GCDMax or BossFightRemains < S.SoulRot:CooldownRemains() + 8) and VarDoTsUp) then
       if Cast(S.PhantomSingularity, Settings.Affliction.GCDasOffGCD.PhantomSingularity, nil, not Target:IsSpellInRange(S.PhantomSingularity)) then return "phantom_singularity main 20"; end
     end
     -- soul_rot,if=variable.vt_ps_up
@@ -865,7 +865,7 @@ local function APL()
     end
     -- shadow_bolt,if=talent.wither&buff.nightfall.react&buff.tormented_crescendo.react<buff.tormented_crescendo.max_stack
     if S.ShadowBolt:IsReady() and (S.Wither:IsAvailable() and Player:BuffUp(S.NightfallBuff) and Player:BuffStack(S.TormentedCrescendoBuff) < 2) then
-      if Cast(DSSB, nil, nil, not Target:IsInRange(40)) then return "drain_soul/shadow_bolt main 40"; end
+      if Cast(S.ShadowBolt, nil, nil, not Target:IsInRange(40)) then return "shadow_bolt main 40"; end
     end
     -- agony,if=refreshable&fight_remains>dot.agony.remains+5
     if S.Agony:IsReady() and (Target:DebuffRefreshable(S.AgonyDebuff) and FightRemains > Target:DebuffRemains(S.AgonyDebuff) + 5) then
