@@ -482,7 +482,7 @@ local function Havoc()
     if Cast(S.Conflagrate, nil, nil, not Target:IsSpellInRange(S.Conflagrate)) then return "conflagrate havoc 24"; end
   end
   -- dimensional_rift,if=soul_shard<4.7&(charges>2|fight_remains<cooldown.dimensional_rift.duration)
-  if CDsON() and S.DimensionalRift:IsCastable() and (SoulShards < 4.7 and (S.DimensionalRift:Charges() > 2 or FightRemains < S.DimensionalRift:Cooldown())) then
+  if S.DimensionalRift:IsCastable() and (SoulShards < 4.7 and (S.DimensionalRift:Charges() > 2 or FightRemains < S.DimensionalRift:Cooldown())) then
     if Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift, nil, not Target:IsSpellInRange(S.DimensionalRift)) then return "dimensional_rift havoc 26"; end
   end
   -- incinerate,if=cast_time<havoc_remains
@@ -513,7 +513,7 @@ local function Aoe()
     local ShouldReturn = Havoc(); if ShouldReturn then return ShouldReturn; end
   end
   -- dimensional_rift,if=soul_shard<4.7&(charges>2|fight_remains<cooldown.dimensional_rift.duration)
-  if CDsON() and S.DimensionalRift:IsCastable() and (SoulShards < 4.7 and (S.DimensionalRift:Charges() > 2 or FightRemains < S.DimensionalRift:Cooldown())) then
+  if S.DimensionalRift:IsCastable() and (SoulShards < 4.7 and (S.DimensionalRift:Charges() > 2 or FightRemains < S.DimensionalRift:Cooldown())) then
     if Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift, nil, not Target:IsSpellInRange(S.DimensionalRift)) then return "dimensional_rift aoe 6"; end
   end
   -- incinerate,if=(diabolic_ritual&(buff.diabolic_ritual_mother_of_chaos.remains+buff.diabolic_ritual_overlord.remains+buff.diabolic_ritual_pit_lord.remains)<=action.incinerate.cast_time)
@@ -625,7 +625,7 @@ local function Aoe()
     if Everyone.CastTargetIf(S.Immolate, Enemies8ySplash, "min", EvaluateTargetIfFilterImmolate, EvaluateTargetIfImmolateAoE3, not Target:IsSpellInRange(S.Immolate)) then return "immolate aoe 50"; end
   end
   -- dimensional_rift
-  if CDsON() and S.DimensionalRift:IsCastable() then
+  if S.DimensionalRift:IsCastable() then
     if Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift, nil, not Target:IsSpellInRange(S.DimensionalRift)) then return "dimensional_rift aoe 52"; end
   end
   -- soul_fire,target_if=min:(dot.wither.remains+dot.immolate.remains-5*debuff.conflagrate.up+100*debuff.havoc.remains),if=buff.decimation.up
@@ -666,8 +666,20 @@ local function Cleave()
     if Cast(S.Malevolence, nil, Settings.CommonsDS.DisplayStyle.Malevolence) then return "malevolence cleave 2"; end
   end
   -- havoc,target_if=min:((-target.time_to_die)<?-15)+dot.immolate.remains+99*(self.target=target),if=(!cooldown.summon_infernal.up|!talent.summon_infernal)&target.time_to_die>8
-  if S.Havoc:IsCastable() and (S.SummonInfernal:CooldownDown() or not S.SummonInfernal:IsAvailable()) then
-    if Everyone.CastTargetIf(S.Havoc, Enemies40y, "min", EvaluateTargetIfFilterHavoc, EvaluateTargetIfHavoc, not Target:IsSpellInRange(S.Havoc)) then return "havoc cleave 3"; end
+  if S.Havoc:IsReady() and (S.SummonInfernal:CooldownDown() or not S.SummonInfernal:IsAvailable()) then
+    local BestUnit, BestConditionValue, CUCV = nil, nil, nil
+    for _, CycleUnit in pairs(Enemies40y) do
+      if CycleUnit:GUID() ~= Target:GUID() then
+        CUCV = EvaluateTargetIfFilterHavoc(CycleUnit)
+        if not CycleUnit:IsFacingBlacklisted() and not CycleUnit:IsUserCycleBlacklisted() and (CycleUnit:AffectingCombat() or CycleUnit:IsDummy())
+          and (not BestConditionValue or Utils.CompareThis("min", CUCV, BestConditionValue)) then
+          BestUnit, BestConditionValue = CycleUnit, CUCV
+        end
+      end
+    end
+    if BestUnit and EvaluateTargetIfHavoc(BestUnit) then
+      HR.CastLeftNameplate(BestUnit, S.Havoc)
+    end
   end
   -- chaos_bolt,if=demonic_art
   if S.ChaosBolt:IsReady() and (DemonicArt()) then
@@ -742,7 +754,7 @@ local function Cleave()
     if Cast(S.ChannelDemonfire, Settings.Destruction.GCDasOffGCD.ChannelDemonfire, nil, not Target:IsInRange(40)) then return "channel_demonfire cleave 38"; end
   end
   -- dimensional_rift
-  if CDsON() and S.DimensionalRift:IsCastable() then
+  if S.DimensionalRift:IsCastable() then
     if Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift, nil, not Target:IsSpellInRange(S.DimensionalRift)) then return "dimensional_rift cleave 40"; end
   end
   -- infernal_bolt
@@ -769,7 +781,7 @@ local function Variables()
   -- cycling_variable,name=havoc_immo_time,op=add,value=dot.immolate.remains*debuff.havoc.up<?dot.wither.remains*debuff.havoc.up
   for _, CycleUnit in pairs(Enemies8ySplash) do
     local HavocUp = num(CycleUnit:DebuffUp(S.HavocDebuff))
-    VarHavocImmoTime = VarHavocImmoTime + min(CycleUnit:DebuffRemains(S.ImmolateDebuff) * HavocUp, CycleUnit:DebuffRemains(S.WitherDebuff) * HavocUp)
+    VarHavocImmoTime = VarHavocImmoTime + max(CycleUnit:DebuffRemains(S.ImmolateDebuff) * HavocUp, CycleUnit:DebuffRemains(S.WitherDebuff) * HavocUp)
   end
   -- variable,name=infernal_active,op=set,value=pet.infernal.active|(cooldown.summon_infernal.duration-cooldown.summon_infernal.remains)<20
   VarInfernalActive = InfernalActive() or S.SummonInfernal:TimeSinceLastCast() < 20
@@ -915,7 +927,7 @@ local function APL()
       if Cast(S.ChannelDemonfire, Settings.Destruction.GCDasOffGCD.ChannelDemonfire, nil, not Target:IsInRange(40)) then return "channel_demonfire main 34"; end
     end
     -- dimensional_rift
-    if CDsON() and S.DimensionalRift:IsCastable() then
+    if S.DimensionalRift:IsCastable() then
       if Cast(S.DimensionalRift, Settings.Destruction.GCDasOffGCD.DimensionalRift, nil, not Target:IsSpellInRange(S.DimensionalRift)) then return "dimensional_rift main 36"; end
     end
     -- infernal_bolt,if=soul_shard<=3
