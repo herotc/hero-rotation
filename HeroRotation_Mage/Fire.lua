@@ -82,7 +82,7 @@ local VarPoolingTime = 15 * Player:GCD()
 local VarFFCombustionFlamestrike = 100
 local VarFFFillerFlamestrike = 100
 local VarSFCombustionFlamestrike = S.SpellfireSpheres:IsAvailable() and (100 - (50 * num(S.MarkoftheFirelord:IsAvailable())) - (44 * num(S.Quickflame:IsAvailable()))) or 999
-local VarSFFillerFlamestrike = 100
+local VarSFFillerFlamestrike = 100 - (50 * num(S.MarkoftheFirelord:IsAvailable())) - (42 * num(S.Quickflame:IsAvailable()))
 local VarCombustionPrecastTime = 0
 local CombustionUp
 local CombustionDown
@@ -143,6 +143,8 @@ HL:RegisterForEvent(function()
   S.Fireball:RegisterInFlight(S.CombustionBuff)
   S.FrostfireBolt:RegisterInFlight(S.CombustionBuff)
   Bolt = S.FrostfireBolt:IsAvailable() and S.FrostfireBolt or S.Fireball
+  VarSFCombustionFlamestrike = S.SpellfireSpheres:IsAvailable() and (100 - (50 * num(S.MarkoftheFirelord:IsAvailable())) - (44 * num(S.Quickflame:IsAvailable()))) or 999
+  VarSFFillerFlamestrike = 100 - (50 * num(S.MarkoftheFirelord:IsAvailable())) - (42 * num(S.Quickflame:IsAvailable()))
   SetPrecombatVariables()
 end, "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB")
 S.Pyroblast:RegisterInFlight()
@@ -222,7 +224,7 @@ local function Precombat()
   -- variable,name=ff_combustion_flamestrike,if=talent.frostfire_bolt,value=100
   -- variable,name=ff_filler_flamestrike,if=talent.frostfire_bolt,value=100
   -- variable,name=sf_combustion_flamestrike,if=talent.spellfire_spheres,value=100-(50*talent.mark_of_the_firelord)-(44*talent.quickflame)
-  -- variable,name=sf_filler_flamestrike,if=talent.spellfire_spheres,value=100
+  -- variable,name=sf_filler_flamestrike,if=talent.spellfire_spheres,value=100-(50*talent.mark_of_the_firelord)-(42*talent.quickflame)
   -- variable,name=treacherous_transmitter_precombat_cast,value=12,if=equipped.treacherous_transmitter
   -- Note: Handled in SetPrecombatVariables.
   -- use_item,name=treacherous_transmitter
