@@ -630,7 +630,7 @@ local function Cleave()
   end
   -- malevolence,if=variable.vt_ps_up
   if S.Malevolence:IsReady() and (VarVTPSUp) then
-    if Cast(S.Malevolence, nil, Settings.CommonsDS.DisplayStyle.Malevolence) then return "malevolence aoe 28"; end
+    if Cast(S.Malevolence, nil, Settings.CommonsDS.DisplayStyle.Malevolence) then return "malevolence cleave 20"; end
   end
   if S.DemonicSoul:IsAvailable() then
     -- call_action_list,name=opener_cleave_se,if=talent.demonic_soul
@@ -794,7 +794,7 @@ local function APL()
       if Cast(S.Haunt, Settings.Affliction.GCDasOffGCD.Haunt, nil, not Target:IsSpellInRange(S.Haunt)) then return "haunt main 8"; end
     end
     -- wither,if=(talent.wither&!talent.absolute_corruption&remains<5|cooldown.soul_rot.remains<5&remains<8)&fight_remains>dot.wither.remains+5
-    if S.Wither:IsReady() and ((S.Wither:IsAvailable() and not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.WitherDebuff) < 5 or S.SoulRot:CooldownRemains() < 5 and Target:DebuffRemains(S.WitherDebuff) < 8) and FightRemains > Target:DebuffRemains(S.WitherDebuff) + 5) then
+    if S.Wither:IsReady() and ((not S.AbsoluteCorruption:IsAvailable() and Target:DebuffRemains(S.WitherDebuff) < 5 or S.SoulRot:CooldownRemains() < 5 and Target:DebuffRemains(S.WitherDebuff) < 8) and FightRemains > Target:DebuffRemains(S.WitherDebuff) + 5) then
       if Cast(S.Wither, nil, nil, not Target:IsInRange(40)) then return "wither main 10"; end
     end
     -- corruption,if=!talent.wither&(!talent.absolute_corruption&remains<5|cooldown.soul_rot.remains<5&remains<8)&fight_remains>dot.corruption.remains+5
