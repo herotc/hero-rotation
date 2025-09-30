@@ -289,7 +289,7 @@ local function Aoe()
     if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe 22"; end
   end
   -- lightning_bolt,if=buff.storm_frenzy.stack=2&!talent.surge_of_power&maelstrom<variable.mael_cap-(15+buff.stormkeeper.up*spell_targets.chain_lightning*spell_targets.chain_lightning)&buff.stormkeeper.up&!buff.call_of_the_ancestors.up&spell_targets.chain_lightning=2
-  if S.LightningBolt:IsViable() and (Player:BuffStack(S.StormFrenzyBuff) == 2 and not S.SurgeofPower:IsAvailable() and VarMaelstrom < VarMaelCap - (15 + num(Player:StormkeeperUp()) * Shaman.ClusterTargets * Shaman.ClusterTargets) and Player:StormkeeperUp() and not S.CalloftheAncestors:IsAvailable() and Shaman.ClusterTargets == 2) then
+  if S.LightningBolt:IsViable() and (Player:BuffStack(S.StormFrenzyBuff) == 2 and not S.SurgeofPower:IsAvailable() and VarMaelstrom < VarMaelCap - (15 + num(Player:StormkeeperUp()) * Shaman.ClusterTargets * Shaman.ClusterTargets) and Player:StormkeeperUp() and Player:BuffDown(S.CalloftheAncestorsBuff) and Shaman.ClusterTargets == 2) then
     if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt aoe 24"; end
   end
   -- chain_lightning,if=buff.storm_frenzy.stack=2&!talent.surge_of_power&maelstrom<variable.mael_cap-(15+buff.stormkeeper.up*spell_targets.chain_lightning*spell_targets.chain_lightning)

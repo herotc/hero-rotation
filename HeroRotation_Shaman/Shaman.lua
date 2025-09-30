@@ -85,6 +85,7 @@ Spell.Shaman.Farseer = {
   -- Buffs
   AncestralSwiftnessBuff                = Spell(443454),
   AncestralWisdomBuff                   = Spell(1238279), -- TWW S3 4pc Buff
+  CalloftheAncestorsBuff                = Spell(447244),
 }
 
 Spell.Shaman.Stormbringer = {
