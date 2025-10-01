@@ -140,7 +140,6 @@ S.AimedShot:RegisterInFlight()
 local function CheckFocusCap(Time)
   -- Shortcut for 'focus+cast_regen<focus.max'
   -- Note: The FocusP override accounts for Focus granted by the current cast.
-  if not Bonus then Bonus = 0 end
   return Player:FocusP() + Player:FocusCastRegen(Time) < Player:FocusMax()
 end
 
@@ -264,23 +263,26 @@ local function Trinkets()
     -- use_items,check_existing=0,slots=trinket1:trinket2,if=this_trinket.is.unyielding_netherprism&(buff.trueshot.remains>14&(buff.latent_energy.stack>(19-cooldown.trueshot.duration%10)|fight_remains<(cooldown.trueshot.duration+20))|fight_remains<22&(buff.latent_energy.stack>8|!other_trinket.has_use_buff|other_trinket.cooldown.remains))
     local OtherTrinket = Trinket2
     if VarTrinket2ID == I.UnyieldingNetherprism:ID() then OtherTrinket = Trinket1 end
-    if I.UnyieldingNetherprism:IsEquippedAndReady() and (Player:BuffRemains(S.TrueshotBuff) > 14 and (Player:BuffStack(S.LatentEnergyBuff) > (19 - TrueshotCD / 10) or BossFightRemains < (TrueshotCD + 20)) or BossFightRemains < 22 and (Player:BuffStack(S.LatentEnergyBuff) > 8 or OtherTrinket:HasUseBuff() or OtherTrinket:CooldownDown())) then
+    if I.UnyieldingNetherprism:IsEquippedAndReady() and (Player:BuffRemains(S.TrueshotBuff) > 14 and (Player:BuffStack(S.LatentEnergyBuff) > (19 - TrueshotCD / 10) or BossFightRemains < (TrueshotCD + 20)) or BossFightRemains < 22 and (Player:BuffStack(S.LatentEnergyBuff) > 8 or not OtherTrinket:HasUseBuff() or OtherTrinket:CooldownDown())) then
       if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets) then return "unyielding_netherprism trinket 10"; end
     end
     -- use_items,check_existing=0,slots=trinket1:trinket2,if=!this_trinket.is.unyielding_netherprism&this_trinket.has_use_buff&(other_trinket.is.unyielding_netherprism&fight_remains<cooldown.trueshot.remains+cooldown.trueshot.duration+10&cooldown.trueshot.remains>20|buff.trueshot.remains>14|buff.trueshot.up&fight_remains<cooldown.trueshot.remains+15|fight_remains<21)
-    if I.UnyieldingNetherprism:IsReady() and (BossFightRemains < S.Trueshot:CooldownRemains() + TrueshotCD + 10 and S.Trueshot:CooldownRemains() > 20 or Player:BuffRemains(S.TrueshotBuff) > 14 or Player:BuffUp(S.TrueshotBuff) and BossFightRemains < S.Trueshot:CooldownRemains() + 15 or BossFightRemains < 21) then
-      if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") trinkets 12"; end
+    if T1Check and (VarTrinket1ID ~= I.UnyieldingNetherprism:ID() and Trinket1:HasUseBuff() and (VarTrinket2ID == I.UnyieldingNetherprism:ID() and BossFightRemains < S.Trueshot:CooldownRemains() + TrueshotCD + 10 and S.Trueshot:CooldownRemains() > 20 or Player:BuffRemains(S.TrueshotBuff) > 14 or Player:BuffUp(S.TrueshotBuff) and BossFightRemains < S.Trueshot:CooldownRemains() + 15 or BossFightRemains < 21)) then
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") trinkets 12"; end
+    end
+    if T2Check and (VarTrinket2ID ~= I.UnyieldingNetherprism:ID() and Trinket2:HasUseBuff() and (VarTrinket1ID == I.UnyieldingNetherprism:ID() and BossFightRemains < S.Trueshot:CooldownRemains() + TrueshotCD + 10 and S.Trueshot:CooldownRemains() > 20 or Player:BuffRemains(S.TrueshotBuff) > 14 or Player:BuffUp(S.TrueshotBuff) and BossFightRemains < S.Trueshot:CooldownRemains() + 15 or BossFightRemains < 21)) then
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") trinkets 14"; end
     end
     -- use_items,check_existing=0,slots=trinket1:trinket2,if=this_trinket.is.unyielding_netherprism&buff.trueshot.remains>14&buff.latent_energy.stack>3&(buff.latent_energy.stack+floor((fight_remains-20)%cooldown.trueshot.duration)*(cooldown.trueshot.duration%10))>17
     if I.UnyieldingNetherprism:IsEquippedAndReady() and (Player:BuffRemains(S.TrueshotBuff) > 14 and Player:BuffStack(S.LatentEnergyBuff) > 3 and (Player:BuffStack(S.LatentEnergyBuff) + mathfloor((BossFightRemains - 20) / TrueshotCD) * (TrueshotCD / 10)) > 17) then
-      if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "unyielding_netherprism (" .. Trinket1:Name() .. ") trinkets 14"; end
+      if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "unyielding_netherprism (" .. Trinket1:Name() .. ") trinkets 16"; end
     end
     -- use_items,check_existing=0,slots=trinket1:trinket2,if=this_trinket.has_use_damage&cooldown.trueshot.remains>20
     if T1Check and (Trinket1:HasUseDamage() and S.Trueshot:CooldownRemains() > 20) then
-      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") trinkets 16"; end
+      if Cast(Trinket1, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket1Range)) then return "trinket1 (" .. Trinket1:Name() .. ") trinkets 18"; end
     end
     if T2Check and (Trinket2:HasUseDamage() and S.Trueshot:CooldownRemains() > 20) then
-      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") trinkets 18"; end
+      if Cast(Trinket2, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsInRange(VarTrinket2Range)) then return "trinket2 (" .. Trinket2:Name() .. ") trinkets 20"; end
     end
   end
   if Settings.Commons.Enabled.Items then
@@ -293,13 +295,13 @@ local function Trinkets()
 end
 
 local function DRST()
+  -- volley,if=buff.double_tap.down&(!raid_event.adds.exists|raid_event.adds.in>cooldown)&(!talent.shrapnel_shot|!talent.salvo|buff.lock_and_load.down)
+  if S.Volley:IsReady() and (Player:BuffDown(S.DoubleTapBuff) and (not S.ShrapnelShot:IsAvailable() or not S.Salvo:IsAvailable() or Player:BuffDown(S.LockandLoadBuff))) then
+    if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley dr_st 2"; end
+  end
   -- explosive_shot,if=talent.precision_detonation&buff.lock_and_load.down&cooldown.aimed_shot.charges_fractional<=1.1&buff.trueshot.down
   if S.ExplosiveShot:IsReady() and (S.PrecisionDetonation:IsAvailable() and Player:BuffDown(S.LockandLoadBuff) and S.AimedShot:ChargesFractional() <= 1.1 and Player:BuffDown(S.TrueshotBuff)) then
-    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot dr_st 2"; end
-  end
-  -- volley,if=buff.double_tap.down&(!raid_event.adds.exists|raid_event.adds.in>cooldown)
-  if S.Volley:IsReady() and (Player:BuffDown(S.DoubleTapBuff)) then
-    if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley dr_st 4"; end
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot dr_st 4"; end
   end
   -- steady_shot,if=variable.buffer_deathblow&buff.trueshot.down&cooldown.trueshot.remains
   if S.SteadyShot:IsCastable() and (VarBufferDeathblow and Player:BuffDown(S.TrueshotBuff) and S.Trueshot:CooldownDown()) then
@@ -344,13 +346,13 @@ local function DRST()
 end
 
 local function SentST()
+  -- volley,if=buff.double_tap.down&(!raid_event.adds.exists|raid_event.adds.in>cooldown)&(!talent.shrapnel_shot|!talent.salvo|buff.lock_and_load.down)
+  if S.Volley:IsReady() and (Player:BuffDown(S.DoubleTapBuff) and (not S.ShrapnelShot:IsAvailable() or not S.Salvo:IsAvailable() or Player:BuffDown(S.LockandLoadBuff))) then
+    if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley sent_st 2"; end
+  end
   -- explosive_shot,if=talent.shrapnel_shot&buff.lock_and_load.down&cooldown.aimed_shot.charges_fractional<=1.1&buff.trueshot.down
   if S.ExplosiveShot:IsReady() and (S.ShrapnelShot:IsAvailable() and Player:BuffDown(S.LockandLoadBuff) and S.AimedShot:ChargesFractional() <= 1.1 and Player:BuffDown(S.TrueshotBuff)) then
-    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot sent_st 2"; end
-  end
-  -- volley,if=buff.double_tap.down&(!raid_event.adds.exists|raid_event.adds.in>cooldown)
-  if S.Volley:IsReady() and (Player:BuffDown(S.DoubleTapBuff)) then
-    if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley sent_st 4"; end
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot sent_st 4"; end
   end
   -- rapid_fire,if=talent.lunar_storm&buff.lunar_storm_cooldown.down
   if S.RapidFire:IsCastable() and (S.LunarStorm:IsAvailable() and Player:BuffDown(S.LunarStormCDBuff)) then
@@ -511,13 +513,13 @@ local function SentCleave()
 end
 
 local function DRTrickshots()
+  -- volley,if=buff.double_tap.down&(!talent.shrapnel_shot|!talent.salvo|buff.lock_and_load.down&cooldown.aimed_shot.charges_fractional<=1.1)
+  if S.Volley:IsReady() and (Player:BuffDown(S.DoubleTapBuff) and (not S.ShrapnelShot:IsAvailable() or not S.Salvo:IsAvailable() or Player:BuffDown(S.LockandLoadBuff) and S.AimedShot:ChargesFractional() <= 1.1)) then
+    if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley dr_trickshots 2"; end
+  end
   -- explosive_shot,if=talent.precision_detonation&buff.trueshot.down&(!talent.shrapnel_shot|buff.lock_and_load.down&(cooldown.aimed_shot.charges_fractional<=1.1|talent.focused_aim))
   if S.ExplosiveShot:IsReady() and (S.PrecisionDetonation:IsAvailable() and Player:BuffDown(S.TrueshotBuff) and (not S.ShrapnelShot:IsAvailable() or Player:BuffDown(S.LockandLoadBuff) and (S.AimedShot:ChargesFractional() <= 1.1 or S.FocusedAim:IsAvailable()))) then
-    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot dr_trickshots 2"; end
-  end
-  -- volley,if=buff.double_tap.down&(!talent.shrapnel_shot|!talent.salvo|buff.lock_and_load.down)
-  if S.Volley:IsReady() and (Player:BuffDown(S.DoubleTapBuff) and (not S.ShrapnelShot:IsAvailable() or not S.Salvo:IsAvailable() or Player:BuffDown(S.LockandLoadBuff))) then
-    if Cast(S.Volley, Settings.Marksmanship.GCDasOffGCD.Volley, nil, not TargetInRange40y)  then return "volley dr_trickshots 4"; end
+    if Cast(S.ExplosiveShot, Settings.CommonsOGCD.GCDasOffGCD.ExplosiveShot, nil, not TargetInRange40y) then return "explosive_shot dr_trickshots 4"; end
   end
   -- black_arrow,if=buff.trick_shots.down|!talent.headshot|buff.precise_shots.up
   if S.BlackArrow:IsReady() and (Player:BuffDown(S.TrickShotsBuff) or not S.Headshot:IsAvailable() or Player:BuffUp(S.PreciseShotsBuff)) then
@@ -533,7 +535,7 @@ local function DRTrickshots()
   end
   -- steady_shot,if=variable.buffer_deathblow&buff.trueshot.down
   if S.SteadyShot:IsCastable() and (VarBufferDeathblow and Player:BuffDown(S.TrueshotBuff)) then
-    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot dr_cleave 12"; end
+    if Cast(S.SteadyShot, nil, nil, not TargetInRange40y) then return "steady_shot dr_trickshots 12"; end
   end
   -- multishot,target_if=max:debuff.spotters_mark.down|action.aimed_shot.in_flight_to_target,if=buff.trick_shots.down|buff.precise_shots.up&(buff.moving_target.down|debuff.spotters_mark.down)
   -- Note: Modifying conditions slightly.
@@ -693,7 +695,7 @@ local function APL()
     if Player:HeroTreeID() == 44 then
       local ShouldReturn = DRST(); if ShouldReturn then return ShouldReturn; end
     end
-    -- call_action_list,name=sentst,if=!talent.black_arrow
+    -- call_action_list,name=sentst,if=hero_tree.sentinel
     -- Note: Added level check to force this function for below level 70.
     if Player:HeroTreeID() == 42 or Player:Level() < 71 then
       local ShouldReturn = SentST(); if ShouldReturn then return ShouldReturn; end

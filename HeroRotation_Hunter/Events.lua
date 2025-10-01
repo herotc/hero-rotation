@@ -17,7 +17,6 @@ local Item   = HL.Item
 -- Lua
 local C_TimerAfter = C_Timer.After
 local GetTime      = GetTime
-local select       = select
 -- File Locals
 HR.Commons.Hunter  = {}
 local Hunter       = HR.Commons.Hunter
@@ -39,8 +38,7 @@ Hunter.PackLeader.BoarChargesRemaining = 0
 
 --- ===== Pet Status Event Tracking =====
 HL:RegisterForSelfCombatEvent(
-  function(...)
-    local DestGUID, _, _, _, SpellID = select(8, ...)
+  function(_, _, _, _, _, _, _, DestGUID, _, _, _, SpellID)
     for _, Spell in pairs(P.SummonSpells) do
       if SpellID == Spell then
         P.Status = 1
@@ -64,8 +62,7 @@ HL:RegisterForEvent(
 )
 
 HL:RegisterForSelfCombatEvent(
-  function(...)
-    local SpellID = select(12, ...)
+  function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
     if SpellID == 2641 then
       -- Delay for 1s, as SPELL_CAST_SUCCESS fires before SPELLS_CHANGED when casting Dismiss Pet.
       C_TimerAfter(1, function()
@@ -79,8 +76,7 @@ HL:RegisterForSelfCombatEvent(
 )
 
 HL:RegisterForCombatEvent(
-  function(...)
-    local DestGUID = select(8, ...)
+  function(_, _, _, _, _, _, _, DestGUID)
     if DestGUID == P.GUID then
       P.Status = 2
       P.GUID = 0
@@ -120,8 +116,7 @@ HL:RegisterForEvent(
 
 --- ===== Howl of the Pack Leader Event Tracking =====
 HL:RegisterForSelfCombatEvent(
-  function(...)
-    local SpellID = select(12, ...)
+  function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
     -- "Boar Next" buff removed
     if SpellID == 472324 then
       Hunter.PackLeader.BoarChargesRemaining = 3
@@ -131,8 +126,7 @@ HL:RegisterForSelfCombatEvent(
 )
 
 HL:RegisterForSelfCombatEvent(
-  function(...)
-    local DestGUID, _, _, _, SpellID = select(8, ...)
+  function(_, _, _, _, _, _, _, DestGUID, _, _, _, SpellID)
     -- Boar Charge
     if SpellID == 471936 then
       Hunter.PackLeader.BoarChargesRemaining = Hunter.PackLeader.BoarChargesRemaining - 1
