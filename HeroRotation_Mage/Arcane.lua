@@ -552,7 +552,7 @@ local function APL()
       VarOpener = false
     end
     -- arcane_barrage,if=fight_remains<2
-    if S.ArcaneBarrage:IsReady() and (BossFightRemains < 2) then
+    if S.ArcaneBarrage:IsReady() and (FightRemains < 2) then
       if Cast(S.ArcaneBarrage, nil, nil, not Target:IsSpellInRange(S.ArcaneBarrage)) then return "arcane_barrage main 18"; end
     end
     -- call_action_list,name=cd_opener,if=!variable.soul_cd
