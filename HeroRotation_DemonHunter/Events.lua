@@ -14,7 +14,6 @@ local Item             = HL.Item
 -- Lua
 local GetTime          = GetTime
 local mathmax          = math.max
-local select           = select
 -- File Locals
 HR.Commons.DemonHunter = {}
 local DemonHunter      = HR.Commons.DemonHunter
@@ -44,8 +43,7 @@ Surge.DeathSweep = false
 -- When we cast Meta, set Demonsurge buffs to active.
 -- Then remove the buffs when we use them.
 HL:RegisterForSelfCombatEvent(
-  function(...)
-    local SpellID = select(12, ...)
+  function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
     if Player:HeroTreeID() == 34 then
       if SpellID == SpellVDH.Metamorphosis:ID() then
         Surge.ConsumingFire = true
@@ -83,8 +81,7 @@ HL:RegisterForSelfCombatEvent(
 -- Watch for the Meta aura.
 -- These spells are buffed on hardcast Meta and Demonic Meta.
 HL:RegisterForSelfCombatEvent(
-  function(...)
-    local SpellID = select(12, ...)
+  function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
     if Player:HeroTreeID() == 34 then
       if SpellID == SpellVDH.MetamorphosisBuff:ID() then
         Surge.SpiritBurst = true
@@ -99,8 +96,7 @@ HL:RegisterForSelfCombatEvent(
 
 -- Remove Demonsurge buffs when Meta ends.
 HL:RegisterForSelfCombatEvent(
-  function(...)
-    local SpellID = select(12, ...)
+  function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
     if Player:HeroTreeID() == 34 and (SpellID == SpellVDH.MetamorphosisBuff:ID() or SpellID == SpellHavoc.MetamorphosisBuff:ID()) then
       Surge.ConsumingFire = false
       Surge.SigilofDoom = false
@@ -122,8 +118,7 @@ Soul.IncomingSouls = 0
 
 -- Casted abilities that generate delayed Soul Fragments.
 HL:RegisterForSelfCombatEvent(
-  function(...)
-    local SpellID = select(12, ...)
+  function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
     local IncAmt = 0
     if SpellID == SpellVDH.Fracture:ID() or SpellID == SpellVDH.Shear:ID() then
       IncAmt = Player:BuffUp(SpellVDH.MetamorphosisBuff) and 3 or 2
@@ -148,8 +143,7 @@ HL:RegisterForSelfCombatEvent(
 
 -- T31 4pc "flare-up" Sigil damage, which spawns a delayed Soul Fragment.
 HL:RegisterForSelfCombatEvent(
-  function(...)
-    local SpellID = select(12, ...)
+  function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
     if SpellID == 425672 then
       Soul.IncomingSouls = Soul.IncomingSouls + 1
     end
@@ -158,8 +152,7 @@ HL:RegisterForSelfCombatEvent(
 
 -- The initial application of the Soul Fragments buff.
 HL:RegisterForSelfCombatEvent(
-  function(...)
-    local SpellID = select(12, ...)
+  function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
     if SpellID == 203981 then
       Soul.AuraSouls = 1
       Soul.IncomingSouls = mathmax(0, Soul.IncomingSouls - 1)
@@ -169,8 +162,7 @@ HL:RegisterForSelfCombatEvent(
 
 -- Triggers every time we add stacks to the Soul Fragments buff.
 HL:RegisterForSelfCombatEvent(
-  function(...)
-    local SpellID, _, _, _, Amount = select(12, ...)
+  function(_, _, _, _, _, _, _, _, _, _, _, SpellID, _, _, _, Amount)
     if SpellID == 203981 then
       Soul.AuraSouls = Amount
       Soul.IncomingSouls = mathmax(0, Soul.IncomingSouls - Amount)
@@ -180,8 +172,7 @@ HL:RegisterForSelfCombatEvent(
 
 -- Triggers every time we remove stacks from the Soul Fragments buff.
 HL:RegisterForSelfCombatEvent(
-  function(...)
-    local SpellID, _, _, _, Amount = select(12, ...)
+  function(_, _, _, _, _, _, _, _, _, _, _, SpellID, _, _, _, Amount)
     if SpellID == 203981 then
       Soul.AuraSouls = Amount
     end
@@ -190,8 +181,7 @@ HL:RegisterForSelfCombatEvent(
 
 -- Triggers when the soul Fragments buff is removed entirely.
 HL:RegisterForSelfCombatEvent(
-  function(...)
-    local SpellID, _, _, _, Amount = select(12, ...)
+  function(_, _, _, _, _, _, _, _, _, _, _, SpellID)
     if SpellID == 203981 then
       Soul.AuraSouls = 0
     end
