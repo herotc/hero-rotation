@@ -139,22 +139,24 @@ HL:RegisterForSelfCombatEvent(
 HL:RegisterForSelfCombatEvent(
   function (_, SubEvent, _, _, _, _, _, _, _, _, _, SpellID, _, _, _, StackAmount)
     if SpellID == SpellEnh.MaelstromWeaponBuff:ID() then
-      local StackAmount
+      local CurrentStacks
       if SubEvent == "SPELL_AURA_REMOVED" then
-        StackAmount = 0
+        CurrentStacks = 0
       else
         if StackAmount == nil then
-          StackAmount = Player:BuffStack(SpellEnh.MaelstromWeaponBuff)
+          CurrentStacks = Player:BuffStack(SpellEnh.MaelstromWeaponBuff)
+        else
+          CurrentStacks = StackAmount
         end
       end
-      StackAmount = StackAmount or 0
-      if StackAmount > Shaman.LastMaelstromWeaponStacks then
-        Shaman.TempestMaelstrom = Shaman.TempestMaelstrom + (StackAmount - Shaman.LastMaelstromWeaponStacks)
+      CurrentStacks = CurrentStacks or 0
+      if CurrentStacks > Shaman.LastMaelstromWeaponStacks then
+        Shaman.TempestMaelstrom = Shaman.TempestMaelstrom + (CurrentStacks - Shaman.LastMaelstromWeaponStacks)
         if Shaman.TempestMaelstrom >= 40 then
           Shaman.TempestMaelstrom = Shaman.TempestMaelstrom % 40
         end
       end
-      Shaman.LastMaelstromWeaponStacks = StackAmount
+      Shaman.LastMaelstromWeaponStacks = CurrentStacks
     end
   end
   , "SPELL_AURA_APPLIED", "SPELL_AURA_APPLIED_DOSE", "SPELL_AURA_REMOVED", "SPELL_AURA_REMOVED_DOSE"
