@@ -374,7 +374,7 @@ local function Single()
     if Cast(S.DoomWinds, Settings.Enhancement.GCDasOffGCD.DoomWinds, nil, not Target:IsInMeleeRange(5)) then return "doom_winds single 16"; end
   end
   -- primordial_wave,if=dot.flame_shock.ticking&(raid_event.adds.in>action.primordial_wave.cooldown|raid_event.adds.in<6)
-  if S.PrimordialWave:IsReady() and (S.FlameShockDebuff:AuraActiveCount() > 0) then
+  if S.PrimordialWave:IsReady() and (Target:DebuffUp(S.FlameShockDebuff)) then
     if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsInRange(45)) then return "primordial_wave single 18"; end
   end
   -- ice_strike,if=buff.tempest.up&tww3_procs_to_asc=1&buff.maelstrom_weapon.stack<=8
@@ -398,7 +398,7 @@ local function Single()
     if Cast(S.TempestAbility, nil, Settings.CommonsDS.DisplayStyle.Tempest, not Target:IsInRange(40)) then return "tempest single 28"; end
   end
   -- ascendance,if=(dot.flame_shock.ticking|!talent.primordial_wave.enabled|!talent.ashen_catalyst.enabled)
-  if CDsON() and S.Ascendance:IsCastable() and (S.FlameShockDebuff:AuraActiveCount() > 0 or not S.PrimordialWave:IsAvailable() or not S.AshenCatalyst:IsAvailable()) then
+  if CDsON() and S.Ascendance:IsCastable() and (Target:DebuffUp(S.FlameShockDebuff) or not S.PrimordialWave:IsAvailable() or not S.AshenCatalyst:IsAvailable()) then
     if Cast(S.Ascendance, Settings.CommonsOGCD.GCDasOffGCD.Ascendance) then return "ascendance single 30"; end
   end
   -- tempest,if=((buff.maelstrom_weapon.stack>=5)|(talent.deeply_rooted_elements.enabled&buff.maelstrom_weapon.stack>=5))&(buff.tempest.stack=buff.tempest.max_stack&(tempest_mael_count>30|buff.awakening_storms.stack=3))
@@ -487,16 +487,18 @@ local function Single()
   if S.CrashLightning:IsReady() and (S.UnrelentingStorms:IsAvailable()) then
     if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInMeleeRange(8)) then return "crash_lightning single 72"; end
   end
-  -- elemental_blast,if=buff.maelstrom_weapon.stack>=5&!buff.primordial_storm.up
-  if S.ElementalBlast:IsReady() and (MaelstromStacks >= 5 and Player:BuffDown(S.PrimordialStormBuff)) then
-    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 74"; end
-  end
-  -- lightning_bolt,if=buff.maelstrom_weapon.stack>=5&!buff.primordial_storm.up
-  if S.LightningBolt:IsCastable() and (MaelstromStacks >= 5 and Player:BuffDown(S.PrimordialStormBuff)) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 76"; end
+  if MaelstromStacks >= 5 and Player:BuffDown(S.PrimordialStormBuff) then
+    -- elemental_blast,if=buff.maelstrom_weapon.stack>=5&!buff.primordial_storm.up
+    if S.ElementalBlast:IsReady() then
+      if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single 74"; end
+    end
+    -- lightning_bolt,if=buff.maelstrom_weapon.stack>=5&!buff.primordial_storm.up
+    if S.LightningBolt:IsCastable() then
+      if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single 76"; end
+    end
   end
   -- lava_lash,if=talent.elemental_assault.enabled&talent.molten_assault.enabled&dot.flame_shock.ticking
-  if S.LavaLash:IsCastable() and (S.ElementalAssault:IsAvailable() and S.MoltenAssault:IsAvailable() and S.FlameShockDebuff:AuraActiveCount() > 0) then
+  if S.LavaLash:IsCastable() and (S.ElementalAssault:IsAvailable() and S.MoltenAssault:IsAvailable() and Target:DebuffUp(S.FlameShockDebuff)) then
     if Cast(S.LavaLash, nil, nil, not Target:IsSpellInRange(S.LavaLash)) then return "lava_lash single 78"; end
   end
   -- sundering
@@ -526,7 +528,7 @@ local function Single()
     if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single 92"; end
   end
   -- fire_nova,if=active_dot.flame_shock
-  if S.FireNova:IsReady() and (S.FlameShockDebuff:AuraActiveCount() > 0) then
+  if S.FireNova:IsReady() and (Target:DebuffUp(S.FlameShockDebuff)) then
     if Cast(S.FireNova) then return "fire_nova single 94"; end
   end
   -- earth_elemental
@@ -584,13 +586,15 @@ local function SingleTotemicOpen()
   if S.Sundering:IsReady() and (Player:BuffUp(S.LegacyoftheFrostWitchBuff)) then
     if Cast(S.Sundering, Settings.Enhancement.GCDasOffGCD.Sundering, nil, not Target:IsInMeleeRange(11)) then return "sundering single_totemic_open 22"; end
   end
-  -- elemental_blast,if=buff.maelstrom_weapon.stack=10
-  if S.ElementalBlast:IsReady() and (MaelstromStacks == 10) then
-    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single_totemic_open 24"; end
-  end
-  -- lightning_bolt,if=buff.maelstrom_weapon.stack=10
-  if S.LightningBolt:IsCastable() and (MaelstromStacks == 10) then
-    if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_totemic_open 26"; end
+  if MaelstromStacks == 10 then
+    -- elemental_blast,if=buff.maelstrom_weapon.stack=10
+    if S.ElementalBlast:IsReady() then
+      if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast single_totemic_open 24"; end
+    end
+    -- lightning_bolt,if=buff.maelstrom_weapon.stack=10
+    if S.LightningBolt:IsCastable() then
+      if Cast(S.LightningBolt, nil, nil, not Target:IsSpellInRange(S.LightningBolt)) then return "lightning_bolt single_totemic_open 26"; end
+    end
   end
   -- stormstrike
   if S.Stormstrike:IsReady() then
@@ -633,7 +637,7 @@ local function SingleTotemic()
     if Cast(S.FeralSpirit, Settings.Enhancement.GCDasOffGCD.FeralSpirit) then return "feral_spirit single_totemic 12"; end
   end
   -- primordial_wave,if=dot.flame_shock.ticking&(raid_event.adds.in>action.primordial_wave.cooldown)|raid_event.adds.in<6
-  if S.PrimordialWave:IsReady() and (S.FlameShockDebuff:AuraActiveCount() > 0) then
+  if S.PrimordialWave:IsReady() and (Target:DebuffUp(S.FlameShockDebuff)) then
     if Cast(S.PrimordialWave, nil, Settings.CommonsDS.DisplayStyle.PrimordialWave, not Target:IsInRange(45)) then return "primordial_wave single_totemic 14"; end
   end
   -- doom_winds,if=buff.legacy_of_the_frost_witch.up
@@ -725,7 +729,7 @@ local function SingleTotemic()
     if Cast(S.FrostShock, nil, nil, not Target:IsSpellInRange(S.FrostShock)) then return "frost_shock single_totemic 58"; end
   end
   -- fire_nova,if=active_dot.flame_shock
-  if S.FireNova:IsReady() and (S.FlameShockDebuff:AuraActiveCount() > 0) then
+  if S.FireNova:IsReady() and (Target:DebuffUp(S.FlameShockDebuff)) then
     if Cast(S.FireNova) then return "fire_nova single_totemic 60"; end
   end
   -- earth_elemental
@@ -1073,13 +1077,15 @@ local function AoeTotemicOpen()
   if S.CrashLightning:IsCastable() and (Player:BuffStack(S.EarthenWeaponBuff) >= 2 and Player:BuffUp(S.PrimordialStormBuff) and Player:BuffUp(S.DoomWindsBuff)) then
     if Cast(S.CrashLightning, Settings.Enhancement.GCDasOffGCD.CrashLightning, nil, not Target:IsInMeleeRange(8)) then return "crash_lightning aoe_totemic_open 30"; end
   end
-  -- elemental_blast,if=buff.maelstrom_weapon.stack>=10
-  if S.ElementalBlast:IsReady() and (MaelstromStacks >= 10) then
-    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe_totemic_open 32"; end
-  end
-  -- chain_lightning,if=buff.maelstrom_weapon.stack>=10
-  if S.ChainLightning:IsReady() and (MaelstromStacks >= 10) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe_totemic_open 34"; end
+  if MaelstromStacks >= 10 then
+    -- elemental_blast,if=buff.maelstrom_weapon.stack>=10
+    if S.ElementalBlast:IsReady() then
+      if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe_totemic_open 32"; end
+    end
+    -- chain_lightning,if=buff.maelstrom_weapon.stack>=10
+    if S.ChainLightning:IsReady() then
+      if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe_totemic_open 34"; end
+    end
   end
   -- frost_shock,if=talent.hailstorm.enabled&buff.hailstorm.up&pet.searing_totem.active
   if S.FrostShock:IsReady() and (S.Hailstorm:IsAvailable() and Player:BuffUp(S.HailstormBuff) and Shaman.SearingTotemActive) then
@@ -1123,13 +1129,15 @@ local function AoeTotemicOpen()
   if S.IceStrike:IsReady() and (S.Hailstorm:IsAvailable() and Player:BuffDown(S.IceStrikeBuff)) then
     if Cast(S.IceStrike, nil, nil, not Target:IsSpellInRange(S.IceStrike)) then return "ice_strike aoe_totemic_open 54"; end
   end
-  -- elemental_blast,if=buff.maelstrom_weapon.stack>=5&!buff.primordial_storm.up
-  if S.ElementalBlast:IsReady() and (MaelstromStacks >= 5 and Player:BuffDown(S.PrimordialStormBuff)) then
-    if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe_totemic_open 56"; end
-  end
-  -- chain_lightning,if=buff.maelstrom_weapon.stack>=5&!buff.primordial_storm.up
-  if S.ChainLightning:IsReady() and (MaelstromStacks >= 5 and Player:BuffDown(S.PrimordialStormBuff)) then
-    if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe_totemic_open 58"; end
+  if MaelstromStacks >= 5 and Player:BuffDown(S.PrimordialStormBuff) then
+    -- elemental_blast,if=buff.maelstrom_weapon.stack>=5&!buff.primordial_storm.up
+    if S.ElementalBlast:IsReady() then
+      if Cast(S.ElementalBlast, nil, nil, not Target:IsSpellInRange(S.ElementalBlast)) then return "elemental_blast aoe_totemic_open 56"; end
+    end
+    -- chain_lightning,if=buff.maelstrom_weapon.stack>=5&!buff.primordial_storm.up
+    if S.ChainLightning:IsReady() then
+      if Cast(S.ChainLightning, nil, nil, not Target:IsSpellInRange(S.ChainLightning)) then return "chain_lightning aoe_totemic_open 58"; end
+    end
   end
   -- stormstrike
   if S.Stormstrike:IsReady() then
