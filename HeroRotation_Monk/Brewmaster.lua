@@ -264,7 +264,7 @@ local function APL()
     end
     -- black_ox_brew,if=energy<40&(!talent.aspect_of_harmony.enabled|cooldown.celestial_brew.charges_fractional<1)
     if S.BlackOxBrew:IsCastable() and (Player:Energy() < 40 and (not S.AspectofHarmony:IsAvailable() or S.CelestialBrew:ChargesFractional() < 1)) then
-      if Cast(S.BlackOxBrew, Settings.Brewmaster.GCDasOffGCD.BlackOxBrew) then return "black_ox_brew main 4"; end
+      if Cast(S.BlackOxBrew, Settings.Brewmaster.OffGCDasOffGCD.BlackOxBrew) then return "black_ox_brew main 4"; end
     end
     -- celestial_brew,if=(buff.aspect_of_harmony_accumulator.value>0.3*health.max&buff.weapons_of_order.up&!dot.aspect_of_harmony_damage.ticking)
     -- celestial_brew,if=(buff.aspect_of_harmony_accumulator.value>0.3*health.max&!talent.weapons_of_order.enabled&!dot.aspect_of_harmony_damage.ticking)
