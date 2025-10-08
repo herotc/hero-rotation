@@ -332,7 +332,7 @@ local function APL()
     end
     -- exploding_keg,if=!talent.rushing_jade_wind.enabled|buff.rushing_jade_wind.up
     if S.ExplodingKeg:IsCastable() and (not S.RushingJadeWind:IsAvailable() or Player:BuffUp(S.RushingJadeWindBuff)) then
-      if Cast(S.ExplodingKeg, nil, nil, not Target:IsInRange(40)) then return "exploding_keg main 32"; end
+      if Cast(S.ExplodingKeg, Settings.Brewmaster.GCDasOffGCD.ExplodingKeg, nil, not Target:IsInRange(40)) then return "exploding_keg main 32"; end
     end
     -- rushing_jade_wind,if=talent.aspect_of_harmony.enabled&((buff.rushing_jade_wind.remains<2.5&buff.rushing_jade_wind.up)|!buff.rushing_jade_wind.up)
     if S.RushingJadeWind:IsReady() and (S.AspectofHarmony:IsAvailable() and ((Player:BuffRemains(S.RushingJadeWindBuff) < 2.5 and Player:BuffUp(S.RushingJadeWindBuff)) or Player:BuffDown(S.RushingJadeWindBuff))) then
