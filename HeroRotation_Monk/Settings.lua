@@ -70,7 +70,6 @@ HR.GUISettings.APL.Monk = {
       -- Racials
       -- Abilities
       BlackOxBrew = true,
-      PurifyingBrew = true,
     }
   },
   BrMDS = {
@@ -80,7 +79,7 @@ HR.GUISettings.APL.Monk = {
       CelestialInfusion = "Suggested",
       DampenHarm = "Suggested",
       FortifyingBrew = "Suggested",
-      Purify = "SuggestedRight"
+      PurifyingBrew = "SuggestedRight"
     },
   },
   Windwalker = {
