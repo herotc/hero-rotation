@@ -1,4 +1,4 @@
-## Interface: 110200
+## Interface: 110205
 
 ## Title: Hero|cFFA330C9Rotation|r [|cFFFF7C0ADruid|r]
 ## Author: Cilraaz
