@@ -599,11 +599,11 @@ local function KOTGST()
     if Cast(S.NewMoon, nil, nil, not Target:IsSpellInRange(S.NewMoon)) then return "new_moon kotg_st 62"; end
   end
   -- half_moon,if=astral_power.deficit>variable.passive_asp+energize_amount&((buff.harmony_of_the_grove.up&!buff.ca_inc.up|buff.ca_inc.up&!cooldown.ca_inc.ready)|cooldown.new_moon.full_recharge_time<cooldown.convoke_the_spirits.remains)|fight_remains<20
-  if S.HalfMoon:IsReady() and (Player:AstralPowerDeficit() > VarPassiveAsp + EnergizeAmount(S.HalfMoon) and (Player:BuffUp(S.HarmonyoftheGroveBuff) and not CAIncBuffUp or CAIncBuffUp and CAInc:CooldownDown()) or S.NewMoon:FullRechargeTime() < S.ConvoketheSpirits:CooldownRemains()) or BossFightRemains < 20 then
+  if S.HalfMoon:IsReady() and (Player:AstralPowerDeficit() > VarPassiveAsp + EnergizeAmount(S.HalfMoon) and ((Player:BuffUp(S.HarmonyoftheGroveBuff) and not CAIncBuffUp or CAIncBuffUp and CAInc:CooldownDown()) or S.NewMoon:FullRechargeTime() < S.ConvoketheSpirits:CooldownRemains()) or BossFightRemains < 20) then
     if Cast(S.HalfMoon, nil, nil, not Target:IsSpellInRange(S.HalfMoon)) then return "half_moon kotg_st 64"; end
   end
   -- full_moon,if=astral_power.deficit>variable.passive_asp+energize_amount&((buff.harmony_of_the_grove.up&!buff.ca_inc.up|buff.ca_inc.up&!cooldown.ca_inc.ready)|cooldown.new_moon.full_recharge_time<cooldown.convoke_the_spirits.remains)|fight_remains<20
-  if S.FullMoon:IsReady() and (Player:AstralPowerDeficit() > VarPassiveAsp + EnergizeAmount(S.FullMoon) and (Player:BuffUp(S.HarmonyoftheGroveBuff) and not CAIncBuffUp or CAIncBuffUp and CAInc:CooldownDown()) or S.NewMoon:FullRechargeTime() < S.ConvoketheSpirits:CooldownRemains()) or BossFightRemains < 20 then
+  if S.FullMoon:IsReady() and (Player:AstralPowerDeficit() > VarPassiveAsp + EnergizeAmount(S.FullMoon) and ((Player:BuffUp(S.HarmonyoftheGroveBuff) and not CAIncBuffUp or CAIncBuffUp and CAInc:CooldownDown()) or S.NewMoon:FullRechargeTime() < S.ConvoketheSpirits:CooldownRemains()) or BossFightRemains < 20) then
     if Cast(S.FullMoon, nil, nil, not Target:IsSpellInRange(S.FullMoon)) then return "full_moon kotg_st 66"; end
   end
   -- starsurge,if=buff.starweavers_weft.up|buff.touch_the_cosmos.up
