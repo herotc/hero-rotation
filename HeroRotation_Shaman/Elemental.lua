@@ -407,8 +407,16 @@ local function SingleTarget()
   if S.AncestralSwiftness:IsViable() then
     if Cast(S.AncestralSwiftness, Settings.CommonsOGCD.GCDasOffGCD.AncestralSwiftness) then return "ancestral_swiftness single_target 16"; end
   end
-  -- ascendance,if=(talent.first_ascendant|fight_remains>200|fight_remains<80|variable.trinket_1_buffs&trinket.1.ready_cooldown|variable.trinket_2_buffs&trinket.2.ready_cooldown|equipped.neural_synapse_enhancer&cooldown.neural_synapse_enhancer.remains=0|equipped.bestinslots&cooldown.bestinslots.remains=0)&(buff.fury_of_storms.up|!talent.fury_of_the_storms)&(cooldown.primordial_wave.remains>25|!talent.primordial_wave)
-  if CDsON() and S.Ascendance:IsCastable() and ((S.FirstAscendant:IsAvailable() or FightRemains > 200 or FightRemains < 80 or VarTrinket1Buffs and Trinket1:CooldownUp() or VarTrinket2Buffs and Trinket2:CooldownUp() or I.NeuralSynapseEnhancer:IsEquippedAndReady() or I.BestinSlotsCaster:IsEquippedAndReady()) and (Player:BuffUp(S.FuryofStormsBuff) or not S.FuryoftheStorms:IsAvailable()) and (S.PrimordialWave:CooldownRemains() > 25 or not S.PrimordialWave:IsAvailable())) then
+  -- ascendance,if=(talent.first_ascendant|fight_remains>200|fight_remains<80
+  -- |variable.trinket_1_buffs&trinket.1.ready_cooldown|variable.trinket_2_buffs&trinket.2.ready_cooldown
+  -- |equipped.neural_synapse_enhancer&cooldown.neural_synapse_enhancer.remains=0|equipped.bestinslots
+  -- &cooldown.bestinslots.remains=0)&(buff.fury_of_storms.up|!talent.fury_of_the_storms)
+  -- &(cooldown.primordial_wave.remains>25|!talent.primordial_wave)
+  if CDsON() and S.Ascendance:IsCastable() and ((S.FirstAscendant:IsAvailable() or FightRemains > 200 or FightRemains < 80
+    or VarTrinket1Buffs and Trinket1:CooldownUp() or VarTrinket2Buffs and Trinket2:CooldownUp()
+    or I.NeuralSynapseEnhancer:IsEquippedAndReady() or I.BestinSlotsCaster:IsEquippedAndReady())
+    and ((S.FuryoftheStorms:IsAvailable() and Player:StormkeeperUp()) or not S.FuryoftheStorms:IsAvailable())
+    and (S.PrimordialWave:CooldownRemains() > 25 or not S.PrimordialWave:IsAvailable())) then
     if Cast(S.Ascendance, Settings.CommonsOGCD.GCDasOffGCD.Ascendance) then return "ascendance single_target 18"; end
   end
   -- tempest,if=buff.surge_of_power.up
