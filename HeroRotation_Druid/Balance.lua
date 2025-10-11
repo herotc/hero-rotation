@@ -453,7 +453,7 @@ local function KOTGPreCD()
     end
   end
   -- use_items,if=buff.ca_inc.up|fight_remains<15
-  if Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items then
+  if (Settings.Commons.Enabled.Trinkets or Settings.Commons.Enabled.Items) and (CAIncBuffUp or BossFightRemains < 15) then
     local ItemToUse, ItemSlot, ItemRange = Player:GetUseableItems(OnUseExcludes)
     if ItemToUse then
       local DisplayStyle = Settings.CommonsDS.DisplayStyle.Trinkets
