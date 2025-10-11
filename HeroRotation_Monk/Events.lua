@@ -155,11 +155,14 @@ HL:RegisterForCombatEvent(
     local args = {...}
     -- Absorb procs from the Stagger spell.
     local DestGUID = args[8]
-    local SpellID = args[12]
-    local Amount = args[22]
-    if DestGUID == Player:GUID() and SpellID == StaggerSpellID then
-      -- Register the full amount of the current Stagger
-      RegisterStaggerFullAbsorb(Amount)
+    if DestGUID == Player:GUID() then
+      -- On melee hit, the stagger spell ID is in 16 and damage is in 19.
+      if args[16] == StaggerSpellID then
+        RegisterStaggerFullAbsorb(args[19])
+      -- On a magical hit, the stagger spell ID is in 19 and damage is in 22.
+      elseif args[19] == StaggerSpellID then
+        RegisterStaggerDamageTaken(args[22])
+      end
     end
   end
   , "SPELL_ABSORBED"
