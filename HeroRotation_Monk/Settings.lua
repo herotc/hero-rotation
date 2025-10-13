@@ -95,12 +95,15 @@ HR.GUISettings.APL.Monk = {
     -- {Display GCD as OffGCD, ForceReturn}
     GCDasOffGCD = {
       -- Abilities
+      CelestialConduit = false,
       CracklingJadeLightning = false,
       FortifyingBrew = true,
       InvokeXuenTheWhiteTiger = true,
       StormEarthAndFireFixate = false,
+      StrikeOfTheWindlord = false,
       TouchOfDeath = true,
       TouchOfKarma = true,
+      WhirlingDragonPunch = false,
     },
     -- {Display OffGCD as OffGCD, ForceReturn}
     OffGCDasOffGCD = {
