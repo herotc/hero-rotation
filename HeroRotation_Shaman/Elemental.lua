@@ -273,7 +273,10 @@ local function Aoe()
     if Cast(S.AncestralSwiftness, Settings.CommonsOGCD.GCDasOffGCD.AncestralSwiftness) then return "ancestral_swiftness aoe 14"; end
   end
   -- ascendance,if=(talent.first_ascendant|fight_remains>200|fight_remains<80|variable.trinket_1_buffs&trinket.1.ready_cooldown|variable.trinket_2_buffs&trinket.2.ready_cooldown|equipped.neural_synapse_enhancer&cooldown.neural_synapse_enhancer.remains=0|equipped.bestinslots&cooldown.bestinslots.remains=0)&(buff.fury_of_storms.up|!talent.fury_of_the_storms)
-  if CDsON() and S.Ascendance:IsCastable() and ((S.FirstAscendant:IsAvailable() or FightRemains > 200 or FightRemains < 80 or VarTrinket1Buffs and Trinket1:CooldownUp() or VarTrinket2Buffs and Trinket2:CooldownUp() or I.NeuralSynapseEnhancer:IsEquippedAndReady() or I.BestinSlotsCaster:IsEquippedAndReady()) and (Player:BuffUp(S.FuryofStormsBuff) or not S.FuryoftheStorms:IsAvailable())) then
+  if CDsON() and S.Ascendance:IsCastable() and ((S.FirstAscendant:IsAvailable() or FightRemains > 200 or FightRemains < 80
+    or VarTrinket1Buffs and Trinket1:CooldownUp() or VarTrinket2Buffs and Trinket2:CooldownUp()
+    or I.NeuralSynapseEnhancer:IsEquippedAndReady() or I.BestinSlotsCaster:IsEquippedAndReady())
+    and ((S.FuryoftheStorms:IsAvailable() and Player:StormkeeperUp()) or not S.FuryoftheStorms:IsAvailable())) then
     if Cast(S.Ascendance, Settings.CommonsOGCD.GCDasOffGCD.Ascendance) then return "ascendance aoe 16"; end
   end
   -- tempest,target_if=min:debuff.lightning_rod.remains,if=buff.arc_discharge.stack<2&(buff.surge_of_power.up|!talent.surge_of_power)
