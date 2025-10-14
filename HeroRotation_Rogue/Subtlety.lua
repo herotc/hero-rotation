@@ -408,7 +408,7 @@ local function Build (ReturnSpellOnly, ForceStealth, BaseSpell)
         return S.ShurikenStorm
       else
         if CastPooling(S.ShurikenStorm) then
-          return "Cast ShurikenStorm"
+          return "Cast ShurikenStorm 1"
         end
       end
     end
@@ -434,7 +434,7 @@ local function Build (ReturnSpellOnly, ForceStealth, BaseSpell)
       return S.ShurikenStorm
     else
       if CastPooling(S.ShurikenStorm) then
-        return "Cast ShurikenStorm"
+        return "Cast ShurikenStorm 2"
       end
     end
   end
@@ -448,7 +448,7 @@ local function Build (ReturnSpellOnly, ForceStealth, BaseSpell)
       return S.ShurikenStorm
     else
       if CastPooling(S.ShurikenStorm) then
-        return "Cast ShurikenStorm"
+        return "Cast ShurikenStorm 3"
       end
     end
   end
@@ -462,7 +462,7 @@ local function Build (ReturnSpellOnly, ForceStealth, BaseSpell)
         return S.ShurikenStorm
       else
         if CastPooling(S.ShurikenStorm) then
-          return "Cast ShurikenStorm"
+          return "Cast ShurikenStorm 4"
         end
       end
     end
@@ -474,7 +474,7 @@ local function Build (ReturnSpellOnly, ForceStealth, BaseSpell)
       return S.Shadowstrike
     else
       if CastPooling(S.Shadowstrike, nil, not Target:IsSpellInRange(S.Shadowstrike)) then
-        return "Cast Shadowstrike"
+        return "Cast Shadowstrike 5"
       end
     end
   end
@@ -562,10 +562,12 @@ end
 local function CDs ()
   -- actions.cds=cold_blood,if=cooldown.secret_technique.up&buff.shadow_dance.up&combo_points>=6&variable.secret
   -- &(buff.flagellation_persist.up|buff.flagellation_buff.remains<=3)
-  if HR.CDsON() and S.ColdBlood:IsReady() and S.SecretTechnique:IsReady() and Player:BuffUp(S.ShadowDanceBuff)
-    and ComboPoints >= 6 and Secret and (Player:BuffUp(S.FlagellationPersistBuff) or Player:BuffRemains(S.FlagellationBuff) <= 3) then
-    if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then
-      return "Cast Cold Blood"
+  if HR.CDsON() and S.ColdBlood:IsReady() then
+    if S.SecretTechnique:IsReady() and Player:BuffUp(S.ShadowDanceBuff)
+      and ComboPoints >= 6 and Secret and (Player:BuffUp(S.FlagellationPersistBuff) or (Player:BuffUp(S.FlagellationBuff) and Player:BuffRemains(S.FlagellationBuff) <= 4)) then
+      if Cast(S.ColdBlood, Settings.CommonsOGCD.OffGCDasOffGCD.ColdBlood) then
+        return "Cast Cold Blood"
+      end
     end
   end
 
@@ -618,7 +620,7 @@ local function CDs ()
   if HR.CDsON() and S.Flagellation:IsAvailable() and S.Flagellation:IsReady()
     and (S.ShadowDance:IsReady() or Player:BuffUp(S.ShadowDanceBuff))
     and (S.SymbolsofDeath:IsReady() or Player:BuffUp(S.SymbolsofDeath))
-    and (S.ShadowBlades:IsReady() or Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:CooldownRemains() <=3) then
+    and (S.ShadowBlades:IsReady() or Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:CooldownRemains() <=4) then
     if ComboPoints >= 5
       or HL.BossFilteredFightRemains("<=", 25) then
       if Cast(S.Flagellation, nil, Settings.CommonsDS.DisplayStyle.Flagellation, not Target:IsSpellInRange(S.Flagellation)) then
@@ -695,7 +697,7 @@ local function Items()
     -- &(buff.latent_energy.stack>=8+8*(trinket.arazs_ritual_forge.cooldown.ready|!equipped.arazs_ritual_forge)
     -- |!equipped.arazs_ritual_forge&fight_remains<=90)|fight_remains<=20
     if I.UnyieldingNetherprism:IsEquippedAndReady() then
-      if Player:BuffUp(S.ShadowBlades) and (Player:BuffStack(S.LatentEnergyBuff) >= 8 + 8*num(I.ArazsRitualForge:IsReady()
+      if (Player:BuffUp(S.ShadowBlades) or S.ShadowBlades:IsReady() ) and (Player:BuffStack(S.LatentEnergyBuff) >= 8 + 8*num(I.ArazsRitualForge:IsReady()
         or not I.ArazsRitualForge:IsEquipped()) or not I.ArazsRitualForge:IsEquipped() and HL.BossFilteredFightRemains('<=', 90))
         or HL.BossFilteredFightRemains('<=', 20) then
         if Cast(I.UnyieldingNetherprism, nil, Settings.CommonsDS.DisplayStyle.Trinkets, not Target:IsItemInRange(I.UnyieldingNetherprism)) then
