@@ -329,7 +329,7 @@ local function DefaultAoE()
   end
   -- strike_of_the_windlord,if=talent.gale_force&cooldown.invoke_xuen_the_white_tiger.remains>10&set_bonus.tww3_2pc&!talent.flurry_strikes
   if S.StrikeoftheWindlord:IsReady() and (S.GaleForce:IsAvailable() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 and TWW3_2pc and not S.FlurryStrikes:IsAvailable()) then
-    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_aoe 8"; end
+    if Cast(S.StrikeoftheWindlord, Settings.Windwalker.GCDasOffGCD.StrikeOfTheWindlord, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_aoe 8"; end
   end
   -- slicing_winds,if=set_bonus.tww3_2pc&talent.celestial_conduit&variable.small_hotjs_active&!talent.flurry_strikes
   if S.SlicingWinds:IsReady() and (TWW3_2pc and S.CelestialConduit:IsAvailable() and VarSmallHotjsActive and not S.FlurryStrikes:IsAvailable()) then
@@ -345,7 +345,7 @@ local function DefaultAoE()
   end
   -- whirling_dragon_punch,target_if=max:target.time_to_die,if=buff.dance_of_chiji.stack<2
   if S.WhirlingDragonPunch:IsReady() and (Player:BuffStack(S.DanceofChijiBuff) < 2) then
-    if Everyone.CastTargetIf(S.WhirlingDragonPunch, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange) then return "whirling_dragon_punch default_aoe 16"; end
+    if Everyone.CastTargetIf(S.WhirlingDragonPunch, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange, Settings.Windwalker.GCDasOffGCD.WhirlingDragonPunch) then return "whirling_dragon_punch default_aoe 16"; end
   end
   -- tiger_palm,if=combo_strike&buff.storm_earth_and_fire.remains>2&talent.flurry_strikes&energy.time_to_max<=gcd.max*3&cooldown.fists_of_fury.remains&(!talent.xuens_battlegear|chi<6)&set_bonus.tww3_4pc
   if S.TigerPalm:IsReady() and (ComboStrike(S.TigerPalm) and Player:BuffRemains(S.StormEarthAndFireBuff) > 2 and S.FlurryStrikes:IsAvailable() and EnergyTTMCheck and S.FistsofFury:CooldownRemains() and (not S.XuensBattlegear:IsAvailable() or Chi < 6) and TWW3_4pc) then
@@ -357,7 +357,7 @@ local function DefaultAoE()
   end
   -- celestial_conduit,if=buff.storm_earth_and_fire.up&cooldown.strike_of_the_windlord.remains&(!variable.small_hotjs_active|debuff.gale_force.remains<5)&(talent.xuens_bond|!talent.xuens_bond&buff.invokers_delight.up)|fight_remains<15|fight_style.dungeonroute&buff.invokers_delight.up&cooldown.strike_of_the_windlord.remains&buff.storm_earth_and_fire.remains<8
   if S.CelestialConduit:IsReady() and (Player:BuffUp(S.StormEarthAndFireBuff) and S.StrikeoftheWindlord:CooldownDown() and (not VarSmallHotjsActive or Target:DebuffRemains(S.GaleForceDebuff) < 5) and (S.XuensBond:IsAvailable() or not S.XuensBond:IsAvailable() and Player:BuffUp(S.InvokersDelightBuff)) or BossFightRemains < 15 or DungeonSlice and Player:BuffUp(S.InvokersDelightBuff) and S.StrikeoftheWindlord:CooldownDown() and Player:BuffRemains(S.StormEarthAndFireBuff) < 8) then
-    if Cast(S.CelestialConduit, nil, nil, not Target:IsInMeleeRange(15)) then return "celestial_conduit default_aoe 22"; end
+    if Cast(S.CelestialConduit, Settings.Windwalker.GCDasOffGCD.CelestialConduit, nil, not Target:IsInMeleeRange(15)) then return "celestial_conduit default_aoe 22"; end
   end
   -- fists_of_fury,target_if=max:target.time_to_die,if=combo_strike&buff.heart_of_the_jade_serpent_cdr_celestial.up|variable.small_hotjs_active
   if S.FistsofFury:IsReady() and (ComboStrike(S.FistsofFury) and Player:BuffUp(S.HeartoftheJadeSerpentCDRCelestialBuff) or VarSmallHotjsActive) then
@@ -373,7 +373,7 @@ local function DefaultAoE()
   end
   -- whirling_dragon_punch,target_if=max:target.time_to_die,if=!talent.revolving_whirl|talent.revolving_whirl&buff.dance_of_chiji.stack<2&active_enemies>2
   if S.WhirlingDragonPunch:IsReady() and (not S.RevolvingWhirl:IsAvailable() or S.RevolvingWhirl:IsAvailable() and Player:BuffStack(S.DanceofChijiBuff) < 2 and EnemiesCount8y > 2) then
-    if Everyone.CastTargetIf(S.WhirlingDragonPunch, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange) then return "whirling_dragon_punch default_aoe 30"; end
+    if Everyone.CastTargetIf(S.WhirlingDragonPunch, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange, Settings.Windwalker.GCDasOffGCD.WhirlingDragonPunch) then return "whirling_dragon_punch default_aoe 30"; end
   end
   -- blackout_kick,if=combo_strike&buff.bok_proc.up&chi<2&talent.energy_burst&energy<55
   if S.BlackoutKick:IsReady() and (ComboStrike(S.BlackoutKick) and Player:BuffUp(S.BlackoutKickBuff) and Chi < 2 and S.EnergyBurst:IsAvailable() and Energy < 55) then
@@ -381,7 +381,7 @@ local function DefaultAoE()
   end
   -- strike_of_the_windlord,target_if=max:target.time_to_die,if=(time>5|buff.invokers_delight.up&buff.storm_earth_and_fire.up)&(cooldown.invoke_xuen_the_white_tiger.remains>15|talent.flurry_strikes)
   if S.StrikeoftheWindlord:IsReady() and ((CombatTime > 5 or Player:BuffUp(S.InvokersDelightBuff) and Player:BuffUp(S.StormEarthAndFireBuff)) and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 15 or S.FlurryStrikes:IsAvailable())) then
-    if Everyone.CastTargetIf(S.StrikeoftheWindlord, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_aoe 34"; end
+    if Everyone.CastTargetIf(S.StrikeoftheWindlord, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord), Settings.Windwalker.GCDasOffGCD.StrikeOfTheWindlord) then return "strike_of_the_windlord default_aoe 34"; end
   end
   -- slicing_winds
   if S.SlicingWinds:IsReady() then
@@ -512,7 +512,7 @@ local function DefaultCleave()
   end
   -- strike_of_the_windlord,if=talent.gale_force&cooldown.invoke_xuen_the_white_tiger.remains>10&set_bonus.tww3_2pc&!talent.flurry_strikes
   if S.StrikeoftheWindlord:IsReady() and (S.GaleForce:IsAvailable() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10 and TWW3_2pc and not S.FlurryStrikes:IsAvailable()) then
-    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_cleave 4"; end
+    if Cast(S.StrikeoftheWindlord, Settings.Windwalker.GCDasOffGCD.StrikeOfTheWindlord, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_cleave 4"; end
   end
   -- slicing_winds,if=set_bonus.tww3_2pc&talent.celestial_conduit&variable.small_hotjs_active&!talent.flurry_strikes
   if S.SlicingWinds:IsReady() and (TWW3_2pc and S.CelestialConduit:IsAvailable() and VarSmallHotjsActive and not S.FlurryStrikes:IsAvailable()) then
@@ -524,7 +524,7 @@ local function DefaultCleave()
   end
   -- whirling_dragon_punch,target_if=max:target.time_to_die,if=variable.small_hotjs_active&buff.dance_of_chiji.stack<2
   if S.WhirlingDragonPunch:IsReady() and (VarSmallHotjsActive and Player:BuffStack(S.DanceofChijiBuff) < 2) then
-    if Everyone.CastTargetIf(S.WhirlingDragonPunch, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange) then return "whirling_dragon_punch default_cleave 10"; end
+    if Everyone.CastTargetIf(S.WhirlingDragonPunch, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange, Settings.Windwalker.GCDasOffGCD.WhirlingDragonPunch) then return "whirling_dragon_punch default_cleave 10"; end
   end
   -- rising_sun_kick,target_if=max:target.time_to_die,if=buff.pressure_point.up&active_enemies<4&cooldown.fists_of_fury.remains>4
   if S.RisingSunKick:IsReady() and (Player:BuffUp(S.PressurePointBuff) and EnemiesCount8y < 4 and S.FistsofFury:CooldownRemains() > 4) then
@@ -558,7 +558,7 @@ local function DefaultCleave()
   -- whirling_dragon_punch,target_if=max:target.time_to_die,if=buff.dance_of_chiji.stack<2
   -- Note: Second line supersedes the first line.
   if S.WhirlingDragonPunch:IsReady() and (Player:BuffStack(S.DanceofChijiBuff) < 2) then
-    if Everyone.CastTargetIf(S.WhirlingDragonPunch, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange) then return "whirling_dragon_punch default_cleave 24"; end
+    if Everyone.CastTargetIf(S.WhirlingDragonPunch, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange, Settings.Windwalker.GCDasOffGCD.WhirlingDragonPunch) then return "whirling_dragon_punch default_cleave 24"; end
   end
   -- slicing_winds,if=variable.small_hotjs_active|buff.heart_of_the_jade_serpent_cdr_celestial.up
   if S.SlicingWinds:IsReady() and (VarSmallHotjsActive or Player:BuffUp(S.HeartoftheJadeSerpentCDRCelestialBuff)) then
@@ -566,7 +566,7 @@ local function DefaultCleave()
   end
   -- celestial_conduit,if=buff.storm_earth_and_fire.up&debuff.gale_force.remains<5&cooldown.strike_of_the_windlord.remains&(!buff.heart_of_the_jade_serpent_cdr.up|debuff.gale_force.remains<5)&(talent.xuens_bond|!talent.xuens_bond&buff.invokers_delight.up)|fight_remains<15|fight_style.dungeonroute&buff.invokers_delight.up&cooldown.strike_of_the_windlord.remains&buff.storm_earth_and_fire.remains<8|fight_remains<10
   if S.CelestialConduit:IsReady() and (Player:BuffUp(S.StormEarthAndFireBuff) and Target:DebuffRemains(S.GaleForceDebuff) < 5 and S.StrikeoftheWindlord:CooldownDown() and (Player:BuffDown(S.HeartoftheJadeSerpentCDRBuff) or Target:DebuffRemains(S.GaleForceDebuff) < 5) and (S.XuensBond:IsAvailable() or not S.XuensBond:IsAvailable() and Player:BuffUp(S.InvokersDelightBuff)) or BossFightRemains < 15 or DungeonSlice and Player:BuffUp(S.InvokersDelightBuff) and S.StrikeoftheWindlord:CooldownDown() and Player:BuffRemains(S.StormEarthAndFireBuff) < 8 or BossFightRemains < 10) then
-    if Cast(S.CelestialConduit, nil, nil, not Target:IsInMeleeRange(15)) then return "celestial_conduit default_cleave 28"; end
+    if Cast(S.CelestialConduit, Settings.Windwalker.GCDasOffGCD.CelestialConduit, nil, not Target:IsInMeleeRange(15)) then return "celestial_conduit default_cleave 28"; end
   end
   -- rising_sun_kick,target_if=max:target.time_to_die,if=!pet.xuen_the_white_tiger.active&prev.tiger_palm&time<5|variable.small_hotjs_active&buff.pressure_point.up&cooldown.fists_of_fury.remains&(talent.glory_of_the_dawn|active_enemies<3)
   if S.RisingSunKick:IsReady() and (not Monk.Xuen.Active and Player:PrevGCD(1, S.TigerPalm) and CombatTime < 5 or VarSmallHotjsActive and Player:BuffUp(S.PressurePointBuff) and S.FistsofFury:CooldownDown() and (S.GloryoftheDawn:IsAvailable() or EnemiesCount8y < 3)) then
@@ -578,11 +578,11 @@ local function DefaultCleave()
   end
   -- whirling_dragon_punch,target_if=max:target.time_to_die,if=buff.heart_of_the_jade_serpent_cdr_celestial.up
   if S.WhirlingDragonPunch:IsReady() and (Player:BuffUp(S.HeartoftheJadeSerpentCDRCelestialBuff)) then
-    if Everyone.CastTargetIf(S.WhirlingDragonPunch, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange) then return "whirling_dragon_punch default_cleave 34"; end
+    if Everyone.CastTargetIf(S.WhirlingDragonPunch, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange, Settings.Windwalker.GCDasOffGCD.WhirlingDragonPunch) then return "whirling_dragon_punch default_cleave 34"; end
   end
   -- strike_of_the_windlord,target_if=max:target.time_to_die,if=talent.gale_force&buff.invokers_delight.up&(buff.bloodlust.up|!buff.heart_of_the_jade_serpent_cdr_celestial.up)
   if S.StrikeoftheWindlord:IsReady() and (S.GaleForce:IsAvailable() and Player:BuffUp(S.InvokersDelightBuff) and (Player:BloodlustUp() or Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff))) then
-    if Everyone.CastTargetIf(S.StrikeoftheWindlord, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_cleave 36"; end
+    if Everyone.CastTargetIf(S.StrikeoftheWindlord, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord), Settings.Windwalker.GCDasOffGCD.StrikeOfTheWindlord) then return "strike_of_the_windlord default_cleave 36"; end
   end
   -- fists_of_fury,target_if=max:target.time_to_die,if=buff.power_infusion.up&buff.bloodlust.up
   if S.FistsofFury:IsReady() and (Player:PowerInfusionUp() and Player:BloodlustUp()) then
@@ -602,11 +602,11 @@ local function DefaultCleave()
   end
   -- whirling_dragon_punch,target_if=max:target.time_to_die,if=!talent.revolving_whirl|talent.revolving_whirl&buff.dance_of_chiji.stack<2&active_enemies>2|active_enemies<3
   if S.WhirlingDragonPunch:IsReady() and (not S.RevolvingWhirl:IsAvailable() or S.RevolvingWhirl:IsAvailable() and Player:BuffStack(S.DanceofChijiBuff) < 2 and EnemiesCount8y > 2 or EnemiesCount8y < 3) then
-    if Everyone.CastTargetIf(S.WhirlingDragonPunch, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange) then return "whirling_dragon_punch default_cleave 46"; end
+    if Everyone.CastTargetIf(S.WhirlingDragonPunch, Enemies5y, "max", EvaluateTargetIfFilterTTD, nil, not IsInMeleeRange, Settings.Windwalker.GCDasOffGCD.WhirlingDragonPunch) then return "whirling_dragon_punch default_cleave 46"; end
   end
   -- strike_of_the_windlord,if=time>5&(cooldown.invoke_xuen_the_white_tiger.remains>15|talent.flurry_strikes)&(cooldown.fists_of_fury.remains<2|cooldown.celestial_conduit.remains<10)
   if S.StrikeoftheWindlord:IsReady() and (CombatTime > 5 and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 15 or S.FlurryStrikes:IsAvailable()) and (S.FistsofFury:CooldownRemains() < 2 or S.CelestialConduit:CooldownRemains() < 10)) then
-    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_cleave 48"; end
+    if Cast(S.StrikeoftheWindlord, Settings.Windwalker.GCDasOffGCD.StrikeOfTheWindlord, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_cleave 48"; end
   end
   -- slicing_winds
   if S.SlicingWinds:IsReady() then
@@ -757,11 +757,11 @@ local function DefaultST()
   end
   -- whirling_dragon_punch,if=!buff.heart_of_the_jade_serpent_cdr_celestial.up&!buff.dance_of_chiji.stack=2&!set_bonus.tww3_2pc
   if S.WhirlingDragonPunch:IsReady() and (Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff) and Player:BuffStack(S.DanceofChijiBuff) ~= 2 and not TWW3_2pc) then
-    if Cast(S.WhirlingDragonPunch, nil, nil, not IsInMeleeRange) then return "whirling_dragon_punch default_st 16"; end
+    if Cast(S.WhirlingDragonPunch, Settings.Windwalker.GCDasOffGCD.WhirlingDragonPunch, nil, not IsInMeleeRange) then return "whirling_dragon_punch default_st 16"; end
   end
   -- celestial_conduit,if=buff.storm_earth_and_fire.up&(!buff.heart_of_the_jade_serpent_cdr.up|debuff.gale_force.remains<5)&cooldown.strike_of_the_windlord.remains&(talent.xuens_bond|!talent.xuens_bond&buff.invokers_delight.up)|fight_remains<15|fight_style.dungeonroute&buff.invokers_delight.up&cooldown.strike_of_the_windlord.remains&buff.storm_earth_and_fire.remains<8|fight_remains<10
   if S.CelestialConduit:IsReady() and (Player:BuffUp(S.StormEarthAndFireBuff) and (Player:BuffDown(S.HeartoftheJadeSerpentCDRBuff) or Target:DebuffRemains(S.GaleForceDebuff) < 5) and S.StrikeoftheWindlord:CooldownDown() and (S.XuensBond:IsAvailable() or not S.XuensBond:IsAvailable() and Player:BuffUp(S.InvokersDelightBuff)) or BossFightRemains < 15 or DungeonSlice and Player:BuffUp(S.InvokersDelightBuff) and S.StrikeoftheWindlord:CooldownDown() and Player:BuffRemains(S.StormEarthAndFireBuff) < 8 or BossFightRemains < 10) then
-    if Cast(S.CelestialConduit, nil, nil, not Target:IsInMeleeRange(15)) then return "celestial_conduit default_st 18"; end
+    if Cast(S.CelestialConduit, Settings.Windwalker.GCDasOffGCD.CelestialConduit, nil, not Target:IsInMeleeRange(15)) then return "celestial_conduit default_st 18"; end
   end
   -- tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=chi<5&combo_strike&variable.small_hotjs_active&!buff.heart_of_the_jade_serpent_cdr_celestial.up&energy.time_to_max<=gcd.max*3&!buff.invokers_delight.up&!buff.bloodlust.up&!buff.storm_earth_and_fire.up
   if S.TigerPalm:IsReady() and (Chi < 5 and ComboStrike(S.TigerPalm) and VarSmallHotjsActive and Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff) and EnergyTTMCheck and Player:BuffDown(S.InvokersDelightBuff) and not Player:BloodlustUp() and Player:BuffDown(S.StormEarthAndFireBuff)) then
@@ -790,19 +790,19 @@ local function DefaultST()
   end
   -- strike_of_the_windlord,if=!buff.heart_of_the_jade_serpent_cdr_celestial.up&talent.celestial_conduit&!buff.invokers_delight.up&!buff.heart_of_the_jade_serpent_cdr_celestial.up&cooldown.fists_of_fury.remains<5&cooldown.invoke_xuen_the_white_tiger.remains>15&(cooldown.slicing_winds.remains<23|!set_bonus.tww3_2pc)|fight_remains<12
   if S.StrikeoftheWindlord:IsReady() and (Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff) and S.CelestialConduit:IsAvailable() and Player:BuffDown(S.InvokersDelightBuff) and Player:BuffUp(S.HeartoftheJadeSerpentCDRBuff) and S.FistsofFury:CooldownRemains() < 5 and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 15 and (S.SlicingWinds:CooldownRemains() < 23 or not TWW3_2pc) or BossFightRemains < 12) then
-    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_st 32"; end
+    if Cast(S.StrikeoftheWindlord, Settings.Windwalker.GCDasOffGCD.StrikeOfTheWindlord, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_st 32"; end
   end
   -- strike_of_the_windlord,if=talent.gale_force&cooldown.invoke_xuen_the_white_tiger.remains>10
   if S.StrikeoftheWindlord:IsReady() and (S.GaleForce:IsAvailable() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10) then
-    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_st 34"; end
+    if Cast(S.StrikeoftheWindlord, Settings.Windwalker.GCDasOffGCD.StrikeOfTheWindlord, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_st 34"; end
   end
   -- strike_of_the_windlord,if=time>5&talent.flurry_strikes
   if S.StrikeoftheWindlord:IsReady() and (CombatTime > 5 and S.FlurryStrikes:IsAvailable()) then
-    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_st 36"; end
+    if Cast(S.StrikeoftheWindlord, Settings.Windwalker.GCDasOffGCD.StrikeOfTheWindlord, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_st 36"; end
   end
   -- strike_of_the_windlord,if=time>15&set_bonus.tww3_2pc&cooldown.invoke_xuen_the_white_tiger.remains>15&(cooldown.slicing_winds.remains<23|!set_bonus.tww3_2pc)
   if S.StrikeoftheWindlord:IsReady() and (CombatTime > 15 and TWW3_2pc and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 15 and (S.SlicingWinds:CooldownRemains() < 23 or not TWW3_2pc)) then
-    if Cast(S.StrikeoftheWindlord, nil, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_st 38"; end
+    if Cast(S.StrikeoftheWindlord, Settings.Windwalker.GCDasOffGCD.StrikeOfTheWindlord, nil, not Target:IsSpellInRange(S.StrikeoftheWindlord)) then return "strike_of_the_windlord default_st 38"; end
   end
   -- spinning_crane_kick,if=buff.dance_of_chiji.stack=2&combo_strike&!talent.flurry_strikes
   if S.SpinningCraneKick:IsReady() and (Player:BuffStack(S.DanceofChijiBuff) == 2 and ComboStrike(S.SpinningCraneKick) and not S.FlurryStrikes:IsAvailable()) then
@@ -818,11 +818,11 @@ local function DefaultST()
   end
   -- whirling_dragon_punch,if=set_bonus.tww3_2pc
   if S.WhirlingDragonPunch:IsReady() and (TWW3_2pc) then
-    if Cast(S.WhirlingDragonPunch, nil, nil, not IsInMeleeRange) then return "whirling_dragon_punch default_st 46"; end
+    if Cast(S.WhirlingDragonPunch, Settings.Windwalker.GCDasOffGCD.WhirlingDragonPunch, nil, not IsInMeleeRange) then return "whirling_dragon_punch default_st 46"; end
   end
   -- whirling_dragon_punch,if=!buff.heart_of_the_jade_serpent_cdr_celestial.up&!buff.dance_of_chiji.stack=2|buff.ordered_elements.up|talent.knowledge_of_the_broken_temple
   if S.WhirlingDragonPunch:IsReady() and (Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff) and Player:BuffStack(S.DanceofChijiBuff) ~= 2 or Player:BuffUp(S.OrderedElementsBuff) or S.KnowledgeoftheBrokenTemple:IsAvailable()) then
-    if Cast(S.WhirlingDragonPunch, nil, nil, not IsInMeleeRange) then return "whirling_dragon_punch default_st 48"; end
+    if Cast(S.WhirlingDragonPunch, Settings.Windwalker.GCDasOffGCD.WhirlingDragonPunch, nil, not IsInMeleeRange) then return "whirling_dragon_punch default_st 48"; end
   end
   -- crackling_jade_lightning,if=buff.the_emperors_capacitor.stack>19&!variable.small_hotjs_active&!buff.heart_of_the_jade_serpent_cdr_celestial.up&combo_strike&(!fight_style.dungeonslice|target.time_to_die>20)&cooldown.invoke_xuen_the_white_tiger.remains>15|buff.the_emperors_capacitor.stack>20&!variable.small_hotjs_active&!buff.heart_of_the_jade_serpent_cdr_celestial.up&combo_strike&(!fight_style.dungeonslice|target.time_to_die>20)&cooldown.invoke_xuen_the_white_tiger.remains<20&cooldown.invoke_xuen_the_white_tiger.remains>2|buff.the_emperors_capacitor.stack>10&fight_remains<5|buff.storm_earth_and_fire.remains<2&buff.the_emperors_capacitor.stack>15&buff.storm_earth_and_fire.up
   if S.CracklingJadeLightning:IsReady() and (Player:BuffStack(S.TheEmperorsCapacitorBuff) > 19 and not VarSmallHotjsActive and Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff) and ComboStrike(S.CracklingJadeLightning) and (not DungeonSlice or Target:TimeToDie() > 20) and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 15 or Player:BuffStack(S.TheEmperorsCapacitorBuff) > 20 and not VarSmallHotjsActive and Player:BuffDown(S.HeartoftheJadeSerpentCDRCelestialBuff) and ComboStrike(S.CracklingJadeLightning) and (not DungeonSlice or Target:TimeToDie() > 20) and S.InvokeXuenTheWhiteTiger:CooldownRemains() < 20 and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 2 or Player:BuffStack(S.TheEmperorsCapacitorBuff) > 10 and BossFightRemains < 5 or Player:BuffRemains(S.StormEarthAndFireBuff) < 2 and Player:BuffStack(S.TheEmperorsCapacitorBuff) > 15 and Player:BuffUp(S.StormEarthAndFireBuff)) then
@@ -874,7 +874,7 @@ local function DefaultST()
   end
   -- whirling_dragon_punch
   if S.WhirlingDragonPunch:IsReady() then
-    if Cast(S.WhirlingDragonPunch, nil, nil, not IsInMeleeRange) then return "whirling_dragon_punch default_st 74"; end
+    if Cast(S.WhirlingDragonPunch, Settings.Windwalker.GCDasOffGCD.WhirlingDragonPunch, nil, not IsInMeleeRange) then return "whirling_dragon_punch default_st 74"; end
   end
   -- spinning_crane_kick,if=buff.dance_of_chiji.stack=2&combo_strike
   -- Note: Duplicate from a few lines above.
