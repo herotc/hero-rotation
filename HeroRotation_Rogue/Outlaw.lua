@@ -225,6 +225,7 @@ local function RtB_Buffs ()
       print("longer: ", Cache.APLVar.RtB_Buffs.Longer)
       print("min remains: ", Cache.APLVar.RtB_Buffs.MinRemains)
       print("max remains: ", Cache.APLVar.RtB_Buffs.MaxRemains)
+      print("buff above pandemic: ", Cache.APLVar.RtB_Buffs.BuffsAbovePandemic)
     end
   end
   return Cache.APLVar.RtB_Buffs.Total
@@ -266,12 +267,49 @@ local function RtB_Reroll(ForceLoadedDice)
         -- +(buff.true_bearing.remains>39)+(buff.grand_melee.remains>39)+(buff.buried_treasure.remains>39)+(buff.skull_and_crossbones.remains>39)
       -- Added to RtB Cache, See RtB_Buffs
 
+      -- TobFon's Cook (Leans into Gambling more)
+      -- actions.roll_the_bones=variable,name=allow_rtb,value=((cooldown.killing_spree.remains>0|buff.subterfuge.remains>gcd*3|buff.vanish.up|buff.stealth.up))
+      --[[local allow_rtb = ((S.KillingSpree:CooldownRemains() > 0 or Player:BuffRemains(S.SubterfugeBuff) > 2.4
+        or Player:BuffUp(S.VanishBuff) or Player:StealthUp(true, false)))
+
+      -- actions.roll_the_bones+=/roll_the_bones,if=(talent.sleight_of_hand&rtb_buffs.will_lose<=1|rtb_buffs.will_lose<=buff.loaded_dice.up)
+      -- &(variable.buffs_above_pandemic<5|rtb_buffs.max_remains<42|!talent.sleight_of_hand)&variable.allow_rtb
+      Cache.APLVar.RtB_Reroll = (S.SleightOfHand:IsAvailable() and Cache.APLVar.RtB_Buffs.Will_Lose.Total <= 1
+        or Cache.APLVar.RtB_Buffs.Will_Lose.Total <= num(Player:BuffUp(S.LoadedDiceBuff)))
+        and (Cache.APLVar.RtB_Buffs.BuffsAbovePandemic < 5 or Cache.APLVar.RtB_Buffs.MaxRemains < 11 or not S.SleightOfHand:IsAvailable())
+        and allow_rtb
+
+      -- actions.roll_the_bones+=/roll_the_bones,if=(talent.supercharger&(talent.sleight_of_hand|buff.loaded_dice.up)
+      -- &rtb_buffs<=2&variable.allow_rtb)&((buff.broadside.up+buff.true_bearing.up<2)|cooldown.keep_it_rolling.remains>0)
+      if not Cache.APLVar.RtB_Reroll then
+        Cache.APLVar.RtB_Reroll = (S.Supercharger:IsAvailable() and (S.SleightOfHand:IsAvailable() or Player:BuffUp(S.LoadedDiceBuff))
+          and Cache.APLVar.RtB_Buffs.Total <= 2 and allow_rtb) and ((num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.TrueBearing)) < 2)
+          or S.KeepItRolling:CooldownRemains() > 0)
+      end
+
+      -- actions.roll_the_bones+=/roll_the_bones,if=talent.sleight_of_hand&rtb_buffs.max_remains<18&rtb_buffs.will_lose<=2
+      -- &talent.supercharger&rtb_buffs.normal>0&variable.allow_rtb&((buff.broadside.up+buff.true_bearing.up<2)|cooldown.keep_it_rolling.remains>0)
+      if not Cache.APLVar.RtB_Reroll then
+        Cache.APLVar.RtB_Reroll = S.SleightOfHand:IsAvailable() and Cache.APLVar.RtB_Buffs.MaxRemains < 1 and Cache.APLVar.RtB_Buffs.Will_Lose.Total <= 2
+          and S.Supercharger:IsAvailable() and Cache.APLVar.RtB_Buffs.Normal > 0 and allow_rtb
+          and ((num(Player:BuffUp(S.Broadside)) + num(Player:BuffUp(S.TrueBearing)) < 2) or S.KeepItRolling:CooldownRemains() > 0)
+      end
+
+      -- actions.roll_the_bones+=/roll_the_bones,if=rtb_buffs<=3&((buff.broadside.up+buff.true_bearing.up+buff.skull_and_crossbones.up
+      -- +buff.ruthless_precision.up<2)&(cooldown.keep_it_rolling.remains>0|buff.loaded_dice.up))
+      if not Cache.APLVar.RtB_Reroll then
+        Cache.APLVar.RtB_Reroll = Cache.APLVar.RtB_Buffs.Total <= 3 and ((num(Player:BuffUp(S.Broadside))
+          + num(Player:BuffUp(S.TrueBearing)) + num(Player:BuffUp(S.SkullandCrossbones))
+          + num(Player:BuffUp(S.RuthlessPrecision)) < 2) and (S.KeepItRolling:CooldownRemains() > 0 or Player:BuffUp(S.LoadedDiceBuff)))
+      end]]
+
+      -- APL + Seny Tweaks
       --# With TWW2, Sleight of Hand, or Supercharger: roll if you will lose 0 or 1 buffs.
       -- This includes rolling immediately after KIR. With TWW2, don't roll immediately after a natural 5 buff KIR.
       -- actions.roll_the_bones+=/roll_the_bones,if=(set_bonus.tww2_4pc|talent.sleight_of_hand|talent.supercharger)
         -- &rtb_buffs.will_lose<=1&(variable.buffs_above_pandemic<5|rtb_buffs.max_remains<42|!set_bonus.tww2_4pc)
       Cache.APLVar.RtB_Reroll = (Player:HasTier("TWW2", 4) or S.SleightOfHand:IsAvailable() or S.Supercharger:IsAvailable())
-        and Cache.APLVar.RtB_Buffs.Will_Lose.Total <= 1 and (Cache.APLVar.RtB_Buffs.BuffsAbovePandemic < 5
+        and Cache.APLVar.RtB_Buffs.Will_Lose.Total <= 1 and (Cache.APLVar.RtB_Buffs.BuffsAbovePandemic < 4
         or Cache.APLVar.RtB_Buffs.MaxRemains < 42 or not Player:HasTier("TWW2", 4))
 
       -- # With TWW2, or Supercharger with either Loaded Dice or Sleight of Hand without KIR: roll over any 2 buffs.
@@ -286,7 +324,7 @@ local function RtB_Reroll(ForceLoadedDice)
       -- # With TWW2, roll over 3-4 buffs, but KIR builds only if all buffs are under ~10 seconds remaining.
       -- actions.roll_the_bones+=/roll_the_bones,if=set_bonus.tww2_4pc&rtb_buffs.will_lose<5&(rtb_buffs.max_remains<11|!talent.keep_it_rolling)
       if not Cache.APLVar.RtB_Reroll then
-        Cache.APLVar.RtB_Reroll = Player:HasTier("TWW2", 4) and Cache.APLVar.RtB_Buffs.Will_Lose.Total < 5
+        Cache.APLVar.RtB_Reroll = Player:HasTier("TWW2", 4) and Cache.APLVar.RtB_Buffs.Will_Lose.Total < 3
         and (Cache.APLVar.RtB_Buffs.MaxRemains < 11 or not S.KeepItRolling:IsAvailable())
       end
 
@@ -426,7 +464,7 @@ local function Finish(ReturnSpellOnly)
   end
 
   -- actions.finish+=/killing_spree
-  if S.KillingSpree:IsCastable() and (Player:BuffDown(S.AdrenalineRush) or Player:BuffRemains(S.AdrenalineRush) > KSHastedDuration) then
+  if S.KillingSpree:IsCastable() and not ReturnSpellOnly and (Player:BuffDown(S.AdrenalineRush) or Player:BuffRemains(S.AdrenalineRush) > KSHastedDuration) then
     if ReturnSpellOnly then
       return S.KillingSpree
     else
@@ -770,8 +808,7 @@ local function CDs (ReturnSpellOnly)
   if CDsON() and S.AdrenalineRush:IsCastable() then
     if Player:BuffDown(S.AdrenalineRush) and (not Finish_Condition() or not S.ImprovedAdrenalineRush:IsAvailable())
     or Player:BuffUp(S.AdrenalineRush) and S.ImprovedAdrenalineRush:IsAvailable() and ComboPoints <= 2
-    and (S.Vanish:Charges() == 0 or DoubleJeopardyBuffUp or not TWW3FateboundHasTier2PC)
-    or HL.BossFilteredFightRemains("<", 2) then
+    and (S.Vanish:Charges() == 0 or DoubleJeopardyBuffUp or not TWW3FateboundHasTier2PC) then
       if S.ImprovedAdrenalineRush:IsAvailable() then
         ShouldReturn = SpellQueueMacro(S.AdrenalineRush)
         if ShouldReturn then
@@ -1018,7 +1055,7 @@ function Build (ReturnSpellOnly)
   -- actions.build+=/blade_flurry,if=talent.deft_maneuvers&combo_points.deficit=spell_targets+buff.broadside.up
   -- &spell_targets>=3-hero_tree.fatebound&talent.fan_the_hammer.rank=1
   if S.BladeFlurry:IsCastable() then
-    if S.DeftManeuvers:IsAvailable() and ComboPointsDeficit == EnemiesBFCount + num(Player:BuffUp(S.Broadside))
+    if S.DeftManeuvers:IsAvailable() and ComboPointsDeficit <= EnemiesBFCount + num(Player:BuffUp(S.Broadside))
       and EnemiesBFCount >= 3 - num(Fatebound) and S.FanTheHammer:TalentRank() == 1 then
       if ReturnSpellOnly then
         return S.BladeFlurry
