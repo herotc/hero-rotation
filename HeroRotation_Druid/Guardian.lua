@@ -56,6 +56,7 @@ local Settings = {
 local VarIFBuild = S.ThornsofIron:IsAvailable() and S.UrsocsEndurance:IsAvailable()
 local MeleeRange, AoERange
 local IsInMeleeRange, IsInAoERange
+local FPBuff
 local ActiveMitigationNeeded
 local IsTanking
 local UseMaul
@@ -184,7 +185,7 @@ local function Bear()
       if Cast(S.RavageAbilityBear, nil, nil, not IsInMeleeRange) then return "ravage bear 2"; end
     end
   -- heart_of_the_Wild,if=(talent.heart_of_the_wild.enabled&!talent.rip.enabled)|talent.heart_of_the_wild.enabled&buff.feline_potential_counter.stack=6&active_enemies<3
-  if CDsON() and S.HeartoftheWild:IsCastable() and (not S.Rip:IsAvailable() or Player:BuffStack(S.FelinePotentialBuff) == 6 and Enemies8yCount < 3) then
+  if CDsON() and S.HeartoftheWild:IsCastable() and (not S.Rip:IsAvailable() or Player:BuffStack(FPBuff) == 6 and Enemies8yCount < 3) then
     if Cast(S.HeartoftheWild, Settings.Guardian.GCDasOffGCD.HeartOfTheWild) then return "heart_of_the_wild bear 4"; end
   end
   -- thrash_bear,target_if=refreshable|(dot.thrash_bear.stack<5&talent.flashing_claws.rank=2|dot.thrash_bear.stack<4&talent.flashing_claws.rank=1|dot.thrash_bear.stack<3&!talent.flashing_claws.enabled)
@@ -200,7 +201,7 @@ local function Bear()
       if Cast(S.LunarBeam, Settings.Guardian.GCDasOffGCD.LunarBeam) then return "lunar_beam bear 8"; end
     end
   -- convoke_the_spirits,if=(talent.wildpower_surge.enabled&buff.cat_form.up&buff.feline_potential.up)|!talent.wildpower_surge.enabled
-  if CDsON() and S.ConvoketheSpirits:IsCastable() and ((S.WildpowerSurge:IsAvailable() and Player:BuffUp(S.CatForm) and Player:BuffUp(S.FelinePotentialBuff)) or not S.WildpowerSurge:IsAvailable()) then
+  if CDsON() and S.ConvoketheSpirits:IsCastable() and ((S.WildpowerSurge:IsAvailable() and Player:BuffUp(S.CatForm) and Player:BuffUp(FPBuff)) or not S.WildpowerSurge:IsAvailable()) then
     if Cast(S.ConvoketheSpirits, nil, Settings.CommonsDS.DisplayStyle.ConvokeTheSpirits) then return "convoke_the_spirits bear 10"; end
   end
   -- berserk_bear
@@ -244,23 +245,23 @@ local function Bear()
     if Cast(S.Ironfur, nil, Settings.Guardian.DisplayStyle.Defensives) then return "ironfur defensive 30"; end
   end
   -- ferocious_bite,if=(buff.cat_form.up&buff.feline_potential.up&(buff.incarnation.up|buff.berserk_bear.up)&!dot.rip.refreshable)
-  if S.FerociousBite:IsReady() and (Player:BuffUp(S.CatForm) and Player:BuffUp(S.FelinePotentialBuff) and (Player:BuffUp(S.Incarnation) or Player:BuffUp(S.Berserk)) and not Target:DebuffRefreshable(S.RipDebuff)) then
+  if S.FerociousBite:IsReady() and (Player:BuffUp(S.CatForm) and Player:BuffUp(FPBuff) and (Player:BuffUp(S.Incarnation) or Player:BuffUp(S.Berserk)) and not Target:DebuffRefreshable(S.RipDebuff)) then
     if Cast(S.FerociousBite, nil, nil, not IsInMeleeRange) then return "ferocious_bite defensive 32"; end
   end
   -- rip,if=(buff.cat_form.up&buff.feline_potential.up)
-  if S.Rip:IsReady() and (Player:BuffUp(S.CatForm) and Player:BuffUp(S.FelinePotentialBuff)) then
+  if S.Rip:IsReady() and (Player:BuffUp(S.CatForm) and Player:BuffUp(FPBuff)) then
     if Cast(S.Rip, nil, nil, not IsInMeleeRange) then return "rip defensive 34"; end
   end
   -- mangle,if=buff.gore.up&active_enemies<11|buff.incarnation_guardian_of_ursoc.up&buff.feline_potential_counter.stack<6&talent.wildpower_surge.enabled
-  if S.Mangle:IsCastable() and (Player:BuffUp(S.GoreBuff) and Enemies8yCount < 11 or Player:BuffUp(S.Incarnation) and Player:BuffStack(S.FelinePotentialBuff) < 6 and S.WildpowerSurge:IsAvailable()) then
+  if S.Mangle:IsCastable() and (Player:BuffUp(S.GoreBuff) and Enemies8yCount < 11 or Player:BuffUp(S.Incarnation) and Player:BuffStack(FPBuff) < 6 and S.WildpowerSurge:IsAvailable()) then
     if Cast(S.Mangle, nil, nil, not IsInMeleeRange) then return "mangle bear 36"; end
   end
   -- shred,if=cooldown.rage_of_the_sleeper.remains<=52&buff.feline_potential_counter.stack=6&!buff.cat_form.up&!dot.rake.refreshable&talent.fluid_form.enabled
-  if S.Shred:IsReady() and (S.RageoftheSleeper:CooldownRemains() <= 52 and Player:BuffStack(S.FelinePotentialBuff) == 6 and Player:BuffDown(S.CatForm) and not Target:DebuffRefreshable(S.RakeDebuff) and S.FluidForm:IsAvailable()) then
+  if S.Shred:IsReady() and (S.RageoftheSleeper:CooldownRemains() <= 52 and Player:BuffStack(FPBuff) == 6 and Player:BuffDown(S.CatForm) and not Target:DebuffRefreshable(S.RakeDebuff) and S.FluidForm:IsAvailable()) then
     if Cast(S.Shred, nil, nil, not IsInMeleeRange) then return "shred bear 38"; end
   end
   -- rake,if=cooldown.rage_of_the_sleeper.remains<=52&buff.feline_potential_counter.stack=6&!buff.cat_form.up&talent.fluid_form.enabled
-  if S.Rake:IsReady() and (S.RageoftheSleeper:CooldownRemains() <= 52 and Player:BuffStack(S.FelinePotentialBuff) == 6 and Player:BuffDown(S.CatForm) and S.FluidForm:IsAvailable()) then
+  if S.Rake:IsReady() and (S.RageoftheSleeper:CooldownRemains() <= 52 and Player:BuffStack(FPBuff) == 6 and Player:BuffDown(S.CatForm) and S.FluidForm:IsAvailable()) then
     if Cast(S.Rake, nil, nil, not IsInMeleeRange) then return "rake bear 40"; end
   end
   -- mangle,if=buff.cat_form.up&talent.fluid_form.enabled
@@ -357,6 +358,9 @@ local function APL()
 
     IsInMeleeRange = Target:IsInRange(5)
     IsInAoERange = Target:IsInRange(8)
+
+    -- Add switch for Feline Potential buff
+    FPBuff = Player:BuffUp(S.CatForm) and S.FelinePotentialCatBuff or S.FelinePotentialBearBuff
   end
 
   if Everyone.TargetIsValid() then
