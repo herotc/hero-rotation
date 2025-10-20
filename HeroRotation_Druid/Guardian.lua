@@ -200,7 +200,7 @@ local function Bear()
       if Cast(S.LunarBeam, Settings.Guardian.GCDasOffGCD.LunarBeam) then return "lunar_beam bear 8"; end
     end
   -- convoke_the_spirits,if=(talent.wildpower_surge.enabled&buff.cat_form.up&buff.feline_potential.up)|!talent.wildpower_surge.enabled
-  if CDsON() and S.ConvoketheSpirits:IsCastable() and ((S.WildpowerSurge:IsAvailable() and Player:BuffUp(S.CatForm) and Player:BuffUp(S.FelinePotentialBuff)) or not S.WildpowerSurge:IsAvailable()) then
+  if CDsON() and S.ConvoketheSpirits:IsCastable() and ((S.WildpowerSurge:IsAvailable() and Player:BuffUp(S.CatForm) and Player:BuffUp(S.AllFelinePotentialBuff)) or not S.WildpowerSurge:IsAvailable()) then
     if Cast(S.ConvoketheSpirits, nil, Settings.CommonsDS.DisplayStyle.ConvokeTheSpirits) then return "convoke_the_spirits bear 10"; end
   end
   -- berserk_bear
@@ -244,12 +244,12 @@ local function Bear()
     if Cast(S.Ironfur, nil, Settings.Guardian.DisplayStyle.Defensives) then return "ironfur defensive 30"; end
   end
   -- ferocious_bite,if=(buff.cat_form.up&buff.feline_potential.up&(buff.incarnation.up|buff.berserk_bear.up)&!dot.rip.refreshable)
-  if S.FerociousBite:IsReady() and (Player:BuffUp(S.CatForm) and Player:BuffUp(S.FelinePotentialBuff) and (Player:BuffUp(S.Incarnation) or Player:BuffUp(S.Berserk)) and not Target:DebuffRefreshable(S.RipDebuff)) then
-    if Cast(S.FerociousBite, nil, nil, not IsInMeleeRange) then return "ferocious_bite defensive 32"; end
+  if S.FerociousBite:IsReady() and (Player:BuffUp(S.CatForm) and Player:BuffUp(S.AllFelinePotentialBuff) and (Player:BuffUp(S.Incarnation) or Player:BuffUp(S.Berserk)) and not Target:DebuffRefreshable(S.RipDebuff)) then
+    if Cast(S.FerociousBite, nil, nil, not IsInMeleeRange) then return "ferocious_bite bear 32"; end
   end
   -- rip,if=(buff.cat_form.up&buff.feline_potential.up)
-  if S.Rip:IsReady() and (Player:BuffUp(S.CatForm) and Player:BuffUp(S.FelinePotentialBuff)) then
-    if Cast(S.Rip, nil, nil, not IsInMeleeRange) then return "rip defensive 34"; end
+  if S.Rip:IsReady() and (Player:BuffUp(S.CatForm) and Player:BuffUp(S.AllFelinePotentialBuff)) then
+    if Cast(S.Rip, nil, nil, not IsInMeleeRange) then return "rip bear 34"; end
   end
   -- mangle,if=buff.gore.up&active_enemies<11|buff.incarnation_guardian_of_ursoc.up&buff.feline_potential_counter.stack<6&talent.wildpower_surge.enabled
   if S.Mangle:IsCastable() and (Player:BuffUp(S.GoreBuff) and Enemies8yCount < 11 or Player:BuffUp(S.Incarnation) and Player:BuffStack(S.FelinePotentialBuff) < 6 and S.WildpowerSurge:IsAvailable()) then
