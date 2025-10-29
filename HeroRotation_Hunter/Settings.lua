@@ -55,6 +55,7 @@ HR.GUISettings.APL.Hunter = {
     }
   },
   BeastMastery = {
+    BypassWitheringFireChecks = false,
     PotionType = {
       Selected = "Tempered",
     },
@@ -120,6 +121,7 @@ CreateARPanelOptions(CP_HunterDS, "APL.Hunter.CommonsDS")
 CreateARPanelOptions(CP_HunterOGCD, "APL.Hunter.CommonsOGCD")
 
 -- Beast Mastery
+CreatePanelOption("CheckButton", CP_BeastMastery, "APL.Hunter.BeastMastery.BypassWitheringFireChecks", "Bypass Withering Fire Checks", "Bypass Withering Fire timings when using some abilities.")
 CreateARPanelOptions(CP_BeastMastery, "APL.Hunter.BeastMastery")
 
 -- Marksmanship
