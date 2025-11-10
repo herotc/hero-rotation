@@ -99,6 +99,7 @@ HR.GUISettings.APL.Monk = {
       CracklingJadeLightning = false,
       FortifyingBrew = true,
       InvokeXuenTheWhiteTiger = true,
+      SlicingWinds = false,
       StormEarthAndFireFixate = false,
       StrikeOfTheWindlord = false,
       TouchOfDeath = true,

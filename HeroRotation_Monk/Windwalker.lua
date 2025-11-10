@@ -333,7 +333,7 @@ local function DefaultAoE()
   end
   -- slicing_winds,if=set_bonus.tww3_2pc&talent.celestial_conduit&variable.small_hotjs_active&!talent.flurry_strikes
   if S.SlicingWinds:IsReady() and (TWW3_2pc and S.CelestialConduit:IsAvailable() and VarSmallHotjsActive and not S.FlurryStrikes:IsAvailable()) then
-    if Cast(S.SlicingWinds, nil, nil, not Target:IsInRange(40)) then return "slicing_winds default_aoe 10"; end
+    if Cast(S.SlicingWinds, Settings.Windwalker.GCDasOffGCD.SlicingWinds, nil, not Target:IsInRange(40)) then return "slicing_winds default_aoe 10"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=buff.dance_of_chiji.stack=2&combo_strike
   if S.SpinningCraneKick:IsReady() and (Player:BuffStack(S.DanceofChijiBuff) == 2 and ComboStrike(S.SpinningCraneKick)) then
@@ -353,7 +353,7 @@ local function DefaultAoE()
   end
   -- slicing_winds,if=variable.small_hotjs_active|buff.heart_of_the_jade_serpent_cdr_celestial.up
   if S.SlicingWinds:IsReady() and (VarSmallHotjsActive or Player:BuffUp(S.HeartoftheJadeSerpentCDRCelestialBuff)) then
-    if Cast(S.SlicingWinds, nil, nil, not Target:IsInRange(40)) then return "slicing_winds default_aoe 20"; end
+    if Cast(S.SlicingWinds, Settings.Windwalker.GCDasOffGCD.SlicingWinds, nil, not Target:IsInRange(40)) then return "slicing_winds default_aoe 20"; end
   end
   -- celestial_conduit,if=buff.storm_earth_and_fire.up&cooldown.strike_of_the_windlord.remains&(!variable.small_hotjs_active|debuff.gale_force.remains<5)&(talent.xuens_bond|!talent.xuens_bond&buff.invokers_delight.up)|fight_remains<15|fight_style.dungeonroute&buff.invokers_delight.up&cooldown.strike_of_the_windlord.remains&buff.storm_earth_and_fire.remains<8
   if S.CelestialConduit:IsReady() and (Player:BuffUp(S.StormEarthAndFireBuff) and S.StrikeoftheWindlord:CooldownDown() and (not VarSmallHotjsActive or Target:DebuffRemains(S.GaleForceDebuff) < 5) and (S.XuensBond:IsAvailable() or not S.XuensBond:IsAvailable() and Player:BuffUp(S.InvokersDelightBuff)) or BossFightRemains < 15 or DungeonSlice and Player:BuffUp(S.InvokersDelightBuff) and S.StrikeoftheWindlord:CooldownDown() and Player:BuffRemains(S.StormEarthAndFireBuff) < 8) then
@@ -385,7 +385,7 @@ local function DefaultAoE()
   end
   -- slicing_winds
   if S.SlicingWinds:IsReady() then
-    if Cast(S.SlicingWinds, nil, nil, not Target:IsInRange(40)) then return "slicing_winds default_aoe 36"; end
+    if Cast(S.SlicingWinds, Settings.Windwalker.GCDasOffGCD.SlicingWinds, nil, not Target:IsInRange(40)) then return "slicing_winds default_aoe 36"; end
   end
   -- blackout_kick,if=buff.teachings_of_the_monastery.stack=8&talent.shadowboxing_treads
   if S.BlackoutKick:IsReady() and (Player:BuffStack(S.TeachingsoftheMonasteryBuff) == 8 and S.ShadowboxingTreads:IsAvailable()) then
@@ -393,7 +393,7 @@ local function DefaultAoE()
   end
   -- crackling_jade_lightning,target_if=max:target.time_to_die,if=buff.the_emperors_capacitor.stack>19&combo_strike&talent.power_of_the_thunder_king&cooldown.invoke_xuen_the_white_tiger.remains>10
   if S.CracklingJadeLightning:IsReady() and (Player:BuffStack(S.TheEmperorsCapacitorBuff) > 19 and ComboStrike(S.CracklingJadeLightning) and S.PoweroftheThunderKing:IsAvailable() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10) then
-    if Everyone.CastTargetIf(S.CracklingJadeLightning, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.CracklingJadeLightning)) then return "crackling_jade_lightning default_aoe 40"; end
+    if Everyone.CastTargetIf(S.CracklingJadeLightning, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.CracklingJadeLightning), Settings.Windwalker.GCDasOffGCD.CracklingJadeLightning) then return "crackling_jade_lightning default_aoe 40"; end
   end
   -- fists_of_fury,target_if=max:target.time_to_die,if=(talent.flurry_strikes|talent.xuens_battlegear&(cooldown.invoke_xuen_the_white_tiger.remains>5&fight_style.patchwerk|cooldown.invoke_xuen_the_white_tiger.remains>9)|cooldown.invoke_xuen_the_white_tiger.remains>10)
   if S.FistsofFury:IsReady() and (S.FlurryStrikes:IsAvailable() or S.XuensBattlegear:IsAvailable() and (S.InvokeXuenTheWhiteTiger:CooldownRemains() > 5 and not DungeonSlice or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 9) or S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10) then
@@ -516,7 +516,7 @@ local function DefaultCleave()
   end
   -- slicing_winds,if=set_bonus.tww3_2pc&talent.celestial_conduit&variable.small_hotjs_active&!talent.flurry_strikes
   if S.SlicingWinds:IsReady() and (TWW3_2pc and S.CelestialConduit:IsAvailable() and VarSmallHotjsActive and not S.FlurryStrikes:IsAvailable()) then
-    if Cast(S.SlicingWinds, nil, nil, not Target:IsInRange(40)) then return "slicing_winds default_cleave 6"; end
+    if Cast(S.SlicingWinds, Settings.Windwalker.GCDasOffGCD.SlicingWinds, nil, not Target:IsInRange(40)) then return "slicing_winds default_cleave 6"; end
   end
   -- spinning_crane_kick,if=buff.dance_of_chiji.stack=2&combo_strike
   if S.SpinningCraneKick:IsReady() and (Player:BuffStack(S.DanceofChijiBuff) == 2 and ComboStrike(S.SpinningCraneKick)) then
@@ -562,7 +562,7 @@ local function DefaultCleave()
   end
   -- slicing_winds,if=variable.small_hotjs_active|buff.heart_of_the_jade_serpent_cdr_celestial.up
   if S.SlicingWinds:IsReady() and (VarSmallHotjsActive or Player:BuffUp(S.HeartoftheJadeSerpentCDRCelestialBuff)) then
-    if Cast(S.SlicingWinds, nil, nil, not Target:IsInRange(40)) then return "slicing_winds default_cleave 26"; end
+    if Cast(S.SlicingWinds, Settings.Windwalker.GCDasOffGCD.SlicingWinds, nil, not Target:IsInRange(40)) then return "slicing_winds default_cleave 26"; end
   end
   -- celestial_conduit,if=buff.storm_earth_and_fire.up&debuff.gale_force.remains<5&cooldown.strike_of_the_windlord.remains&(!buff.heart_of_the_jade_serpent_cdr.up|debuff.gale_force.remains<5)&(talent.xuens_bond|!talent.xuens_bond&buff.invokers_delight.up)|fight_remains<15|fight_style.dungeonroute&buff.invokers_delight.up&cooldown.strike_of_the_windlord.remains&buff.storm_earth_and_fire.remains<8|fight_remains<10
   if S.CelestialConduit:IsReady() and (Player:BuffUp(S.StormEarthAndFireBuff) and Target:DebuffRemains(S.GaleForceDebuff) < 5 and S.StrikeoftheWindlord:CooldownDown() and (Player:BuffDown(S.HeartoftheJadeSerpentCDRBuff) or Target:DebuffRemains(S.GaleForceDebuff) < 5) and (S.XuensBond:IsAvailable() or not S.XuensBond:IsAvailable() and Player:BuffUp(S.InvokersDelightBuff)) or BossFightRemains < 15 or DungeonSlice and Player:BuffUp(S.InvokersDelightBuff) and S.StrikeoftheWindlord:CooldownDown() and Player:BuffRemains(S.StormEarthAndFireBuff) < 8 or BossFightRemains < 10) then
@@ -610,11 +610,11 @@ local function DefaultCleave()
   end
   -- slicing_winds
   if S.SlicingWinds:IsReady() then
-    if Cast(S.SlicingWinds, nil, nil, not Target:IsInRange(40)) then return "slicing_winds default_cleave 50"; end
+    if Cast(S.SlicingWinds, Settings.Windwalker.GCDasOffGCD.SlicingWinds, nil, not Target:IsInRange(40)) then return "slicing_winds default_cleave 50"; end
   end
   -- crackling_jade_lightning,target_if=max:target.time_to_die,if=buff.the_emperors_capacitor.stack>19&combo_strike&talent.power_of_the_thunder_king&cooldown.invoke_xuen_the_white_tiger.remains>10
   if S.CracklingJadeLightning:IsReady() and (Player:BuffStack(S.TheEmperorsCapacitorBuff) > 19 and ComboStrike(S.CracklingJadeLightning) and S.PoweroftheThunderKing:IsAvailable() and S.InvokeXuenTheWhiteTiger:CooldownRemains() > 10) then
-    if Everyone.CastTargetIf(S.CracklingJadeLightning, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.CracklingJadeLightning)) then return "crackling_jade_lightning default_cleave 52"; end
+    if Everyone.CastTargetIf(S.CracklingJadeLightning, Enemies8y, "max", EvaluateTargetIfFilterTTD, nil, not Target:IsSpellInRange(S.CracklingJadeLightning), Settings.Windwalker.GCDasOffGCD.CracklingJadeLightning) then return "crackling_jade_lightning default_cleave 52"; end
   end
   -- spinning_crane_kick,target_if=max:target.time_to_die,if=combo_strike&buff.dance_of_chiji.stack=2
   if S.SpinningCraneKick:IsReady() and (ComboStrike(S.SpinningCraneKick) and Player:BuffStack(S.DanceofChijiBuff) == 2) then
@@ -733,7 +733,7 @@ local function DefaultST()
   end
   -- slicing_winds,if=set_bonus.tww3_2pc&talent.celestial_conduit&variable.small_hotjs_active
   if S.SlicingWinds:IsReady() and (TWW3_2pc and S.CelestialConduit:IsAvailable() and VarSmallHotjsActive) then
-    if Cast(S.SlicingWinds, nil, nil, not Target:IsInRange(40)) then return "slicing_winds default_st 4"; end
+    if Cast(S.SlicingWinds, Settings.Windwalker.GCDasOffGCD.SlicingWinds, nil, not Target:IsInRange(40)) then return "slicing_winds default_st 4"; end
   end
   -- tiger_palm,if=combo_strike&!cooldown.celestial_conduit.remains&buff.pressure_point.up&chi<5&time<10
   if S.TigerPalm:IsReady() and (ComboStrike(S.TigerPalm) and S.CelestialConduit:CooldownUp() and Player:BuffUp(S.PressurePointBuff) and Chi < 5 and CombatTime < 10) then
@@ -830,7 +830,7 @@ local function DefaultST()
   end
   -- slicing_winds,if=target.time_to_die>10&!set_bonus.tww3_4pc|talent.flurry_strikes
   if S.SlicingWinds:IsReady() and (Target:TimeToDie() > 10 and not TWW3_4pc or S.FlurryStrikes:IsAvailable()) then
-    if Cast(S.SlicingWinds, nil, nil, not Target:IsInRange(40)) then return "slicing_winds default_st 52"; end
+    if Cast(S.SlicingWinds, Settings.Windwalker.GCDasOffGCD.SlicingWinds, nil, not Target:IsInRange(40)) then return "slicing_winds default_st 52"; end
   end
   -- rising_sun_kick,if=combo_strike&(chi>4|chi>2&energy>50|cooldown.fists_of_fury.remains>2)
   if S.RisingSunKick:IsReady() and (ComboStrike(S.RisingSunKick) and (Chi > 4 or Chi > 2 and Energy > 50 or S.FistsofFury:CooldownRemains() > 2)) then
