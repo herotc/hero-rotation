@@ -69,6 +69,7 @@ HR.GUISettings.APL.DeathKnight = {
       DancingRuneWeapon = false,
       DeathStrike = false,
       IceboundFortitude = false,
+      ReapersMark = false,
       Tombstone = false,
       VampiricBlood = false,
     },

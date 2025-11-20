@@ -235,7 +235,7 @@ local function Deathbringer()
   end
   -- reapers_mark
   if S.ReapersMark:IsReady() then
-    if Cast(S.ReapersMark, nil, nil, not TargetInMeleeRange) then return "reapers_mark deathbringer 8"; end
+    if Cast(S.ReapersMark, Settings.Blood.GCDasOffGCD.ReapersMark, nil, not TargetInMeleeRange) then return "reapers_mark deathbringer 8"; end
   end
   -- blood_boil,if=buff.dancing_rune_weapon.up&!drw.bp_ticking
   if S.BloodBoil:IsCastable() and (Player:BuffUp(S.DancingRuneWeaponBuff) and not Player:DRWBPTicking()) then
